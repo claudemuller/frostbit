@@ -5,7 +5,8 @@ ASANFLAGS=-fsanitize=address -fno-common -fno-omit-frame-pointer
 INCS=-I./libs/
 LIBS=
 LFLAGS=-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
-SRC=./src/*.c
+SRC=./src/*.c \
+	./src/systems/*.c
 BIN=gameengine
 
 # Mac Stuff

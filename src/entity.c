@@ -25,46 +25,22 @@ add_component_rigidbody(entity_t *entity, vec2_t vel)
 }
 
 void
+add_component_boxcollider(entity_t *entity, vec2_t bounds)
+{
+	entity->components.boxcollider = malloc(sizeof(component_boxcollider_t));
+	if (entity->components.boxcollider == NULL)
+		SDL_Log("failed to add boxcollider component to entity");
+
+	entity->components.boxcollider->bounds.x = bounds.x;
+	entity->components.boxcollider->bounds.y = bounds.y;
+}
+
+void
 free_entity(entity_t *entity)
 {
 	if (entity->components.transform) free(entity->components.transform);
-	if (entity->components.transform) free(entity->components.rigidbody);
-	// TODO: fix leaks
-	// free(entity);
+	if (entity->components.rigidbody) free(entity->components.rigidbody);
+	if (entity->components.boxcollider) free(entity->components.boxcollider);
+	free(entity);
 }
 
-int
-update_transform_system(entity_t *entities, size_t num_entities, double dt)
-{
-	for (size_t i = 0; i < num_entities; i++) {
-		if (!entities[i].components.transform)
-			return 1;
-		if (!entities[i].components.rigidbody)
-			return 1;
-
-		entities[i].components.transform->x += entities[i].components.rigidbody->velocity.x * dt;
-		entities[i].components.transform->y += entities[i].components.rigidbody->velocity.y * dt;
-	}
-
-	return 0;
-}
-
-int
-update_render_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities)
-{
-	for (size_t i = 0; i < num_entities; i++) {
-		if (!entities[i].components.transform)
-			return 1;
-
-		SDL_Rect dst = {
-			.x = entities[i].components.transform->x,
-			.y = entities[i].components.transform->y,
-			.w = entities[i].components.transform->w,
-			.h = entities[i].components.transform->h,
-		};
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(renderer, &dst);
-	}
-
-	return 0;
-}

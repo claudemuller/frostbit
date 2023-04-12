@@ -1,5 +1,7 @@
 #include "state.h"
-#include <string.h>
+#include "systems/movement_system.h"
+#include "systems/collision_system.h"
+#include "systems/render_system.h"
 
 const size_t ENTS_LEN = 3;
 
@@ -35,7 +37,8 @@ state_render(state_t *self, SDL_Renderer *renderer)
 void
 state_update(state_t *self, double dt)
 {
-	update_transform_system(self->ents, self->num_entites, dt);
+	update_movement_system(self->ents, self->num_entites, dt);
+	update_collision_system(self->ents, self->num_entites);
 }
 
 void

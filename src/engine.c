@@ -35,12 +35,14 @@ engine_setup(engine_t *engine)
 	entity_t entity1;
 	entity1.id = 1;
 	add_component_transform(&entity1, 10, 10, 30, 30);
+	add_component_boxcollider(&entity1, (vec2_t){30, 30});
 	add_component_rigidbody(&entity1, (vec2_t){10, 10});
 	entities[0] = entity1;
 
 	entity_t entity2;
 	entity2.id = 2;
 	add_component_transform(&entity2, 100, 100, 40, 30);
+	add_component_boxcollider(&entity2, (vec2_t){40, 30});
 	add_component_rigidbody(&entity2, (vec2_t){-10, -10});
 	entities[1] = entity2;
 
