@@ -41,8 +41,9 @@ state_update(state_t *self, double dt)
 void
 state_destroy(state_t *self)
 {
-	for (size_t i = 0; i < self->num_entites; i++)
+	for (size_t i = 0; i < self->num_entites; i++) {
 		free_entity(&self->ents[i]);
+	}
 	free(self->ents);
 	free(self);
 }

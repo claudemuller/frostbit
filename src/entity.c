@@ -7,7 +7,6 @@ add_component_transform(entity_t *entity, float x, float y, int w, int h)
 	if (entity->components.transform == NULL)
 		SDL_Log("failed to add transform component to entity");
 
-	printf("entity %d gets transform [%d:%d %d:%d]\n", entity->id, x, y, w, h);
 	entity->components.transform->x = x;
 	entity->components.transform->y = y;
 	entity->components.transform->w = w;
@@ -29,7 +28,9 @@ void
 free_entity(entity_t *entity)
 {
 	if (entity->components.transform) free(entity->components.transform);
-	if (entity->components.rigidbody) free(entity->components.rigidbody);
+	if (entity->components.transform) free(entity->components.rigidbody);
+	// TODO: fix leaks
+	// free(entity);
 }
 
 int
