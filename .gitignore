@@ -1,0 +1,5 @@
+gameengine*
+memcheck*
+debug
+compile_commands.json
+.cache
