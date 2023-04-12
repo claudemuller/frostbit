@@ -35,6 +35,23 @@ add_component_boxcollider(entity_t *entity, vec2_t bounds)
 	entity->components.boxcollider->bounds.y = bounds.y;
 }
 
+void add_component_sprite(entity_t *entity, char *asset_id)
+{
+	entity->components.sprite = malloc(sizeof(component_sprite_t));
+	if (entity->components.sprite == NULL)
+		SDL_Log("failed to add bspritecomponent to entity");
+
+	entity->components.sprite->id = asset_id;
+	entity->components.sprite->width = 32;
+	entity->components.sprite->height = 32;
+	entity->components.sprite->srcRect = (SDL_Rect){
+		.x = 0,
+		.y = 0,
+		.w = 32,
+		.h = 32
+	};
+}
+
 void
 free_entity(entity_t *entity)
 {

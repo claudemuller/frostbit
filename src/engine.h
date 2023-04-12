@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "graphics.h"
 #include "state_manager.h"
+#include "asset_store.h"
 
 extern const int FPS;
 extern const int MILLISECS_PER_FRAME;
@@ -19,6 +20,7 @@ typedef struct {
 	int millisecs_previous_frame;
 	graphics_t graphics;
 	state_manager_t state_manager;
+	asset_store_t asset_store;
 } engine_t;
 
 unsigned int init_state1(void);

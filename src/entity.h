@@ -7,11 +7,13 @@
 #include "components/transform_component.h"
 #include "components/rigidbody_component.h"
 #include "components/boxcollider_component.h"
+#include "components/sprite_component.h"
 
 typedef struct {
 	component_transform_t *transform;
 	component_rigidbody_t *rigidbody;
 	component_boxcollider_t *boxcollider;
+	component_sprite_t *sprite;
 } components_t;
 
 typedef struct {
@@ -22,6 +24,7 @@ typedef struct {
 void add_component_transform(entity_t *entity, float x, float y, int w, int h);
 void add_component_rigidbody(entity_t *entity, vec2_t vel);
 void add_component_boxcollider(entity_t *entity, vec2_t bounds);
+void add_component_sprite(entity_t *entity, char *asset_id);
 void free_entity(entity_t *entity);
 
 #endif // ENTITY_H

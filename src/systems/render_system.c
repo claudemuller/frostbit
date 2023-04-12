@@ -1,20 +1,36 @@
+#include <SDL2/SDL_image.h>
 #include "render_system.h"
+#include "../components/transform_component.h"
 
 int
-update_render_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities)
+update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, entity_t *entities, size_t num_entities)
 {
 	for (size_t i = 0; i < num_entities; i++) {
 		if (!entities[i].components.transform)
 			return 1;
+		if (!entities[i].components.sprite)
+			return 1;
 
-		SDL_Rect dst = {
-			.x = entities[i].components.transform->x,
-			.y = entities[i].components.transform->y,
-			.w = entities[i].components.transform->w,
-			.h = entities[i].components.transform->h,
+		component_transform_t *transform = entities[i].components.transform;
+		component_sprite_t *sprite = entities[i].components.sprite;
+
+		SDL_Rect srcRect = sprite->srcRect;
+		SDL_Rect dstRect = {
+			transform->x,
+			transform->y,
+			transform->w,
+			transform->h
 		};
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(renderer, &dst);
+
+		SDL_RenderCopyEx(
+				renderer,
+				asset_store_get_texture(asset_store, sprite->id),
+				&srcRect,
+				&dstRect,
+				0,
+				NULL,
+				0
+		);
 	}
 
 	return 0;

@@ -29,9 +29,9 @@ state_init(struct state_t *self)
 }
 
 void
-state_render(state_t *self, SDL_Renderer *renderer)
+state_render(state_t *self, SDL_Renderer *renderer, asset_store_t *asset_store)
 {
-	update_render_system(renderer, self->ents, self->num_entites);
+	update_render_system(renderer, asset_store, self->ents, self->num_entites);
 }
 
 void

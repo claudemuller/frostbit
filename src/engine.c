@@ -1,3 +1,4 @@
+#include <SDL2/SDL_image.h>
 #include "engine.h"
 #include "vector.h"
 
@@ -22,6 +23,7 @@ engine_init(engine_t *engine, struct engine_options *options)
 		return false;
 
 	state_manager_init(&engine->state_manager);
+	asset_store_init(&engine->asset_store);
 
 	engine->running = true;
 	return true;
@@ -30,6 +32,8 @@ engine_init(engine_t *engine, struct engine_options *options)
 void
 engine_setup(engine_t *engine)
 {
+	asset_store_add_texture(&engine->asset_store, engine->graphics.renderer, "tank", "./assets/tank.png");
+
 	entity_t *entities = malloc(sizeof(entity_t)*2);
 
 	entity_t entity1;
@@ -37,6 +41,7 @@ engine_setup(engine_t *engine)
 	add_component_transform(&entity1, 10, 10, 30, 30);
 	add_component_boxcollider(&entity1, (vec2_t){30, 30});
 	add_component_rigidbody(&entity1, (vec2_t){10, 10});
+	add_component_sprite(&entity1, "tank");
 	entities[0] = entity1;
 
 	entity_t entity2;
@@ -44,6 +49,7 @@ engine_setup(engine_t *engine)
 	add_component_transform(&entity2, 100, 100, 40, 30);
 	add_component_boxcollider(&entity2, (vec2_t){40, 30});
 	add_component_rigidbody(&entity2, (vec2_t){-10, -10});
+	add_component_sprite(&entity2, "tank");
 	entities[1] = entity2;
 
 	state_t *state1 = state_new(entities, 2);
@@ -97,7 +103,7 @@ engine_render(engine_t *engine)
 	SDL_SetRenderDrawColor(engine->graphics.renderer, 21, 21, 21, 255);
     SDL_RenderClear(engine->graphics.renderer);
 
-	state_manager_render(&engine->state_manager, engine->graphics.renderer);
+	state_manager_render(&engine->state_manager, engine->graphics.renderer, &engine->asset_store);
 
     SDL_RenderPresent(engine->graphics.renderer);
 }
@@ -106,6 +112,7 @@ int
 engine_clean(engine_t *engine)
 {
 	state_manager_free(&engine->state_manager);
+	asset_store_free(&engine->asset_store);
 	graphics_free(&engine->graphics);
 	SDL_Quit();
 	return 0;

@@ -70,11 +70,11 @@ state_manager_update(state_manager_t *stateman, double dt)
 }
 
 int
-state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer)
+state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer, asset_store_t *asset_store)
 {
 	state_t *cur_state = state_manager_top(stateman);
 	if (cur_state != NULL && cur_state->render != NULL)
-		cur_state->render(cur_state, renderer);
+		cur_state->render(cur_state, renderer, asset_store);
 
 	// TODO: fix this hard-coded/always val
 	return 0;
