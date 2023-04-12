@@ -29,7 +29,7 @@ state_manager_push(state_manager_t *stateman, state_t *state)
 	stateman->stack[stateman->top] = state;
 
 	if (state->init != NULL)
-		state->init();
+		state->init(state);
 
 	return stateman->top;
 }
@@ -42,7 +42,7 @@ state_manager_pop(state_manager_t *stateman)
 
 	state_t *top = state_manager_top(stateman);
 	if (top != NULL && top->destroy != NULL)
-		top->destroy();
+		top->destroy(top);
 
 	stateman->stack[stateman->top] = NULL;
 	stateman->top--;
@@ -61,19 +61,22 @@ state_manager_top(state_manager_t *stateman)
 int
 state_manager_update(state_manager_t *stateman, double dt)
 {
-	state_t *state = state_manager_top(stateman);
-	if (state != NULL && state->update != NULL)
-		return state->update(dt);
-	return 1;
+	state_t *cur_state = state_manager_top(stateman);
+	if (cur_state != NULL && cur_state->update != NULL)
+		cur_state->update(cur_state, dt);
+
+	// TODO: fix this hard-coded/always val
+	return 0;
 }
 
 int
-state_manager_render(state_manager_t *stateman, double dt)
+state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer)
 {
-	// state_t *state = state_manager_top(stateman);
-	// if (state != NULL && state->draw != NULL)
-	// 	return state->draw(dt);
-	// return 1;
+	state_t *cur_state = state_manager_top(stateman);
+	if (cur_state != NULL && cur_state->render != NULL)
+		cur_state->render(cur_state, renderer);
+
+	// TODO: fix this hard-coded/always val
 	return 0;
 }
 

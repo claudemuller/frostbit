@@ -3,14 +3,20 @@
 
 #include "entity.h"
 
-typedef unsigned int (*fn)(void);
-typedef unsigned int (*fn_fl)(float);
+typedef struct state_t {
+	entity_t *ents;
+	size_t num_entites;
 
-typedef struct {
-	fn init;
-	fn_fl update;
-	fn_fl draw;
-	fn destroy;
+	void (*init)(struct state_t *self);
+	void (*update)(struct state_t *self, double dt);
+	void (*render)(struct state_t *self, SDL_Renderer *renderer);
+	void (*destroy)(struct state_t *self);
 } state_t;
+
+state_t* state_new(entity_t *entities, size_t num_entites);
+void state_init(struct state_t *self);
+void state_render(struct state_t *self, SDL_Renderer *renderer);
+void state_update(struct state_t *self, double dt);
+void state_destroy(state_t *self);
 
 #endif // STATE_H

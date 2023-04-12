@@ -29,7 +29,7 @@ typedef struct {
 void add_component_transform(entity_t *entity, float x, float y, int w, int h);
 void add_component_rigidbody(entity_t *entity, vec2_t vel);
 void free_entity(entity_t *entity);
-int update_transform_system(entity_t *entity, double dt);
-int update_render_system(SDL_Renderer *renderer, entity_t *entity);
+int update_transform_system(entity_t *entities, size_t num_entities, double dt);
+int update_render_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities);
 
 #endif // ENTITY_H

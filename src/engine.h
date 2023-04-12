@@ -21,12 +21,16 @@ typedef struct {
 	state_manager_t state_manager;
 } engine_t;
 
+unsigned int init_state1(void);
+unsigned int destroy_state1(void);
+unsigned int update_state1(float dt);
+
 bool engine_init(engine_t *engine, struct engine_options *options);
 void engine_setup(engine_t *engine);
 void engine_run(engine_t *engine);
 void engine_process_input(engine_t *engine);
-void engine_update(engine_t *engine, entity_t *ent);
-void engine_render(engine_t *engine, entity_t *ent);
+void engine_update(engine_t *engine);
+void engine_render(engine_t *engine);
 int engine_clean(engine_t *engine);
 
 #endif // ENGINE_H
