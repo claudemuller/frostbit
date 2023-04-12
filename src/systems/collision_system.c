@@ -11,8 +11,6 @@ update_collision_system(entity_t *entities, size_t num_entities)
 
 		for (size_t j = 0; j < num_entities; j++) {
 			if (entities[i].id != entities[j].id) {
-				printf("checking %d with %d\n", entities[i].id, entities[j].id);
-
 				if (!entities[j].components.boxcollider)
 					return 1;
 				if (!entities[j].components.transform)
