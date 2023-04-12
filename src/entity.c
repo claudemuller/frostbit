@@ -38,9 +38,8 @@ add_component_boxcollider(entity_t *entity, vec2_t bounds)
 void
 free_entity(entity_t *entity)
 {
-	if (entity->components.transform) free(entity->components.transform);
-	if (entity->components.rigidbody) free(entity->components.rigidbody);
-	if (entity->components.boxcollider) free(entity->components.boxcollider);
-	free(entity);
+	if (entity && entity->components.transform) free(entity->components.transform);
+	if (entity && entity->components.rigidbody) free(entity->components.rigidbody);
+	if (entity && entity->components.boxcollider) free(entity->components.boxcollider);
 }
 
