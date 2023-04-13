@@ -22,6 +22,10 @@ all: clean build run
 build:
 	$(CC) $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o $(BIN)
 
+build_small:
+	$(CC) -Os -fdata-sections -ffunction-sections $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -Wl,-dead_strip -o $(BIN)
+
+
 debug:
 	@$(CC) -g $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o debug
 
