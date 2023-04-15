@@ -5,12 +5,13 @@
 #include <SDL2/SDL.h>
 
 typedef struct {
-	char *id;
+	SDL_Rect src_rect;
 	int width;
 	int height;
 	int z_index;
+	SDL_RendererFlip is_flipped;
 	bool is_fixed;
-	SDL_Rect srcRect;
+	char *id;
 } component_sprite_t;
 
 #endif // SPRITE_COMPONENT_H

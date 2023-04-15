@@ -38,18 +38,18 @@ engine_setup(engine_t *engine)
 
 	entity_t entity1;
 	entity1.id = 1;
-	add_component_transform(&entity1, 10, 10, 30, 30);
-	add_component_boxcollider(&entity1, (vec2_t){30, 30});
-	add_component_rigidbody(&entity1, (vec2_t){10, 10});
-	add_component_sprite(&entity1, "tank");
+	add_component_transform(&entity1, 10, 10, (vec2_t){1, 1});
+	add_component_boxcollider(&entity1, 32, 32, (vec2_t){1, 1}, (SDL_Color){255, 0, 0, 255});
+	add_component_rigidbody(&entity1, (vec2_t){1, 1});
+	add_component_sprite(&entity1, "tank", 32, 32, 0, 0, 1, false, SDL_FLIP_NONE);
 	entities[0] = entity1;
 
 	entity_t entity2;
 	entity2.id = 2;
-	add_component_transform(&entity2, 100, 100, 40, 30);
-	add_component_boxcollider(&entity2, (vec2_t){40, 30});
+	add_component_transform(&entity2, 100, 100, (vec2_t){1, 1});
+	add_component_boxcollider(&entity2, 30, 30, (vec2_t){1, 1}, (SDL_Color){255, 0, 0, 255});
 	add_component_rigidbody(&entity2, (vec2_t){-10, -10});
-	add_component_sprite(&entity2, "tank");
+	add_component_sprite(&entity2, "tank", 32, 32, 0, 0, 1, false, SDL_FLIP_NONE);
 	entities[1] = entity2;
 
 	state_t *state1 = state_new(entities, 2);

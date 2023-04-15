@@ -9,27 +9,31 @@ update_collision_system(entity_t *entities, size_t num_entities)
 		if (!entities[i].components.transform)
 			return 1;
 
+		component_transform_t *transformA = entities[i].components.transform;
+		component_boxcollider_t *colliderA = entities[i].components.boxcollider;
+
 		for (size_t j = 0; j < num_entities; j++) {
-			if (entities[i].id != entities[j].id) {
-				if (!entities[j].components.boxcollider)
-					return 1;
-				if (!entities[j].components.transform)
-					return 1;
-
-				bool is_colliding = check_aabb_collision(
-					entities[i].components.transform->x,
-					entities[i].components.transform->y,
-					entities[i].components.transform->w,
-					entities[i].components.transform->h,
-					entities[j].components.transform->x,
-					entities[j].components.transform->y,
-					entities[j].components.transform->w,
-					entities[j].components.transform->h
-				);
-
-				if (is_colliding)
-					printf("collision\n");
+			if (entities[i].id == entities[j].id) {
+				continue;
 			}
+
+			if (!entities[j].components.boxcollider)
+				return 1;
+			if (!entities[j].components.transform)
+				return 1;
+
+			component_transform_t *transformB = entities[j].components.transform;
+			component_boxcollider_t *colliderB = entities[j].components.boxcollider;
+
+			bool is_colliding = check_aabb_collision(
+					transformA->position.x, transformA->position.y,
+					colliderA->width, colliderA->height,
+					transformB->position.x, transformB->position.y,
+					colliderB->width, colliderB->height
+			);
+
+			if (is_colliding)
+				printf("collision\n");
 		}
 	}
 

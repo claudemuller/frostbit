@@ -21,10 +21,20 @@ typedef struct {
 	components_t components;
 } entity_t;
 
-void add_component_transform(entity_t *entity, float x, float y, int w, int h);
+void add_component_transform(entity_t *entity, float x, float y, vec2_t scale);
 void add_component_rigidbody(entity_t *entity, vec2_t vel);
-void add_component_boxcollider(entity_t *entity, vec2_t bounds);
-void add_component_sprite(entity_t *entity, char *asset_id);
+void add_component_boxcollider(entity_t *entity, int width, int height, vec2_t offset, SDL_Color colour);
+void add_component_sprite(
+	entity_t *entity,
+	char *asset_id,
+	int width,
+	int height,
+	int x,
+	int y,
+	int z_index,
+	bool is_fixed,
+	SDL_RendererFlip is_flipped
+);
 void free_entity(entity_t *entity);
 
 #endif // ENTITY_H

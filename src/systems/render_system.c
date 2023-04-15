@@ -14,12 +14,12 @@ update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, entity_
 		component_transform_t *transform = entities[i].components.transform;
 		component_sprite_t *sprite = entities[i].components.sprite;
 
-		SDL_Rect srcRect = sprite->srcRect;
+		SDL_Rect srcRect = sprite->src_rect;
 		SDL_Rect dstRect = {
-			transform->x,
-			transform->y,
-			transform->w,
-			transform->h
+			transform->position.x,
+			transform->position.y,
+			sprite->width * transform->scale.x,
+			sprite->height * transform->scale.y
 		};
 
 		SDL_RenderCopyEx(
@@ -27,9 +27,9 @@ update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, entity_
 				asset_store_get_texture(asset_store, sprite->id),
 				&srcRect,
 				&dstRect,
-				0,
+				transform->rotation,
 				NULL,
-				0
+				sprite->is_flipped
 		);
 	}
 
