@@ -1,10 +1,15 @@
+#include <stdio.h>
 #include "event_bus.h"
+#include "array.h"
 
 event_bus_t*
 new_event_bus(void)
 {
 	event_bus_t *event_bus = malloc(sizeof(event_bus_t));
 	// TODO: err stuff
+
+	// array_hold(event_bus->listeners, 1, sizeof(handler_t));
+	// array_hold(event_bus->poll, 1, sizeof(event_t));
 
 	handler_t *listeners = malloc(sizeof(handler_t)*10);
 	event_t *poll = malloc(sizeof(event_t)*10);
@@ -27,10 +32,9 @@ new_event_bus(void)
 void
 event_bus_add_handler(event_bus_t *self, handler_t handler)
 {
-	self->listeners[0] = handler;
-	self->num_listeners = 3;
-	self->listeners[1] = handler;
-	self->listeners[2] = handler;
+	// array_push(self->listeners, handler);
+	self->listeners[self->num_listeners] = handler;
+	self->num_listeners++;
 }
 
 void
@@ -46,8 +50,9 @@ event_bus_on_event(event_bus_t *self, event_type_t type, handler_fn handler_fn)
 void
 event_bus_add_event(event_bus_t *self, event_t ev)
 {
-	self->poll[0] = ev;
-	self->num_poll = 1;
+	// array_push(self->poll, ev);
+	self->poll[self->num_poll] = ev;
+	self->num_poll++;
 }
 
 void
@@ -60,15 +65,18 @@ event_bus_emit(event_bus_t *self, event_type_t type)
 }
 
 void
-event_bus_process_events(event_bus_t *self)
-{
+event_bus_process_events(event_bus_t *self) {
 	if (self->num_poll == 0)
 		return;
 
-	for (size_t i = 0; i < self->num_poll; i++)
-		for (size_t j = 0; j < self->num_listeners; j++)
-			if (self->poll[i].type == self->listeners[j].type)
+	for (size_t i = 0; i < self->num_poll; i++) {
+		for (size_t j = 0; j < self->num_listeners; j++) {
+			if (self->poll[i].type == self->listeners[j].type) {
 				self->listeners[j].handler();
+			}
+		}
+	}
+	self->num_poll = 0;
 }
 
 void

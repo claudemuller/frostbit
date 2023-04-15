@@ -4,7 +4,8 @@
 void
 asset_store_init(asset_store_t *asset_store)
 {
-	asset_store->textures = hashmap_create();
+	asset_store->textures = g_hash_table_new(g_str_hash, g_str_equal);
+	GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
 void
@@ -13,19 +14,18 @@ asset_store_add_texture(asset_store_t *asset_store, SDL_Renderer *renderer, char
 	SDL_Surface *surface = IMG_Load(filename);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
-	hashmap_set(asset_store->textures, asset_id, sizeof(asset_id)-1, (uintptr_t)texture);
+	g_hash_table_insert(asset_store->textures, asset_id, texture);
 }
 
 SDL_Texture*
 asset_store_get_texture(asset_store_t *asset_store, char *asset_id)
 {
-	uintptr_t texture;
-	hashmap_get(asset_store->textures, asset_id, sizeof(asset_id)-1, &texture);
-	return (SDL_Texture*)texture;
+	SDL_Texture *texture = (SDL_Texture*)g_hash_table_lookup(asset_store->textures, asset_id);
+	return texture;
 }
 
 void
 asset_store_free(asset_store_t *asset_store)
 {
-	hashmap_free(asset_store->textures);
+	g_hash_table_destroy(asset_store->textures);
 }

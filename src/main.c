@@ -10,8 +10,8 @@ main(void) {
 	// Init options to be optional.
 	struct engine_options options = {0};
 	options.title = "Some Rando Game";
-	options.width = 480;
-	options.height = 272;
+	options.width = 800;
+	options.height = 600;
 
 	engine_t engine;
 	if (!engine_init(&engine, &options))
