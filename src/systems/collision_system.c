@@ -1,7 +1,7 @@
 #include "collision_system.h"
 
 int
-update_collision_system(entity_t *entities, size_t num_entities)
+update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t num_entities)
 {
 	for (size_t i = 0; i < num_entities; i++) {
 		if (!entities[i].components.boxcollider)
@@ -32,8 +32,9 @@ update_collision_system(entity_t *entities, size_t num_entities)
 					colliderB->width, colliderB->height
 			);
 
-			if (is_colliding)
-				printf("collision\n");
+			if (is_colliding) {
+				event_bus->emit(event_bus, EVENT_DESTROY_ENTITY);
+			}
 		}
 	}
 

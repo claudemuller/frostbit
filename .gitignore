@@ -3,3 +3,5 @@ memcheck*
 debug
 compile_commands.json
 .cache
+.DS_Store
+.idea

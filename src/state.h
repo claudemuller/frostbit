@@ -1,12 +1,15 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include "event_bus.h"
 #include "entity.h"
 #include "asset_store.h"
 
 typedef struct state_t {
+	event_bus_t *event_bus;
 	entity_t *ents;
 	size_t num_entites;
+	bool render_colliders;
 
 	void (*init)(struct state_t *self);
 	void (*update)(struct state_t *self, double dt);
