@@ -2,6 +2,7 @@
 #define EVENT_BUS_H
 
 #include <stdlib.h>
+#include <glib-2.0/glib.h>
 
 typedef enum {
 	EVENT_DESTROY_ENTITY,
@@ -20,9 +21,9 @@ typedef struct {
 } handler_t;
 
 typedef struct event_bus_t {
-	handler_t *listeners;
+	GArray *listeners;
 	size_t num_listeners;
-	event_t *poll;
+	GArray *poll;
 	size_t num_poll;
 
 	void (*add_handler)(struct event_bus_t *self, handler_t handler);

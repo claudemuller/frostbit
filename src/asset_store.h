@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <glib-2.0/glib.h>
 #include <SDL2/SDL.h>
-#include "map.h"
 
 typedef struct {
 	GHashTable *textures;
