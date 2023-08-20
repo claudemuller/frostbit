@@ -32,9 +32,12 @@ engine_init(engine_t *engine, struct engine_options *options)
 void
 engine_setup(engine_t *engine)
 {
+	asset_store_add_texture(&engine->asset_store, engine->graphics.renderer, "tilemap", "./assets/tilemaps/jungle.png");
 	asset_store_add_texture(&engine->asset_store, engine->graphics.renderer, "tank", "./assets/tank.png");
 
-	entity_t *entities = malloc(sizeof(entity_t)*2);
+	load_tilemap_data("./assets/tilemaps/jungle.map");
+
+	GArray *entities = g_array_new(false, false, sizeof(entity_t));
 
 	entity_t entity1;
 	entity1.id = 1;
@@ -42,7 +45,7 @@ engine_setup(engine_t *engine)
 	add_component_boxcollider(&entity1, 32, 32, (vec2_t){1, 1}, (SDL_Color){255, 0, 0, 255});
 	add_component_rigidbody(&entity1, (vec2_t){1, 1});
 	add_component_sprite(&entity1, "tank", 32, 32, 0, 0, 1, false, SDL_FLIP_NONE);
-	entities[0] = entity1;
+	g_array_append_val(entities, entity1);
 
 	entity_t entity2;
 	entity2.id = 2;
@@ -50,7 +53,7 @@ engine_setup(engine_t *engine)
 	add_component_boxcollider(&entity2, 30, 30, (vec2_t){1, 1}, (SDL_Color){255, 0, 0, 255});
 	add_component_rigidbody(&entity2, (vec2_t){-10, -10});
 	add_component_sprite(&entity2, "tank", 32, 32, 0, 0, 1, false, SDL_FLIP_NONE);
-	entities[1] = entity2;
+	g_array_append_val(entities, entity2);
 
 	state_t *state1 = state_new(entities, 2);
 	state_manager_push(&engine->state_manager, state1);
@@ -116,4 +119,10 @@ engine_clean(engine_t *engine)
 	graphics_free(&engine->graphics);
 	SDL_Quit();
 	return 0;
+}
+
+void
+load_tilemap_data(char *filename)
+{
+
 }

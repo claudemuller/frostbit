@@ -1,29 +1,31 @@
 #include "collision_system.h"
 
 int
-update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t num_entities)
+update_collision_system(event_bus_t *event_bus, GArray *entities, size_t num_entities)
 {
 	for (size_t i = 0; i < num_entities; i++) {
-		if (!entities[i].components.boxcollider)
+		entity_t entityA = g_array_index(entities, entity_t, i);
+		if (!entityA.components.boxcollider)
 			return 1;
-		if (!entities[i].components.transform)
+		if (!entityA.components.transform)
 			return 1;
 
-		component_transform_t *transformA = entities[i].components.transform;
-		component_boxcollider_t *colliderA = entities[i].components.boxcollider;
+		component_transform_t *transformA = entityA.components.transform;
+		component_boxcollider_t *colliderA = entityA.components.boxcollider;
 
 		for (size_t j = 0; j < num_entities; j++) {
-			if (entities[i].id == entities[j].id) {
+			entity_t entityB = g_array_index(entities, entity_t, i);
+			if (entityA.id == entityB.id) {
 				continue;
 			}
 
-			if (!entities[j].components.boxcollider)
+			if (!entityB.components.boxcollider)
 				return 1;
-			if (!entities[j].components.transform)
+			if (!entityB.components.transform)
 				return 1;
 
-			component_transform_t *transformB = entities[j].components.transform;
-			component_boxcollider_t *colliderB = entities[j].components.boxcollider;
+			component_transform_t *transformB = entityB.components.transform;
+			component_boxcollider_t *colliderB = entityB.components.boxcollider;
 
 			bool is_colliding = check_aabb_collision(
 					transformA->position.x, transformA->position.y,

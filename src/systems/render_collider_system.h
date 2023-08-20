@@ -7,6 +7,6 @@
 #include "../entity.h"
 
 void init_render_collider_system(event_bus_t *event_bus);
-int update_render_collider_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities);
+int update_render_collider_system(SDL_Renderer *renderer, GArray *entities, size_t num_entities);
 
 #endif // RENDER_COLLIDER_SYSTEM_H

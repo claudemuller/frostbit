@@ -16,19 +16,20 @@ init_render_collider_system(event_bus_t *event_bus)
 }
 
 int
-update_render_collider_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities)
+update_render_collider_system(SDL_Renderer *renderer, GArray *entities, size_t num_entities)
 {
 	if (!render_collider)
 		return 0;
 
 	for (size_t i = 0; i < num_entities; i++) {
-		if (!entities[i].components.transform)
+		entity_t entity = g_array_index(entities, entity_t, i);
+		if (!entity.components.transform)
 			return 1;
-		if (!entities[i].components.boxcollider)
+		if (!entity.components.boxcollider)
 			return 1;
 
-		component_transform_t *transform = entities[i].components.transform;
-		component_boxcollider_t *collider = entities[i].components.boxcollider;
+		component_transform_t *transform = entity.components.transform;
+		component_boxcollider_t *collider = entity.components.boxcollider;
 
 		SDL_Rect collider_rect = {
 			transform->position.x,

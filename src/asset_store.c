@@ -5,7 +5,6 @@ void
 asset_store_init(asset_store_t *asset_store)
 {
 	asset_store->textures = g_hash_table_new(g_str_hash, g_str_equal);
-	GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
 void

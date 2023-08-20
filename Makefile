@@ -1,41 +1,61 @@
-UNAME_S := $(shell uname -s)
-CC=gcc
-CFLAGS=-Wall -Wfatal-errors -Wextra -pedantic -Wmissing-declarations -std=c11
+CC = gcc
+DBG_BIN = lldb
+CFLAGS = -D_GNU_SOURCE
+CFLAGS += -std=c11
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -pedantic
+# CFLAGS += -Werror
+CFLAGS += -Wmissing-declarations
+CFLAGS += -I./libs/
 ASANFLAGS=-fsanitize=address -fno-common -fno-omit-frame-pointer
-INCS=-I./libs/
-LIBS=
-LFLAGS=-lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua -lglib-2.0 -lintl
-SRC=./src/*.c \
-	./src/systems/*.c
-DETECT_LEAKS=ASAN_OPTIONS=detect_leaks=1
-BIN=gameengine
+CFLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf SDL2_image glib-2.0)
+LDFLAGS = $(shell pkg-config --libs sdl2 SDL2_ttf SDL2_image glib-2.0)
+LIBS =
+SRC_FILES = ./src/*.c
+BIN_DIR = ./bin
+BIN = $(BIN_DIR)/gameengine
+TEST_DIR = ./tests
+TEST_SRC = $(filter-out ./src/main.c, $(wildcard ./src/*.c)) $(TEST_DIR)/*.c
 
-# Mac Stuff
-ifeq ($(UNAME_S),Darwin)
-	INCS+= -I/opt/homebrew/include -I/opt/homebrew/Cellar/sdl2/2.26.3/include/SDL2/ -I/opt/homebrew/Cellar/glib/2.76.1/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.76.1/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.42/include
-	LIBS+= -L/opt/homebrew/lib -L/opt/homebrew/lib/ -L/opt/homebrew/Cellar/glib/2.76.1/lib -L/opt/homebrew/opt/gettext/lib
-	DETECT_LEAKS=
-endif
+build: bin-dir
+	$(CC) $(CFLAGS) $(LIBS) $(SRC_FILES) -o $(BIN) $(LDFLAGS)
 
-all: clean build run
-
-build:
-	$(CC) $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o $(BIN)
+bin-dir:
+	mkdir -p $(BIN_DIR)
 
 build_small:
-	$(CC) -Os -fdata-sections -ffunction-sections $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -Wl,-dead_strip -o $(BIN)
+	$(CC) -Os -fdata-sections -ffunction-sections -Wl,-dead_strip $(CFLAGS) $(LIBS) $(SRC_FILES) -o $(BIN) $(LDFLAGS)
 
+debug: debug-build
+	$(DBG_BIN) $(BIN) $(ARGS)
 
-debug:
-	@$(CC) -g $(SRC) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o debug
+debug-build: bin-dir
+	$(CC) $(CFLAGS) -g $(LIBS) $(SRC_FILES) -o $(BIN) $(LDFLAGS)
+
+run: build
+	@$(BIN) $(ARGS)
+
+test:
+	$(CC) $(CFLAGS) $(LIBS) $(TEST_SRC) -o $(TEST_DIR)/tests $(LDFLAGS) && $(TEST_DIR)/tests
+
+test-debug:
+	$(CC) $(CFLAGS) -g $(LIBS) $(TEST_SRC) -o $(TEST_DIR)/tests $(LDFLAGS) && lldb $(TEST_DIR)/tests $(ARGS)
 
 memcheck:
 	@$(CC) -g $(SRC) $(ASANFLAGS) $(CFLAGS) $(INCS) $(LIBS) $(LFLAGS) -o memcheck.out
-	@$(DETECT_LEAKS) ./memcheck.out
+	@./memcheck.out
 	@echo "Memory check passed"
 
-run:
-	./$(BIN)
-
 clean:
-	rm -rf $(BIN) debug*
+	rm -rf $(BIN_DIR)/* $(TEST_DIR)/tests*
+
+gen-compilation-db:
+	bear -- make build
+
+gen-compilation-db-make:
+	make --always-make --dry-run \
+	| grep -wE 'gcc|g\+\+' \
+	| grep -w '\-c' \
+	| jq -nR '[inputs|{directory:".", command:., file: match(" [^ ]+$").string[1:]}]' \
+	> compile_commands.json
