@@ -1,10 +1,10 @@
 #include "collision_system.h"
 
 int
-update_collision_system(event_bus_t *event_bus, GArray *entities, size_t num_entities)
+update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t num_entities)
 {
 	for (size_t i = 0; i < num_entities; i++) {
-		entity_t entityA = g_array_index(entities, entity_t, i);
+		entity_t entityA = entities[i];
 		if (!entityA.components.boxcollider)
 			return 1;
 		if (!entityA.components.transform)
@@ -14,7 +14,7 @@ update_collision_system(event_bus_t *event_bus, GArray *entities, size_t num_ent
 		component_boxcollider_t *colliderA = entityA.components.boxcollider;
 
 		for (size_t j = 0; j < num_entities; j++) {
-			entity_t entityB = g_array_index(entities, entity_t, i);
+			entity_t entityB = entities[i];
 			if (entityA.id == entityB.id) {
 				continue;
 			}

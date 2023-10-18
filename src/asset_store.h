@@ -2,11 +2,11 @@
 #define ASSET_STORE
 
 #include <stdlib.h>
-#include <glib-2.0/glib.h>
+// #include <glib-2.0/glib.h>
 #include <SDL2/SDL.h>
 
 typedef struct {
-	GHashTable *textures;
+	// GHashTable *textures;
 } asset_store_t;
 
 void asset_store_add_texture(asset_store_t *asset_store, SDL_Renderer *renderer, char* asset_id, char* filename);

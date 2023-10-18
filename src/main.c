@@ -5,8 +5,7 @@
 #include "graphics.h"
 #include "state_manager.h"
 
-int
-main(void) {
+int main(void) {
 	// Init options to be optional.
 	struct engine_options options = {0};
 	options.title = "Some Rando Game";

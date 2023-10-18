@@ -16,13 +16,13 @@ init_render_collider_system(event_bus_t *event_bus)
 }
 
 int
-update_render_collider_system(SDL_Renderer *renderer, GArray *entities, size_t num_entities)
+update_render_collider_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities)
 {
 	if (!render_collider)
 		return 0;
 
 	for (size_t i = 0; i < num_entities; i++) {
-		entity_t entity = g_array_index(entities, entity_t, i);
+		entity_t entity = entities[i];
 		if (!entity.components.transform)
 			return 1;
 		if (!entity.components.boxcollider)

@@ -3,10 +3,10 @@
 #include "../components/transform_component.h"
 
 int
-update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, GArray *entities, size_t num_entities)
+update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, entity_t *entities, size_t num_entities)
 {
 	for (size_t i = 0; i < num_entities; i++) {
-		entity_t entity = g_array_index(entities, entity_t, i);
+		entity_t entity = entities[i];
 		if (!entity.components.transform)
 			return 1;
 		if (!entity.components.sprite)

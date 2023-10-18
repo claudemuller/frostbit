@@ -1,6 +1,8 @@
 #ifndef ARRAY_H
 #define ARRAY_H
 
+#include <stdlib.h>
+
 #define array_push(array, value)                                              \
     do {                                                                      \
         (array) = array_hold((array), 1, sizeof(*(array)));                   \

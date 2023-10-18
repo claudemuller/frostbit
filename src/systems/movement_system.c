@@ -2,14 +2,16 @@
 #include "movement_system.h"
 
 int
-update_movement_system(GArray *entities, size_t num_entities, double dt)
+update_movement_system(entity_t *entities, size_t num_entities, double dt)
 {
-	for (size_t i = 0; i < entities->len; i++) {
-		entity_t entity = g_array_index(entities, entity_t, i);
+	for (size_t i = 0; i < num_entities; i++) {
+		entity_t entity = entities[i];
 		if (!entity.components.transform)
 			return 1;
+
 		if (!entity.components.rigidbody)
 			return 1;
+
 		if (!entity.components.sprite)
 			return 1;
 

@@ -12,7 +12,7 @@ ASANFLAGS=-fsanitize=address -fno-common -fno-omit-frame-pointer
 CFLAGS += $(shell pkg-config --cflags sdl2 SDL2_ttf SDL2_image glib-2.0)
 LDFLAGS = $(shell pkg-config --libs sdl2 SDL2_ttf SDL2_image glib-2.0)
 LIBS =
-SRC_FILES = ./src/*.c
+SRC_FILES = ./src/*.c ./src/systems/*.c
 BIN_DIR = ./bin
 BIN = $(BIN_DIR)/gameengine
 TEST_DIR = ./tests

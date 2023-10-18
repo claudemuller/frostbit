@@ -1,8 +1,7 @@
 #include <stdbool.h>
 #include "graphics.h"
 
-int
-graphics_init(graphics_t *graphics)
+int graphics_init(graphics_t *graphics)
 {
 	if (!graphics->window_title)
 		graphics->window_title = "";
@@ -39,8 +38,7 @@ graphics_init(graphics_t *graphics)
 	return true;
 }
 
-void
-graphics_free(graphics_t *graphics)
+void graphics_free(graphics_t *graphics)
 {
 	SDL_DestroyWindow(graphics->window);
 	SDL_DestroyRenderer(graphics->renderer);

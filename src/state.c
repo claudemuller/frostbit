@@ -1,4 +1,5 @@
 #include "state.h"
+#include "entity.h"
 #include "event_bus.h"
 #include "systems/movement_system.h"
 #include "systems/collision_system.h"
@@ -6,9 +7,9 @@
 #include "systems/render_collider_system.h"
 
 state_t*
-state_new(GArray *entities, size_t num_entities)
+state_new(entity_t *entities, size_t num_entities)
 {
-	state_t *state = malloc(sizeof(state_t));
+	state_t *state = (state_t*)malloc(sizeof(state_t));
 	// TODO: err handling
 
 	state->event_bus = new_event_bus();
@@ -17,11 +18,6 @@ state_new(GArray *entities, size_t num_entities)
 	state->entities = entities;
 	state->num_entites = num_entities;
 	state->render_colliders = false;
-
-	state->init = state_init;
-	state->render = state_render;
-	state->update = state_update;
-	state->destroy = state_destroy;
 
 	return state;
 }
@@ -50,7 +46,7 @@ void
 state_destroy(state_t *self)
 {
 	// for (size_t i = 0; i < self->num_entites; i++) {
-	g_array_free(self->entities, true);
+	free(self->entities);
 	// }
 	self->event_bus->destroy(self->event_bus);
 	free(self->event_bus);
