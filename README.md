@@ -1,4 +1,4 @@
-# Frostbit
+# 🧊 Frostbit
 
 [![c](https://github.com/claudemuller/frostbit/actions/workflows/c.yml/badge.svg)](https://github.com/claudemuller/frostbit/actions/workflows/c.yml)
 

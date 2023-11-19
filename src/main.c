@@ -8,7 +8,7 @@
 int main(void)
 {
     struct engine_options options = {
-        .title = "Some Rando Game",
+        .title = "Frostbit",
         .width = 800,
         .height = 600
     };

@@ -29,7 +29,7 @@ int update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t n
         component_boxcollider_t *colliderA = entityA.components.boxcollider;
 
         for (size_t j = 0; j < num_entities; j++) {
-            entity_t entityB = entities[i];
+            entity_t entityB = entities[j];
             if (entityA.id == entityB.id) {
                 continue;
             }
