@@ -11,7 +11,7 @@ typedef struct {
 	int z_index;
 	SDL_RendererFlip is_flipped;
 	bool is_fixed;
-	char *id;
+	const char *id;
 } component_sprite_t;
 
 #endif // SPRITE_COMPONENT_H

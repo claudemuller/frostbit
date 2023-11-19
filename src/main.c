@@ -1,24 +1,27 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <SDL2/SDL.h>
 #include "engine.h"
-#include "graphics.h"
+#include "gfx.h"
 #include "state_manager.h"
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+#include <stdio.h>
 
-int main(void) {
-	// Init options to be optional.
-	struct engine_options options = {0};
-	options.title = "Some Rando Game";
-	options.width = 800;
-	options.height = 600;
+int main(void)
+{
+    struct engine_options options = {
+        .title = "Some Rando Game",
+        .width = 800,
+        .height = 600
+    };
 
-	engine_t engine;
-	if (!engine_init(&engine, &options))
-		return 1;
+    engine_t engine;
+    if (!engine_init(&engine, &options)) {
+        SDL_LogCritical(1, "Error initialising engine\n");
+        return 1;
+    }
 
-	engine_run(&engine);
+    engine_run(&engine);
 
-	engine_clean(&engine);
+    engine_clean(&engine);
 
-	return 0;
+    return 0;
 }

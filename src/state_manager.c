@@ -1,82 +1,109 @@
-#include <stdlib.h>
 #include "state_manager.h"
+#include <stdlib.h>
 
-int state_manager_init(state_manager_t *stateman) {
-	stateman->cap = 3;
-	stateman->stack = malloc(stateman->cap * sizeof(state_t*));
-	stateman->top = -1;
-	return 0;
-}
-
-int state_manager_free(state_manager_t *stateman)
+bool state_manager_init(state_manager_t *stateman)
 {
-	do {
-		state_manager_pop(stateman);
-	} while (stateman->top > -1);
-	free(stateman->stack);
+    stateman->stack = malloc(stateman->cap * sizeof(stateman->stack));
+    if (!stateman->stack) {
+        return false;
+    }
 
-	return 0;
+    stateman->cap = 3;
+    stateman->top = -1;
+
+    return true;
 }
 
-int state_manager_push(state_manager_t *stateman, state_t *state)
+void state_manager_free(state_manager_t *stateman)
 {
-	if (stateman->top+1 == stateman->cap)
-		state_manager_grow(stateman);
+    do {
+        state_manager_pop(stateman);
+    } while (stateman->top > -1);
 
-	stateman->top++;
-	stateman->stack[stateman->top] = state;
-
-	state_init(state);
-
-	return stateman->top;
+    free(stateman->stack);
 }
 
-int
-state_manager_pop(state_manager_t *stateman) {
-	if (stateman->top == -1)
-		return 0;
+bool state_manager_push(state_manager_t *stateman, state_t *state)
+{
+    if (stateman->top + 1 == stateman->cap) {
+        if (!state_manager_grow(stateman)) {
+            SDL_LogError(1, "Error growing state manager's stack\n");
+            return false;
+        }
+    }
 
-	state_t *top = state_manager_top(stateman);
-	if (top != NULL)
-		state_destroy(top);
+    stateman->top++;
+    stateman->stack[stateman->top] = state;
 
-	stateman->stack[stateman->top] = NULL;
-	stateman->top--;
+    // state_init(state);
 
-	return stateman->top;
+    return true;
+}
+
+int state_manager_pop(state_manager_t *stateman)
+{
+    if (stateman->top == -1) {
+        return 0;
+    }
+
+    state_t *top = state_manager_top(stateman);
+    if (!top) {
+        SDL_LogError(1, "Error poping top state\n");
+        return false;
+    }
+
+    state_destroy(top);
+    stateman->stack[stateman->top] = NULL;
+    stateman->top--;
+
+    return stateman->top;
 }
 
 state_t *state_manager_top(state_manager_t *stateman)
 {
-	if (stateman->top == -1)
-		return NULL;
+    if (stateman->top == -1) {
+        return NULL;
+    }
 
-	return stateman->stack[stateman->top];
+    return stateman->stack[stateman->top];
 }
 
-int state_manager_update(state_manager_t *stateman, double dt)
+bool state_manager_update(state_manager_t *stateman, double dt)
 {
-	state_t *cur_state = state_manager_top(stateman);
-	if (cur_state != NULL)
-		state_update(cur_state, dt);
+    state_t *cur_state = state_manager_top(stateman);
+    if (!cur_state) {
+        SDL_LogError(1, "Error poping top state\n");
+        return false;
+    }
 
-	// TODO: fix this hard-coded/always val
-	return 0;
+    state_update(cur_state, dt);
+
+    return true;
 }
 
-int state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer, asset_store_t *asset_store)
+bool state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer)
 {
-	state_t *cur_state = state_manager_top(stateman);
-	if (cur_state != NULL)
-		state_render(cur_state, renderer, asset_store);
+    state_t *cur_state = state_manager_top(stateman);
+    if (!cur_state) {
+        SDL_LogError(1, "Error poping top state\n");
+        return false;
+    }
 
-	// TODO: fix this hard-coded/always val
-	return 0;
+    state_render(cur_state, renderer);
+
+    return true;
 }
 
-int state_manager_grow(state_manager_t *stateman)
+bool state_manager_grow(state_manager_t *stateman)
 {
-	stateman->cap *= 2;
-	stateman->stack = realloc(stateman->stack, stateman->cap * sizeof(state_t*));
-	return stateman->cap;
+    state_t **tmp = realloc(stateman->stack, stateman->cap * 2 * sizeof(state_t *));
+    if (!tmp) {
+        fprintf(stderr, "error resizing state manager");
+        return false;
+    }
+
+    stateman->cap *= 2;
+    stateman->stack = tmp;
+
+    return true;
 }

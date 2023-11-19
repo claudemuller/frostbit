@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef GFX_H_
+#define GFX_H_
 
 #include <SDL2/SDL.h>
 
@@ -11,7 +11,7 @@ typedef struct {
 	SDL_Renderer *renderer;
 } graphics_t;
 
-int graphics_init(graphics_t *graphics);
-void graphics_free(graphics_t *graphics);
+int gfx_init(graphics_t *graphics);
+void gfx_free(graphics_t *graphics);
 
-#endif // GRAPHICS_H
+#endif // GFX_H_

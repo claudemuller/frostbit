@@ -1,7 +1,7 @@
 CC = gcc
-DBG_BIN = lldb
-CFLAGS = -D_GNU_SOURCE
-CFLAGS += -std=c11
+DBG_BIN = gdb
+# CFLAGS = -D_GNU_SOURCE
+CFLAGS += -std=gnu11
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -pedantic
@@ -17,6 +17,10 @@ BIN_DIR = ./bin
 BIN = $(BIN_DIR)/gameengine
 TEST_DIR = ./tests
 TEST_SRC = $(filter-out ./src/main.c, $(wildcard ./src/*.c)) $(TEST_DIR)/*.c
+
+ifeq ($(shell uname -s),Darwin)
+	DBG_BIN = lldb
+endif
 
 build: bin-dir
 	$(CC) $(CFLAGS) $(LIBS) $(SRC_FILES) -o $(BIN) $(LDFLAGS)

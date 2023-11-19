@@ -1,11 +1,11 @@
-#ifndef RENDER_SYSTEM_H
-#define RENDER_SYSTEM_H
+#ifndef RENDER_SYSTEM_H_
+#define RENDER_SYSTEM_H_
 
 #include <SDL2/SDL.h>
 #include "../entity.h"
 #include "../asset_store.h"
 
-int update_render_system(SDL_Renderer *renderer, asset_store_t *asset_store, entity_t *entities, size_t num_entities);
+int update_render_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities);
 
-#endif // RENDER_SYSTEM_H
+#endif // RENDER_SYSTEM_H_
 

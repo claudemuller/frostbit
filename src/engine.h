@@ -1,8 +1,8 @@
-#ifndef	ENGINE_H
-#define	ENGINE_H
+#ifndef	ENGINE_H_
+#define	ENGINE_H_
 
 #include <stdbool.h>
-#include "graphics.h"
+#include "gfx.h"
 #include "state_manager.h"
 #include "asset_store.h"
 
@@ -16,11 +16,10 @@ struct engine_options {
 };
 
 typedef struct {
-	bool running;
-	int millisecs_previous_frame;
 	graphics_t graphics;
 	state_manager_t state_manager;
 	asset_store_t asset_store;
+	bool running;
 } engine_t;
 
 bool engine_init(engine_t *engine, struct engine_options *options);
@@ -32,4 +31,4 @@ void engine_render(engine_t *engine);
 int engine_clean(engine_t *engine);
 void load_tilemap_data(char *filename);
 
-#endif // ENGINE_H
+#endif // ENGINE_H_
