@@ -2,15 +2,15 @@
 #include "keyboard_control_system.h"
 #include <stdio.h>
 
-#define PLAYER_SPEED 10
+#define PLAYER_SPEED 100
 
 // TODO: redo this
-static vec2_t key_press_vel = { 0 };
+static SDL_Event key_event = { 0 };
 
 static void key_press(args_t args)
 {
-    key_press_vel = args.movement;
-    printf("key pressed: %f\n", args.movement.x);
+    key_event = args.event;
+    printf("key pressed\n");
 }
 
 void init_keyboard_control_system(void)
@@ -35,12 +35,30 @@ int update_keyboard_control_system(entity_t *entities, const double dt)
             return 1;
         }
 
+        vec2_t move_vec = { 0 };
+
+        switch (key_event.key.keysym.sym) {
+        case SDLK_w: {
+            move_vec.y = -1;
+        } break;
+
+        case SDLK_a: {
+            move_vec.x = -1;
+        } break;
+
+        case SDLK_s: {
+            move_vec.y = 1;
+        } break;
+
+        case SDLK_d: {
+            move_vec.x = 1;
+        } break;
+        }
+
         component_transform_t *transform = entity.components.transform;
         component_rigidbody_t *rigidbody = entity.components.rigidbody;
 
-        rigidbody->velocity.x += key_press_vel.x * PLAYER_SPEED * dt;
-        rigidbody->velocity.y += key_press_vel.y * PLAYER_SPEED * dt;
+        rigidbody->velocity.x += move_vec.x * PLAYER_SPEED * dt;
+        rigidbody->velocity.y += move_vec.y * PLAYER_SPEED * dt;
     }
-
-    return 0;
 }

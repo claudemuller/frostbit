@@ -4,6 +4,8 @@
 #include "event_bus.h"
 #include "state.h"
 #include "state_manager.h"
+#include "systems/keyboard_control_system.h"
+#include "systems/render_collider_system.h"
 #include "vector.h"
 #include <SDL2/SDL_image.h>
 
@@ -53,7 +55,10 @@ void engine_setup(engine_t *engine)
     asset_store_add_texture(engine->graphics.renderer, "tilemap", "./assets/tilemaps/jungle.png");
     asset_store_add_texture(engine->graphics.renderer, "tank", "./assets/tank.png");
 
-    // load_tilemap_data("./assets/tilemaps/jungle.map");
+    load_tilemap_data("./assets/tilemaps/jungle.map");
+
+    init_render_collider_system();
+    init_keyboard_control_system();
 
     entity_t *entities = NULL;
 
@@ -142,32 +147,14 @@ void engine_process_input(engine_t *engine)
                 engine->running = false;
             } break;
 
-            case SDLK_w: {
-                args_t move_vec = {
-                    .movement = (vec2_t) { 0, -1 },
-                };
-                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
-            } break;
-
-            case SDLK_a: {
-                args_t move_vec = {
-                    .movement = (vec2_t) { -1, 0 },
-                };
-                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
-            } break;
-
-            case SDLK_s: {
-                args_t move_vec = {
-                    .movement = (vec2_t) { 0, 1 },
-                };
-                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
-            } break;
-
+            case SDLK_w:
+            case SDLK_a:
+            case SDLK_s:
             case SDLK_d: {
-                args_t move_vec = {
-                    .movement = (vec2_t) { 1, 0 },
+                args_t args = {
+                    .event = e,
                 };
-                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
+                event_bus_emit(EVT_PLAYER_MOVE, args);
             } break;
             }
         }
@@ -208,6 +195,6 @@ int engine_clean(engine_t *engine)
     return 0;
 }
 
-// void load_tilemap_data(char *filename)
-// {
-// }
+void load_tilemap_data(const char *filename)
+{
+}

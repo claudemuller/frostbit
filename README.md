@@ -4,6 +4,11 @@
 
 A game engine written in C with SDL.
 
+## Features
+
+- Entity Component System
+- Event Bus
+
 ## Requirements
 
 - [gcc](https://gcc.gnu.org/)

@@ -15,9 +15,6 @@ state_t *state_new(entity_t *entities)
         return NULL;
     }
 
-    init_render_collider_system();
-    init_keyboard_control_system();
-
     state->entities = entities;
     state->render_colliders = false;
 

@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include <stdbool.h>
+#include "SDL.h"
 
 typedef enum {
 	EVT_DEAD,
@@ -11,7 +12,7 @@ typedef enum {
 } event_type_t;
 
 typedef union {
-	vec2_t movement;
+	SDL_Event event;
 	int i;
 } args_t;
 
