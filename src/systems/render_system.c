@@ -2,12 +2,14 @@
 #include "../components/transform_component.h"
 #include "render_system.h"
 #include <SDL2/SDL_image.h>
+#include <string.h>
 
 int update_render_system(SDL_Renderer *renderer, entity_t *entities)
 {
     size_t entities_len = array_length(entities);
     for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
+
         if (!entity.components.transform) {
             return 1;
         }

@@ -1,7 +1,13 @@
 #include "components/keyboard_control_component.h"
 #include "entity.h"
 
-void add_component_transform(entity_t *entity, float x, float y, vec2_t scale)
+void add_component_transform(
+    entity_t *entity,
+    const float x,
+    const float y,
+    const vec2_t scale,
+    const float rotation
+)
 {
     entity->components.transform = malloc(sizeof(component_transform_t));
     if (entity->components.transform) {
@@ -12,6 +18,7 @@ void add_component_transform(entity_t *entity, float x, float y, vec2_t scale)
     entity->components.transform->position.y = y;
     entity->components.transform->scale.x = scale.x;
     entity->components.transform->scale.y = scale.y;
+    entity->components.transform->rotation = rotation;
 }
 
 void add_component_rigidbody(entity_t *entity, vec2_t vel)

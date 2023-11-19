@@ -8,6 +8,7 @@
 #include "systems/render_collider_system.h"
 #include "vector.h"
 #include <SDL2/SDL_image.h>
+#include <stdio.h>
 
 const int FPS = 60;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
@@ -52,20 +53,22 @@ bool engine_init(engine_t *engine, struct engine_options *options)
 
 void engine_setup(engine_t *engine)
 {
-    asset_store_add_texture(engine->graphics.renderer, "tilemap", "./assets/tilemaps/jungle.png");
-    asset_store_add_texture(engine->graphics.renderer, "tank", "./assets/tank.png");
-
-    load_tilemap_data("./assets/tilemaps/jungle.map");
-
     init_render_collider_system();
     init_keyboard_control_system();
 
+    asset_store_add_texture(engine->graphics.renderer, "tilemap", "./assets/tilemaps/jungle.png");
+    asset_store_add_texture(engine->graphics.renderer, "tank", "./assets/tank.png");
+
     entity_t *entities = NULL;
 
+    load_tilemap_data("./assets/tilemaps/jungle.map", &entities);
+
+    printf("len:%d\n", array_length(&entities));
+
     entity_t player = {
-        .id = 1,
+        .id = "player",
     };
-    add_component_transform(&player, 10, 10, (vec2_t) { 1, 1 });
+    add_component_transform(&player, 10, 10, (vec2_t) { 1, 1 }, 0);
     add_component_boxcollider(
         &player,
         32,
@@ -89,9 +92,9 @@ void engine_setup(engine_t *engine)
     array_push(entities, player);
 
     entity_t entity2 = {
-        .id = 2,
+        .id = "enemy1",
     };
-    add_component_transform(&entity2, 100, 100, (vec2_t) { 1, 1 });
+    add_component_transform(&entity2, 100, 100, (vec2_t) { 1, 1 }, 0);
     add_component_boxcollider(
         &entity2,
         30,
@@ -195,6 +198,62 @@ int engine_clean(engine_t *engine)
     return 0;
 }
 
-void load_tilemap_data(const char *filename)
+bool load_tilemap_data(const char *filename, entity_t **entities)
 {
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL) {
+        SDL_LogError(1, "Error opening tilemap\n");
+        return false;
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int x = 0, y = 0;
+    int tile_width = 32;
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        char *token = strtok(line, ",");
+        while (token != NULL) {
+            char tile_id[50] = { 0 };
+            sprintf(tile_id, "tile%d_%d", x, y);
+
+            entity_t tile = {
+                .id = tile_id,
+            };
+            add_component_transform(
+                &tile,
+                x * tile_width,
+                y * tile_width,
+                (vec2_t) { 1, 1 },
+                0
+            );
+
+            int tile_num = atoi(token);
+            int tile_map_x = tile_num % 10;
+            int tile_map_y = tile_num / 10;
+            add_component_sprite(
+                &tile,
+                "tilemap",
+                tile_width,
+                tile_width,
+                tile_map_x * tile_width,
+                tile_map_y * tile_width,
+                1,
+                false,
+                SDL_FLIP_NONE
+            );
+            array_push(*entities, tile);
+
+            token = strtok(NULL, ",");
+            x++;
+        }
+        x = 0;
+        y++;
+    }
+
+    fclose(fp);
+    free(line);
+
+    return true;
 }

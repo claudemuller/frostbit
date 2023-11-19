@@ -1,6 +1,7 @@
 #ifndef	ENGINE_H_
 #define	ENGINE_H_
 
+#include "entity.h"
 #include "gfx.h"
 #include "state_manager.h"
 #include "asset_store.h"
@@ -30,6 +31,6 @@ void engine_process_input(engine_t *engine);
 void engine_update(engine_t *engine);
 void engine_render(engine_t *engine);
 int engine_clean(engine_t *engine);
-void load_tilemap_data(const char *filename);
+bool load_tilemap_data(const char *filename, entity_t **entities);
 
 #endif // ENGINE_H_

@@ -61,4 +61,6 @@ int update_keyboard_control_system(entity_t *entities, const double dt)
         rigidbody->velocity.x += move_vec.x * PLAYER_SPEED * dt;
         rigidbody->velocity.y += move_vec.y * PLAYER_SPEED * dt;
     }
+
+    return 0;
 }

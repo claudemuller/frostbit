@@ -18,11 +18,17 @@ typedef struct {
 } components_t;
 
 typedef struct {
-	unsigned int id;
+	const char *id;
 	components_t components;
 } entity_t;
 
-void add_component_transform(entity_t *entity, float x, float y, vec2_t scale);
+void add_component_transform(
+	entity_t *entity,
+	const float x,
+	const float y,
+	const vec2_t scale,
+	const float rotation
+);
 void add_component_rigidbody(entity_t *entity, vec2_t vel);
 void add_component_boxcollider(entity_t *entity, int width, int height, vec2_t offset, SDL_Color colour);
 void add_component_sprite(
@@ -30,8 +36,8 @@ void add_component_sprite(
 	const char *asset_id,
 	const int width,
 	const int height,
-	const int x,
-	const int y,
+	const int src_x,
+	const int src_y,
 	const int z_index,
 	const bool is_fixed,
 	SDL_RendererFlip is_flipped
