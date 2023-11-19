@@ -33,10 +33,11 @@ void event_bus_on_event(event_type_t type, handler_fn handler_fn)
     array_push(event_bus.handlers, handler);
 }
 
-void event_bus_emit(event_type_t type)
+void event_bus_emit(event_type_t type, args_t args)
 {
     event_t ev = {
-        .type = type
+        .type = type,
+        .args = args,
     };
     array_push(event_bus.poll, ev);
 }

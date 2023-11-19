@@ -3,7 +3,7 @@
 
 bool render_collider = false;
 
-static void collide(vec2_t args)
+static void collide(args_t args)
 {
     render_collider = true;
 }

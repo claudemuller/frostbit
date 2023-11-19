@@ -38,7 +38,7 @@ void state_update(state_t *self, double dt)
 {
     update_movement_system(self->entities, dt);
     update_collision_system(self->entities);
-    update_keyboard_control_system(self->entities);
+    update_keyboard_control_system(self->entities, dt);
 }
 
 void state_destroy(state_t *self)

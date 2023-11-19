@@ -54,7 +54,8 @@ int update_collision_system(entity_t *entities)
             );
 
             if (is_colliding) {
-                event_bus_emit(EVT_DESTROY_ENTITY);
+                args_t args = { 0 };
+                event_bus_emit(EVT_DESTROY_ENTITY, args);
             }
         }
     }

@@ -39,8 +39,6 @@ bool state_manager_push(state_t *state)
     stateman.top++;
     stateman.stack[stateman.top] = state;
 
-    // state_init(state);
-
     return true;
 }
 

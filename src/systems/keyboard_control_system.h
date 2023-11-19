@@ -6,6 +6,6 @@
 #include "SDL.h"
 
 void init_keyboard_control_system(void);
-int update_keyboard_control_system(entity_t *entities);
+int update_keyboard_control_system(entity_t *entities, const double dt);
 
 #endif // KEYBOARD_CONTROL_SYSTEM_

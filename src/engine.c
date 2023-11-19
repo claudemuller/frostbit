@@ -57,20 +57,20 @@ void engine_setup(engine_t *engine)
 
     entity_t *entities = NULL;
 
-    entity_t entity1 = {
+    entity_t player = {
         .id = 1,
     };
-    add_component_transform(&entity1, 10, 10, (vec2_t) { 1, 1 });
+    add_component_transform(&player, 10, 10, (vec2_t) { 1, 1 });
     add_component_boxcollider(
-        &entity1,
+        &player,
         32,
         32,
         (vec2_t) { 1, 1 },
         (SDL_Color) { 255, 0, 0, 255 }
     );
-    add_component_rigidbody(&entity1, (vec2_t) { 1, 1 });
+    add_component_rigidbody(&player, (vec2_t) { 0 });
     add_component_sprite(
-        &entity1,
+        &player,
         "tank",
         32,
         32,
@@ -80,7 +80,8 @@ void engine_setup(engine_t *engine)
         false,
         SDL_FLIP_NONE
     );
-    array_push(entities, entity1);
+    add_component_keyboard_control(&player);
+    array_push(entities, player);
 
     entity_t entity2 = {
         .id = 2,
@@ -141,11 +142,32 @@ void engine_process_input(engine_t *engine)
                 engine->running = false;
             } break;
 
-            case SDLK_w:
-            case SDLK_a:
-            case SDLK_s:
+            case SDLK_w: {
+                args_t move_vec = {
+                    .movement = (vec2_t) { 0, -1 },
+                };
+                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
+            } break;
+
+            case SDLK_a: {
+                args_t move_vec = {
+                    .movement = (vec2_t) { -1, 0 },
+                };
+                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
+            } break;
+
+            case SDLK_s: {
+                args_t move_vec = {
+                    .movement = (vec2_t) { 0, 1 },
+                };
+                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
+            } break;
+
             case SDLK_d: {
-                event_bus_emit(EVT_PLAYER_MOVE);
+                args_t move_vec = {
+                    .movement = (vec2_t) { 1, 0 },
+                };
+                event_bus_emit(EVT_PLAYER_MOVE, move_vec);
             } break;
             }
         }

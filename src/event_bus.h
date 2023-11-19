@@ -10,12 +10,17 @@ typedef enum {
 	EVT_PLAYER_MOVE
 } event_type_t;
 
+typedef union {
+	vec2_t movement;
+	int i;
+} args_t;
+
 typedef struct {
 	event_type_t type;
-	vec2_t args;
+	args_t args;
 } event_t;
 
-typedef void (*handler_fn)(vec2_t);
+typedef void (*handler_fn)(args_t);
 
 typedef struct {
 	event_type_t type;
@@ -27,14 +32,14 @@ typedef struct event_bus_t {
 	event_t *poll;
 
 	void (*on_event)(event_type_t type, handler_fn handler_fn);
-	void (*emit)(event_type_t type);
+	void (*emit)(event_type_t type, args_t args);
 	void (*process_events)(void);
 	void (*destroy)(void);
 } event_bus_t;
 
 bool event_bus_init(void);
 void event_bus_on_event(event_type_t type, handler_fn handler_fn);
-void event_bus_emit(event_type_t type);
+void event_bus_emit(event_type_t type, args_t args);
 void event_bus_process_events(void);
 void event_bus_destroy(void);
 
