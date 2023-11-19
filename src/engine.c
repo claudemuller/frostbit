@@ -1,3 +1,4 @@
+#include "array.h"
 #include "engine.h"
 #include "entity.h"
 #include "state.h"
@@ -28,7 +29,7 @@ bool engine_init(engine_t *engine, struct engine_options *options)
         return false;
     }
 
-    if (!state_manager_init(&engine->state_manager)) {
+    if (!state_manager_init()) {
         SDL_LogCritical(1, "Unable to init state manager");
         return false;
     }
@@ -47,10 +48,11 @@ void engine_setup(engine_t *engine)
 
     // load_tilemap_data("./assets/tilemaps/jungle.map");
 
-    entity_t *entities = malloc(sizeof(*entities) * MAX_ENTITIES);
+    entity_t *entities = NULL;
 
-    entity_t entity1;
-    entity1.id = 1;
+    entity_t entity1 = {
+        .id = 1,
+    };
     add_component_transform(&entity1, 10, 10, (vec2_t) { 1, 1 });
     add_component_boxcollider(
         &entity1,
@@ -71,10 +73,11 @@ void engine_setup(engine_t *engine)
         false,
         SDL_FLIP_NONE
     );
-    entities[0] = entity1;
+    array_push(entities, entity1);
 
-    entity_t entity2;
-    entity2.id = 2;
+    entity_t entity2 = {
+        .id = 2,
+    };
     add_component_transform(&entity2, 100, 100, (vec2_t) { 1, 1 });
     add_component_boxcollider(
         &entity2,
@@ -95,15 +98,15 @@ void engine_setup(engine_t *engine)
         false,
         SDL_FLIP_NONE
     );
-    entities[1] = entity2;
+    array_push(entities, entity2);
 
-    state_t *state1 = state_new(entities, 2);
-    if (!state1) {
-        SDL_LogError(1, "Error initialising state1\n");
+    state_t *level1 = state_new(entities, array_length(entities));
+    if (!level1) {
+        SDL_LogError(1, "Error initialising level 1\n");
         exit(1);
     }
 
-    state_manager_push(&engine->state_manager, state1);
+    state_manager_push(level1);
 }
 
 void engine_run(engine_t *engine)
@@ -121,12 +124,28 @@ void engine_process_input(engine_t *engine)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
-        if (e.type == SDL_QUIT)
+        if (e.type == SDL_QUIT) {
             engine->running = false;
+        }
+
         if (e.type == SDL_KEYDOWN) {
             switch (e.key.keysym.sym) {
-            case SDLK_ESCAPE:
+            case SDLK_ESCAPE: {
                 engine->running = false;
+            } break;
+
+            case SDLK_w: {
+
+            } break;
+            case SDLK_a: {
+
+            } break;
+            case SDLK_s: {
+
+            } break;
+            case SDLK_d: {
+
+            } break;
             }
         }
     }
@@ -142,7 +161,7 @@ void engine_update(engine_t *engine)
     double dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
     prev_frame_ms = SDL_GetTicks();
 
-    state_manager_update(&engine->state_manager, dt);
+    state_manager_update(dt);
 }
 
 void engine_render(engine_t *engine)
@@ -150,17 +169,14 @@ void engine_render(engine_t *engine)
     SDL_SetRenderDrawColor(engine->graphics.renderer, 21, 21, 21, 255);
     SDL_RenderClear(engine->graphics.renderer);
 
-    state_manager_render(
-        &engine->state_manager,
-        engine->graphics.renderer
-    );
+    state_manager_render(engine->graphics.renderer);
 
     SDL_RenderPresent(engine->graphics.renderer);
 }
 
 int engine_clean(engine_t *engine)
 {
-    state_manager_free(&engine->state_manager);
+    state_manager_free();
     asset_store_free();
     gfx_free(&engine->graphics);
     SDL_Quit();

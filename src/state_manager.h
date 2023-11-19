@@ -10,13 +10,13 @@ typedef struct {
 	int top;
 } state_manager_t;
 
-bool state_manager_init(state_manager_t *stateman);
-void state_manager_free(state_manager_t *stateman);
-bool state_manager_push(state_manager_t *stateman, state_t *state);
-int state_manager_pop(state_manager_t *stateman);
-state_t *state_manager_top(state_manager_t *stateman);
-bool state_manager_update(state_manager_t *stateman, double dt);
-bool state_manager_render(state_manager_t *stateman, SDL_Renderer *renderer);
-bool state_manager_grow(state_manager_t *stateman);
+bool state_manager_init(void);
+void state_manager_free(void);
+bool state_manager_push(state_t *state);
+int state_manager_pop(void);
+state_t *state_manager_top(void);
+bool state_manager_update(double dt);
+bool state_manager_render(SDL_Renderer *renderer);
+bool state_manager_grow(void);
 
 #endif // STATE_MANAGER_H_

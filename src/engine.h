@@ -1,10 +1,10 @@
 #ifndef	ENGINE_H_
 #define	ENGINE_H_
 
-#include <stdbool.h>
 #include "gfx.h"
 #include "state_manager.h"
 #include "asset_store.h"
+#include <stdbool.h>
 
 extern const int FPS;
 extern const int MILLISECS_PER_FRAME;
@@ -13,6 +13,7 @@ struct engine_options {
 	char *title;
 	int width;
 	int height;
+	bool fullscreen;
 };
 
 typedef struct {
