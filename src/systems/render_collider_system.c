@@ -1,25 +1,27 @@
+#include "../array.h"
 #include "render_collider_system.h"
 
 bool render_collider = false;
 
-static void collide(void)
+static void collide(vec2_t args)
 {
-    printf("collision from event\n");
     render_collider = true;
 }
 
-void init_render_collider_system(event_bus_t *event_bus)
+void init_render_collider_system(void)
 {
-    event_bus->on_event(event_bus, EVENT_DESTROY_ENTITY, &collide);
+    event_bus_on_event(EVT_DESTROY_ENTITY, &collide);
 }
 
-int update_render_collider_system(SDL_Renderer *renderer, entity_t *entities, size_t num_entities)
+int update_render_collider_system(SDL_Renderer *renderer, entity_t *entities)
 {
     if (!render_collider) {
         return 0;
     }
+    render_collider = false;
 
-    for (size_t i = 0; i < num_entities; i++) {
+    size_t entities_len = array_length(entities);
+    for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
         if (!entity.components.transform) {
             return 1;

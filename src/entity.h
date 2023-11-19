@@ -1,13 +1,12 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef ENTITY_H_
+#define ENTITY_H_
 
-#include <stdlib.h>
-#include <SDL2/SDL.h>
 #include "vector.h"
 #include "components/transform_component.h"
 #include "components/rigidbody_component.h"
 #include "components/boxcollider_component.h"
 #include "components/sprite_component.h"
+#include "SDL.h"
 
 typedef struct {
 	component_transform_t *transform;
@@ -37,4 +36,4 @@ void add_component_sprite(
 );
 void free_entity(entity_t *entity);
 
-#endif // ENTITY_H
+#endif // ENTITY_H_

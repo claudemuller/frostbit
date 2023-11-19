@@ -1,7 +1,7 @@
 #ifndef GFX_H_
 #define GFX_H_
 
-#include <SDL2/SDL.h>
+#include "SDL.h"
 
 typedef struct {
 	char *window_title;

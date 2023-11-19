@@ -1,7 +1,9 @@
 #include "array.h"
 #include "engine.h"
 #include "entity.h"
+#include "event_bus.h"
 #include "state.h"
+#include "state_manager.h"
 #include "vector.h"
 #include <SDL2/SDL_image.h>
 
@@ -35,6 +37,11 @@ bool engine_init(engine_t *engine, struct engine_options *options)
     }
 
     asset_store_init();
+
+    if (!event_bus_init()) {
+        SDL_LogCritical(1, "Unable to init event bus");
+        return false;
+    }
 
     engine->running = true;
 
@@ -100,7 +107,7 @@ void engine_setup(engine_t *engine)
     );
     array_push(entities, entity2);
 
-    state_t *level1 = state_new(entities, array_length(entities));
+    state_t *level1 = state_new(entities);
     if (!level1) {
         SDL_LogError(1, "Error initialising level 1\n");
         exit(1);
@@ -134,17 +141,11 @@ void engine_process_input(engine_t *engine)
                 engine->running = false;
             } break;
 
-            case SDLK_w: {
-
-            } break;
-            case SDLK_a: {
-
-            } break;
-            case SDLK_s: {
-
-            } break;
+            case SDLK_w:
+            case SDLK_a:
+            case SDLK_s:
             case SDLK_d: {
-
+                event_bus_emit(EVT_PLAYER_MOVE);
             } break;
             }
         }
@@ -162,6 +163,7 @@ void engine_update(engine_t *engine)
     prev_frame_ms = SDL_GetTicks();
 
     state_manager_update(dt);
+    event_bus_process_events();
 }
 
 void engine_render(engine_t *engine)

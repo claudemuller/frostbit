@@ -1,8 +1,8 @@
-#ifndef SPRITE_COMPONENT_H
-#define SPRITE_COMPONENT_H
+#ifndef SPRITE_COMPONENT_H_
+#define SPRITE_COMPONENT_H_
 
+#include "SDL.h"
 #include <stdbool.h>
-#include <SDL2/SDL.h>
 
 typedef struct {
 	SDL_Rect src_rect;
@@ -14,4 +14,4 @@ typedef struct {
 	const char *id;
 } component_sprite_t;
 
-#endif // SPRITE_COMPONENT_H
+#endif // SPRITE_COMPONENT_H_

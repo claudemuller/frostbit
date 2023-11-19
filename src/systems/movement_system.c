@@ -1,9 +1,10 @@
+#include "../array.h"
 #include "movement_system.h"
-#include <stdlib.h>
 
-int update_movement_system(entity_t *entities, size_t num_entities, double dt)
+int update_movement_system(entity_t *entities, double dt)
 {
-    for (size_t i = 0; i < num_entities; i++) {
+    size_t entities_len = array_length(entities);
+    for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
         if (!entity.components.transform) {
             return 1;

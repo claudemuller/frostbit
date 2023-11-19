@@ -1,15 +1,12 @@
+#include "../array.h"
 #include "../components/transform_component.h"
-#include "SDL_render.h"
 #include "render_system.h"
 #include <SDL2/SDL_image.h>
 
-int update_render_system(
-    SDL_Renderer *renderer,
-    entity_t *entities,
-    size_t num_entities
-)
+int update_render_system(SDL_Renderer *renderer, entity_t *entities)
 {
-    for (size_t i = 0; i < num_entities; i++) {
+    size_t entities_len = array_length(entities);
+    for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
         if (!entity.components.transform) {
             return 1;

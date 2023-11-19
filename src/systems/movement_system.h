@@ -3,6 +3,6 @@
 
 #include "../entity.h"
 
-int update_movement_system(entity_t *entities, size_t num_entities, double dt);
+int update_movement_system(entity_t *entities, double dt);
 
 #endif // MOVEMENT_SYSTEM_H_

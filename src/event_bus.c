@@ -2,82 +2,73 @@
 #include "event_bus.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-event_bus_t *event_bus_new(void)
+static event_bus_t event_bus = { 0 };
+
+bool event_bus_init(void)
 {
     event_bus_t *event_bus = malloc(sizeof(event_bus_t));
     if (!event_bus) {
-        return NULL;
+        return false;
     }
 
-    // handler_t *listeners = malloc(sizeof(handler_t) * 10);
-    // event_t *poll = malloc(sizeof(event_t) * 10);
+    event_bus->handlers = NULL;
+    event_bus->poll = NULL;
 
-    event_bus->listeners = NULL; // listeners;
-    event_bus->num_listeners = 0;
-    event_bus->poll = NULL; // poll;
-    event_bus->num_poll = 0;
-
-    event_bus->add_handler = event_bus_add_handler;
     event_bus->on_event = event_bus_on_event;
-    event_bus->add_event = event_bus_add_event;
     event_bus->emit = event_bus_emit;
     event_bus->process_events = event_bus_process_events;
     event_bus->destroy = event_bus_destroy;
 
-    return event_bus;
+    return true;
 }
 
-void event_bus_add_handler(event_bus_t *self, handler_t handler)
-{
-    array_push(self->listeners, handler);
-    // self->listeners[self->num_listeners] = handler;
-    self->num_listeners++;
-}
-
-void event_bus_on_event(event_bus_t *self, event_type_t type, handler_fn handler_fn)
+void event_bus_on_event(event_type_t type, handler_fn handler_fn)
 {
     handler_t handler = {
         .type = type,
         .handler = handler_fn,
     };
-    self->add_handler(self, handler);
+    array_push(event_bus.handlers, handler);
 }
 
-void event_bus_add_event(event_bus_t *self, event_t ev)
-{
-    array_push(self->poll, ev);
-    self->poll[self->num_poll] = ev;
-    self->num_poll++;
-}
-
-void event_bus_emit(event_bus_t *self, event_type_t type)
+void event_bus_emit(event_type_t type)
 {
     event_t ev = {
         .type = type
     };
-    self->add_event(self, ev);
+    array_push(event_bus.poll, ev);
 }
 
-void event_bus_process_events(event_bus_t *self)
+void event_bus_process_events(void)
 {
-    if (array_length(self->poll) == 0) {
+    size_t poll_len = array_length(event_bus.poll);
+    if (poll_len == 0) {
         return;
     }
 
-    for (size_t i = 0; i < 1; i++) {
-        for (size_t j = 0; j < 1; j++) {
-            event_t ev = self->poll[i];
-            handler_t hn = self->listeners[i];
+    size_t handlers_len = array_length(event_bus.handlers);
+
+    for (size_t i = 0; i < poll_len; i++) {
+        event_t ev = event_bus.poll[i];
+
+        for (size_t j = 0; j < handlers_len; j++) {
+            handler_t hn = event_bus.handlers[j];
             if (ev.type == hn.type) {
-                hn.handler();
+                hn.handler(ev.args);
+
+                // TODO: figure out how to remove items from array
+                event_bus.poll[i] = (event_t) {
+                    .type = EVT_DEAD,
+                };
             }
         }
     }
 }
 
-void event_bus_destroy(event_bus_t *self)
+void event_bus_destroy(void)
 {
-    free(self->listeners);
-    free(self->poll);
+    free(event_bus.handlers);
+    free(event_bus.poll);
 }

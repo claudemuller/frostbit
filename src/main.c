@@ -1,7 +1,7 @@
+#include "SDL.h"
 #include "engine.h"
 #include "gfx.h"
 #include "state_manager.h"
-#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdio.h>
 

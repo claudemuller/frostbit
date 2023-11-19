@@ -1,5 +1,5 @@
-#ifndef TRANSFORM_COMPONENT_H
-#define TRANSFORM_COMPONENT_H
+#ifndef TRANSFORM_COMPONENT_H_
+#define TRANSFORM_COMPONENT_H_
 
 #include "../vector.h"
 
@@ -9,4 +9,4 @@ typedef struct {
 	float rotation;
 } component_transform_t;
 
-#endif // TRANSFORM_COMPONENT_H
+#endif // TRANSFORM_COMPONENT_H_

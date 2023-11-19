@@ -1,7 +1,7 @@
 #ifndef ASSET_STORE_
 #define ASSET_STORE_
 
-#include <SDL2/SDL.h>
+#include "SDL.h"
 
 typedef struct {
 	SDL_Texture *texture;

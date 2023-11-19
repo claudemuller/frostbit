@@ -1,8 +1,8 @@
-#ifndef BOXCOLLIDER_COMPONENT_H
-#define BOXCOLLIDER_COMPONENT_H
+#ifndef BOXCOLLIDER_COMPONENT_H_
+#define BOXCOLLIDER_COMPONENT_H_
 
-#include <SDL2/SDL.h>
 #include "../vector.h"
+#include "SDL.h"
 
 typedef struct {
 	vec2_t offset;
@@ -11,5 +11,4 @@ typedef struct {
 	SDL_Color colour;
 } component_boxcollider_t;
 
-#endif // BOXCOLLIDER_COMPONENT_H
-
+#endif // BOXCOLLIDER_COMPONENT_H_

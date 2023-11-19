@@ -1,3 +1,4 @@
+#include "../array.h"
 #include "collision_system.h"
 
 static bool check_aabb_collision(
@@ -13,9 +14,10 @@ static bool check_aabb_collision(
         && aY + aH > bY;
 }
 
-int update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t num_entities)
+int update_collision_system(entity_t *entities)
 {
-    for (size_t i = 0; i < num_entities; i++) {
+    size_t entities_len = array_length(entities);
+    for (size_t i = 0; i < entities_len; i++) {
         entity_t entityA = entities[i];
 
         if (!entityA.components.boxcollider) {
@@ -28,7 +30,7 @@ int update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t n
         component_transform_t *transformA = entityA.components.transform;
         component_boxcollider_t *colliderA = entityA.components.boxcollider;
 
-        for (size_t j = 0; j < num_entities; j++) {
+        for (size_t j = 0; j < entities_len; j++) {
             entity_t entityB = entities[j];
             if (entityA.id == entityB.id) {
                 continue;
@@ -52,7 +54,7 @@ int update_collision_system(event_bus_t *event_bus, entity_t *entities, size_t n
             );
 
             if (is_colliding) {
-                event_bus->emit(event_bus, EVENT_DESTROY_ENTITY);
+                event_bus_emit(EVT_DESTROY_ENTITY);
             }
         }
     }
