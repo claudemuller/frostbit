@@ -37,10 +37,10 @@ int update_collision_system(entity_t *entities)
             }
 
             if (!entityB.components.boxcollider) {
-                return 1;
+                continue;
             }
             if (!entityB.components.transform) {
-                return 1;
+                continue;
             }
 
             component_transform_t *transformB = entityB.components.transform;

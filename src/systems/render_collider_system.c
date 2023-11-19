@@ -24,10 +24,10 @@ int update_render_collider_system(SDL_Renderer *renderer, entity_t *entities)
     for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
         if (!entity.components.transform) {
-            return 1;
+            continue;
         }
         if (!entity.components.boxcollider) {
-            return 1;
+            continue;
         }
 
         component_transform_t *transform = entity.components.transform;

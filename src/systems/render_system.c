@@ -11,10 +11,10 @@ int update_render_system(SDL_Renderer *renderer, entity_t *entities)
         entity_t entity = entities[i];
 
         if (!entity.components.transform) {
-            return 1;
+            continue;
         }
         if (!entity.components.sprite) {
-            return 1;
+            continue;
         }
 
         component_transform_t *transform = entity.components.transform;

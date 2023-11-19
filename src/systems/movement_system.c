@@ -7,15 +7,15 @@ int update_movement_system(entity_t *entities, const double dt)
     for (size_t i = 0; i < entities_len; i++) {
         entity_t entity = entities[i];
         if (!entity.components.transform) {
-            return 1;
+            continue;
         }
 
         if (!entity.components.rigidbody) {
-            return 1;
+            continue;
         }
 
         if (!entity.components.sprite) {
-            return 1;
+            continue;
         }
 
         component_transform_t *transform = entity.components.transform;
