@@ -53,17 +53,20 @@ bool engine_init(engine_t *engine, struct engine_options *options)
 
 void engine_setup(engine_t *engine)
 {
+    state_t *level1 = state_new();
+    if (!level1) {
+        SDL_LogError(1, "Error initialising level 1\n");
+        exit(1);
+    }
+
     init_render_collider_system();
     init_keyboard_control_system();
 
     asset_store_add_texture(engine->graphics.renderer, "tilemap", "./assets/tilemaps/jungle.png");
     asset_store_add_texture(engine->graphics.renderer, "tank", "./assets/tank.png");
+    asset_store_add_texture(engine->graphics.renderer, "chopper", "./assets/chopper.png");
 
-    entity_t *entities = NULL;
-
-    load_tilemap_data("./assets/tilemaps/jungle.map", &entities);
-
-    printf("len:%d\n", array_length(&entities));
+    load_tilemap_data("./assets/tilemaps/jungle.map", level1);
 
     entity_t player = {
         .id = "player",
@@ -79,7 +82,7 @@ void engine_setup(engine_t *engine)
     add_component_rigidbody(&player, (vec2_t) { 0 });
     add_component_sprite(
         &player,
-        "tank",
+        "chopper",
         32,
         32,
         0,
@@ -89,7 +92,7 @@ void engine_setup(engine_t *engine)
         SDL_FLIP_NONE
     );
     add_component_keyboard_control(&player);
-    array_push(entities, player);
+    array_push(level1->entities, player);
 
     entity_t entity2 = {
         .id = "enemy1",
@@ -114,13 +117,7 @@ void engine_setup(engine_t *engine)
         false,
         SDL_FLIP_NONE
     );
-    array_push(entities, entity2);
-
-    state_t *level1 = state_new(entities);
-    if (!level1) {
-        SDL_LogError(1, "Error initialising level 1\n");
-        exit(1);
-    }
+    array_push(level1->entities, entity2);
 
     state_manager_push(level1);
 }
@@ -198,7 +195,7 @@ int engine_clean(engine_t *engine)
     return 0;
 }
 
-bool load_tilemap_data(const char *filename, entity_t **entities)
+bool load_tilemap_data(const char *filename, state_t *state)
 {
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -243,7 +240,7 @@ bool load_tilemap_data(const char *filename, entity_t **entities)
                 false,
                 SDL_FLIP_NONE
             );
-            array_push(*entities, tile);
+            array_push(state->entities, tile);
 
             token = strtok(NULL, ",");
             x++;

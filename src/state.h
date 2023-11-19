@@ -13,7 +13,7 @@ typedef struct state_t {
 	bool render_colliders;
 } state_t;
 
-state_t* state_new(entity_t *entities);
+state_t* state_new(void);
 void state_init(struct state_t *self);
 void state_render(struct state_t *self, SDL_Renderer *renderer);
 void state_update(struct state_t *self, double dt);

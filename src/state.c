@@ -7,7 +7,7 @@
 #include "systems/render_collider_system.h"
 #include "systems/render_system.h"
 
-state_t *state_new(entity_t *entities)
+state_t *state_new(void)
 {
     state_t *state = malloc(sizeof(*state));
     if (!state) {
@@ -15,7 +15,7 @@ state_t *state_new(entity_t *entities)
         return NULL;
     }
 
-    state->entities = entities;
+    state->entities = NULL;
     state->render_colliders = false;
 
     return state;

@@ -31,6 +31,6 @@ void engine_process_input(engine_t *engine);
 void engine_update(engine_t *engine);
 void engine_render(engine_t *engine);
 int engine_clean(engine_t *engine);
-bool load_tilemap_data(const char *filename, entity_t **entities);
+bool load_tilemap_data(const char *filename, state_t *state);
 
 #endif // ENGINE_H_
