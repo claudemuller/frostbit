@@ -7,7 +7,6 @@
 #include "systems/keyboard_control_system.h"
 #include "systems/render_collider_system.h"
 #include "vector.h"
-#include <SDL2/SDL_image.h>
 #include <stdio.h>
 
 const int FPS = 60;
@@ -71,7 +70,7 @@ void engine_setup(engine_t *engine)
     entity_t player = {
         .id = "player",
     };
-    add_component_transform(&player, 10, 10, (vec2_t) { 1, 1 }, 0);
+    add_component_transform(&player, 10, 10, (vec2_t) { 2, 2 }, 0);
     add_component_boxcollider(
         &player,
         32,
@@ -97,7 +96,7 @@ void engine_setup(engine_t *engine)
     entity_t entity2 = {
         .id = "enemy1",
     };
-    add_component_transform(&entity2, 100, 100, (vec2_t) { 1, 1 }, 0);
+    add_component_transform(&entity2, 100, 100, (vec2_t) { 2, 2 }, 0);
     add_component_boxcollider(
         &entity2,
         30,
@@ -222,7 +221,7 @@ bool load_tilemap_data(const char *filename, state_t *state)
                 &tile,
                 x * tile_width,
                 y * tile_width,
-                (vec2_t) { 1, 1 },
+                (vec2_t) { 2, 2 },
                 0
             );
 

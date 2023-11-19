@@ -9,8 +9,8 @@ int main(void)
 {
     struct engine_options options = {
         .title = "Frostbit",
-        .width = 800,
-        .height = 600
+        .width = 1280,
+        .height = 1080
     };
 
     engine_t engine;

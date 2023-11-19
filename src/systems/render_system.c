@@ -22,8 +22,8 @@ int update_render_system(SDL_Renderer *renderer, entity_t *entities)
 
         SDL_Rect srcRect = sprite->src_rect;
         SDL_Rect dstRect = {
-            transform->position.x,
-            transform->position.y,
+            transform->position.x * transform->scale.x,
+            transform->position.y * transform->scale.y,
             sprite->width * transform->scale.x,
             sprite->height * transform->scale.y
         };

@@ -1,6 +1,5 @@
 #include "../array.h"
 #include "keyboard_control_system.h"
-#include <stdio.h>
 
 #define PLAYER_SPEED 100
 
@@ -10,7 +9,6 @@ static SDL_Event key_event = { 0 };
 static void key_press(args_t args)
 {
     key_event = args.event;
-    printf("key pressed\n");
 }
 
 void init_keyboard_control_system(void)
