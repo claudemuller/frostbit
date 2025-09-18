@@ -37,7 +37,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER), render_collider_sys_render, NULL);
 
     // --------------------------------------------------------------------------------------------
-    // SDL bootstrap
+    // Bootstrap SDL
     // --------------------------------------------------------------------------------------------
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -105,7 +105,7 @@ void game_destroy(void)
     SDL_Quit();
 }
 
-// ---------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 
 static void load_level(MemoryArena* game_mem)
 {
