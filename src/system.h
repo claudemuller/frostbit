@@ -40,5 +40,6 @@ static inline void sysmgr_update_entity(SystemManager* mgr, EntityManager* entmg
 void movement_sys_update(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
 void render_sys_render(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
 void render_collider_sys_render(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
+void keyboard_control_sys_update(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
 
 #endif // !SYSTEM_H_
