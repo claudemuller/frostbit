@@ -29,8 +29,6 @@ void entity_destroy(EntityManager* entmgr, Entity e)
 
 void transform_add(EntityManager* entmgr, Entity e, TransformComponent t)
 {
-    SDL_Log("transform added");
-
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
     entmgr->transform_comps[e] = t;
     SIGNATURE_SET(entmgr->signatures[e], COMP_TRANSFORM);
@@ -44,8 +42,6 @@ void transform_remove(EntityManager* entmgr, Entity e)
 
 void sprite_add(EntityManager* entmgr, Entity e, SpriteComponent t)
 {
-    SDL_Log("sprite added");
-
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
     entmgr->sprite_comps[e] = t;
     SIGNATURE_SET(entmgr->signatures[e], COMP_SPRITE);
@@ -55,4 +51,43 @@ void sprite_remove(EntityManager* entmgr, Entity e)
 {
     if (e >= MAX_ENTITIES || entmgr->live_entities[e]) return;
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_SPRITE);
+}
+
+void animation_add(EntityManager* entmgr, Entity e, AnimationComponent a)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    entmgr->animation_comps[e] = a;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_ANIMATION);
+}
+
+void animation_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_ANIMATION);
+}
+
+void keyboard_control_add(EntityManager* entmgr, Entity e, KeyboardControlComponent kb)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    entmgr->keyboard_control_comps[e] = kb;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
+}
+
+void keyboard_control_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
+}
+
+void box_collider_add(EntityManager* entmgr, Entity e, BoxColliderComponent bc)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    entmgr->box_collider_comps[e] = bc;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_BOX_COLLIDER);
+}
+
+void box_collider_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_BOX_COLLIDER);
 }
