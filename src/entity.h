@@ -64,7 +64,6 @@ typedef struct EntityManager {
     bool live_entities[MAX_ENTITIES];
 } EntityManager;
 
-EntityManager* entity_manager_new(MemoryArena* game_mem);
 Entity entity_create(EntityManager* entmgr);
 void entity_destroy(EntityManager* entmgr, Entity e);
 

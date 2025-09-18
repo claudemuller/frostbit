@@ -24,6 +24,8 @@ void entity_destroy(EntityManager* entmgr, Entity e)
 }
 
 // ------------------------------------------------------------------------------------------------
+// Components
+// ------------------------------------------------------------------------------------------------
 
 void transform_add(EntityManager* entmgr, Entity e, TransformComponent t)
 {

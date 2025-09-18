@@ -3,22 +3,7 @@
 #include "entity.h"
 #include "state.h"
 #include "system.h"
-#include "texture.h"
 #include <assert.h>
-
-GameState state = {0};
-
-// static EntityManager *entmgr;
-// static System system_render = {
-//     .component_mask = (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE),
-//     .fn = render_sys_update,
-//     .ctx = NULL,
-// };
-// static System system_movement = {
-//     .component_mask = (1U << COMP_TRANSFORM),
-//     .fn = movement_sys_update,
-//     .ctx = NULL,
-// };
 
 static void load_level(MemoryArena* game_mem);
 static void tick(void);
@@ -26,8 +11,14 @@ static void process_input(void);
 static void update(void);
 static void render(void);
 
+GameState state = {0};
+
 bool game_init(MemoryArena* game_mem)
 {
+    // --------------------------------------------------------------------------------------------
+    // Allocate managers
+    // --------------------------------------------------------------------------------------------
+
     state.sysmgr = (SystemManager*)arena_alloc_aligned(game_mem, sizeof(SystemManager), 16);
     assert(state.sysmgr && "Failed to allocate system manager.");
 
@@ -39,14 +30,14 @@ bool game_init(MemoryArena* game_mem)
 
     // --------------------------------------------------------------------------------------------
     // Register systems
-    //
+    // --------------------------------------------------------------------------------------------
 
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM), movement_sys_update, NULL);
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_update, NULL);
 
     // --------------------------------------------------------------------------------------------
     // SDL bootstrap
-    //
+    // --------------------------------------------------------------------------------------------
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error init'ing SDL: %s", SDL_GetError());
@@ -85,7 +76,7 @@ bool game_init(MemoryArena* game_mem)
 
     // --------------------------------------------------------------------------------------------
     // Setup game state
-    //
+    // --------------------------------------------------------------------------------------------
 
     state.is_running = true;
 
