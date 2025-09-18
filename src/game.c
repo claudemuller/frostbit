@@ -3,36 +3,50 @@
 #include "entity.h"
 #include "state.h"
 #include "system.h"
+#include "texture.h"
 #include <assert.h>
 
-static GameState state;
-static EntityManager *ent_man;
-static System system_render = {
-    .component_mask = (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE),
-    .fn = render_sys_update,
-    .ctx = NULL,
-};
-static System system_movement = {
-    .component_mask = (1U << COMP_TRANSFORM),
-    .fn = movement_sys_update,
-    .ctx = NULL,
-};
+GameState state = {0};
 
-static void load_level(MemoryArena *game_mem);
+// static EntityManager *entmgr;
+// static System system_render = {
+//     .component_mask = (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE),
+//     .fn = render_sys_update,
+//     .ctx = NULL,
+// };
+// static System system_movement = {
+//     .component_mask = (1U << COMP_TRANSFORM),
+//     .fn = movement_sys_update,
+//     .ctx = NULL,
+// };
+
+static void load_level(MemoryArena* game_mem);
 static void tick(void);
 static void process_input(void);
 static void update(void);
 static void render(void);
 
-bool game_init(MemoryArena *game_mem)
+bool game_init(MemoryArena* game_mem)
 {
-    ent_man = entity_manager_new(game_mem);
+    state.sysmgr = (SystemManager*)arena_alloc_aligned(game_mem, sizeof(SystemManager), 16);
+    assert(state.sysmgr && "Failed to allocate system manager.");
 
-    // state.tex_man = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
-    // assert(state.tex_man && "Failed to allocate texture manager.");
+    state.entmgr = (EntityManager*)arena_alloc_aligned(game_mem, sizeof(EntityManager), 16);
+    assert(state.entmgr && "Failed to allocate entity manager.");
+
+    // state.texmgr = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
+    // assert(state.texmgr && "Failed to allocate texture manager.");
+
+    // --------------------------------------------------------------------------------------------
+    // Register systems
     //
-    // state.sys_man = (SystemManager*)arena_alloc_aligned(game_mem, sizeof(SystemManager), 16);
-    // assert(state.sys_man && "Failed to allocate system manager.");
+
+    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM), movement_sys_update, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_update, NULL);
+
+    // --------------------------------------------------------------------------------------------
+    // SDL bootstrap
+    //
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error init'ing SDL: %s", SDL_GetError());
@@ -66,15 +80,19 @@ bool game_init(MemoryArena *game_mem)
     }
 
     SDL_SetWindowSize(state.window, 320 * 2, 240 * 2);
-    const char *platform = SDL_GetPlatform();
+    const char* platform = SDL_GetPlatform();
     if (strncmp(platform, "Linux", strlen("Linux")) == 0) SDL_SetWindowPosition(state.window, 3200, 300);
+
+    // --------------------------------------------------------------------------------------------
+    // Setup game state
+    //
 
     state.is_running = true;
 
     return true;
 }
 
-bool game_run(MemoryArena *game_mem)
+bool game_run(MemoryArena* game_mem)
 {
     load_level(game_mem);
 
@@ -97,10 +115,10 @@ void game_destroy(void)
 
 // ---------------------------------------------------------------------------------------
 
-static void load_level(MemoryArena *game_mem)
+static void load_level(MemoryArena* game_mem)
 {
-    Entity player = entity_create(ent_man);
-    transform_add(ent_man,
+    Entity player = entity_create(state.entmgr);
+    transform_add(state.entmgr,
                   player,
                   (TransformComponent){
                       .pos =
@@ -109,7 +127,7 @@ static void load_level(MemoryArena *game_mem)
                               .y = 10,
                           },
                   });
-    sprite_add(ent_man,
+    sprite_add(state.entmgr,
                player,
                (SpriteComponent){
                    .size =
@@ -130,7 +148,7 @@ static void tick(void)
 static void process_input(void)
 {
     SDL_Event event;
-    const bool *keystate = SDL_GetKeyboardState(NULL);
+    const bool* keystate = SDL_GetKeyboardState(NULL);
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -173,15 +191,15 @@ static void update(void)
 {
     float dt = 1.0f;
 
-    system_movement.ctx = &dt;
+    // TODO: update to map
+    for (uint32_t i = 0; i < state.sysmgr->count; ++i) {
+        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = &dt;
+    }
 
-    SDL_Log("next: %d", ent_man->next_entity_id);
+    for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
+        if (!state.entmgr->live_entities[e]) continue;
 
-    for (Entity e = 0; e < ent_man->next_entity_id; ++e) {
-        if (!ent_man->live_entities[e]) continue;
-
-        if (SIGNATURE_MATCH(ent_man->signatures[e], system_movement.component_mask))
-            system_movement.fn(ent_man, NULL, e, system_movement.ctx);
+        sysmgr_update_entity(state.sysmgr, state.entmgr, NULL, e);
     }
 }
 
@@ -190,13 +208,10 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    system_render.ctx = NULL;
+    for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
+        if (!state.entmgr->live_entities[e]) continue;
 
-    for (Entity e = 0; e < ent_man->next_entity_id; ++e) {
-        if (!ent_man->live_entities[e]) continue;
-
-        if (SIGNATURE_MATCH(ent_man->signatures[e], system_render.component_mask))
-            system_render.fn(ent_man, state.renderer, e, system_render.ctx);
+        sysmgr_update_entity(state.sysmgr, state.entmgr, state.renderer, e);
     }
 
     SDL_RenderPresent(state.renderer);

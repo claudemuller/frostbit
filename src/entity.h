@@ -33,7 +33,7 @@ typedef struct {
 } TransformComponent;
 
 typedef struct {
-    char *asset_id;
+    char* asset_id;
     Vector2 size;
     int z_index;
     bool is_fixed;
@@ -56,7 +56,7 @@ typedef struct {
     Vector2 right_vel;
 } KeyboardControlComponent;
 
-typedef struct {
+typedef struct EntityManager {
     uint32_t next_entity_id;
     TransformComponent transform_comps[MAX_ENTITIES];
     SpriteComponent sprite_comps[MAX_ENTITIES];
@@ -64,13 +64,13 @@ typedef struct {
     bool live_entities[MAX_ENTITIES];
 } EntityManager;
 
-EntityManager *entity_manager_new(MemoryArena *game_mem);
-Entity entity_create(EntityManager *ent_man);
-void entity_destroy(EntityManager *ent_man, Entity e);
+EntityManager* entity_manager_new(MemoryArena* game_mem);
+Entity entity_create(EntityManager* entmgr);
+void entity_destroy(EntityManager* entmgr, Entity e);
 
-void transform_add(EntityManager *ent_man, Entity e, TransformComponent t);
-void transform_remove(EntityManager *ent_man, Entity e);
-void sprite_add(EntityManager *ent_man, Entity e, SpriteComponent t);
-void sprite_remove(EntityManager *ent_man, Entity e);
+void transform_add(EntityManager* entmgr, Entity e, TransformComponent t);
+void transform_remove(EntityManager* entmgr, Entity e);
+void sprite_add(EntityManager* entmgr, Entity e, SpriteComponent t);
+void sprite_remove(EntityManager* entmgr, Entity e);
 
 #endif // !ENTITY_H_
