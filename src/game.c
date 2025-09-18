@@ -32,8 +32,9 @@ bool game_init(MemoryArena* game_mem)
     // Register systems
     // --------------------------------------------------------------------------------------------
 
-    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM), movement_sys_update, NULL);
-    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_update, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY), movement_sys_update, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_render, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER), render_collider_sys_render, NULL);
 
     // --------------------------------------------------------------------------------------------
     // SDL bootstrap
@@ -127,6 +128,8 @@ static void load_level(MemoryArena* game_mem)
                            .y = 20,
                        },
                });
+    rigid_body_add(state.entmgr, player, (Vector2){.x = 0.1f});
+    box_collider_add(state.entmgr, player, (Vector2){20, 20}, (Vector2){0});
 }
 
 static void tick(void)
@@ -184,6 +187,7 @@ static void update(void)
 
     // TODO: update to map
     for (uint32_t i = 0; i < state.sysmgr->count; ++i) {
+        // Update systems with delta time
         if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = &dt;
     }
 

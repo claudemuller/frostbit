@@ -22,6 +22,7 @@ enum ComponentID {
     COMP_ANIMATION = 2,
     COMP_KEYBOARD_CONTROL = 3,
     COMP_BOX_COLLIDER = 4,
+    COMP_RIGID_BODY = 4,
     COMP_COUNT = MAX_COMPONENTS,
 };
 
@@ -66,6 +67,10 @@ typedef struct {
     SDL_Color colour;
 } BoxColliderComponent;
 
+typedef struct {
+    Vector2 vel;
+} RigidBodyComponent;
+
 typedef struct EntityManager {
     uint32_t next_entity_id;
     TransformComponent transform_comps[MAX_ENTITIES];
@@ -73,6 +78,7 @@ typedef struct EntityManager {
     AnimationComponent animation_comps[MAX_ENTITIES];
     KeyboardControlComponent keyboard_control_comps[MAX_ENTITIES];
     BoxColliderComponent box_collider_comps[MAX_ENTITIES];
+    RigidBodyComponent rigid_body_comps[MAX_ENTITIES];
     Signature signatures[MAX_ENTITIES];
     bool live_entities[MAX_ENTITIES];
 } EntityManager;
@@ -88,7 +94,9 @@ void animation_add(EntityManager* entmgr, Entity e, AnimationComponent a);
 void animation_remove(EntityManager* entmgr, Entity e);
 void keyboard_control_add(EntityManager* entmgr, Entity e, KeyboardControlComponent kb);
 void keyboard_control_remove(EntityManager* entmgr, Entity e);
-void box_collider_add(EntityManager* entmgr, Entity e, BoxColliderComponent bc);
+void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset);
 void box_collider_remove(EntityManager* entmgr, Entity e);
+void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v);
+void rigid_body_remove(EntityManager* entmgr, Entity e);
 
 #endif // !ENTITY_H_

@@ -1,4 +1,5 @@
 #include "entity.h"
+#include <SDL3/SDL_pixels.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -79,9 +80,16 @@ void keyboard_control_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
 }
 
-void box_collider_add(EntityManager* entmgr, Entity e, BoxColliderComponent bc)
+void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+
+    BoxColliderComponent bc = (BoxColliderComponent){
+        .size = size,
+        .offset = offset,
+        .colour = (SDL_Color){255, 0, 0, 255},
+    };
+
     entmgr->box_collider_comps[e] = bc;
     SIGNATURE_SET(entmgr->signatures[e], COMP_BOX_COLLIDER);
 }
@@ -90,4 +98,22 @@ void box_collider_remove(EntityManager* entmgr, Entity e)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_BOX_COLLIDER);
+}
+
+void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+
+    RigidBodyComponent rb = (RigidBodyComponent){
+        .vel = v,
+    };
+
+    entmgr->rigid_body_comps[e] = rb;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_RIGID_BODY);
+}
+
+void rigid_body_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_RIGID_BODY);
 }
