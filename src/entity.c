@@ -80,6 +80,19 @@ void keyboard_control_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
 }
 
+void mouse_control_add(EntityManager* entmgr, Entity e, MouseControlComponent m)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    entmgr->mouse_control_comps[e] = m;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_MOUSE_CONTROL);
+}
+
+void mouse_control_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_MOUSE_CONTROL);
+}
+
 void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;

@@ -2,11 +2,12 @@
 #define SYSTEM_H_
 
 #include "entity.h"
+#include "state.h"
 #include <stdint.h>
 
 #define MAX_SYSTEMS 16
 
-typedef void (*SystemFn)(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
+typedef void (*SystemFn)(GameState* state, Entity e, void* ctx);
 
 typedef struct System {
     Signature component_mask;
@@ -29,17 +30,18 @@ static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn f
     };
 }
 
-static inline void sysmgr_update_entity(SystemManager* mgr, EntityManager* entmgr, SDL_Renderer* renderer, Entity e)
+static inline void sysmgr_update_entity(GameState* state, Entity e)
 {
-    for (uint32_t i = 0; i < mgr->count; ++i) {
-        System* s = &mgr->systems[i];
-        if (SIGNATURE_MATCH(entmgr->signatures[e], s->component_mask)) s->fn(entmgr, renderer, e, s->ctx);
+    for (uint32_t i = 0; i < state->sysmgr->count; ++i) {
+        System* s = &state->sysmgr->systems[i];
+        if (SIGNATURE_MATCH(state->entmgr->signatures[e], s->component_mask)) s->fn(state, e, s->ctx);
     }
 }
 
-void movement_sys_update(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
-void render_sys_render(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
-void render_collider_sys_render(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
-void keyboard_control_sys_update(EntityManager* entmgr, SDL_Renderer* renderer, Entity e, void* ctx);
+void movement_sys_update(GameState* state, Entity e, void* ctx);
+void render_sys_render(GameState* state, Entity e, void* ctx);
+void render_collider_sys_render(GameState* state, Entity e, void* ctx);
+void keyboard_control_sys_update(GameState* state, Entity e, void* ctx);
+void mouse_control_sys_update(GameState* state, Entity e, void* ctx);
 
 #endif // !SYSTEM_H_

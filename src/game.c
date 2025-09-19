@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "state.h"
 #include "system.h"
+#include <SDL3/SDL_log.h>
 #include <assert.h>
 
 static void load_level(MemoryArena* game_mem);
@@ -35,6 +36,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY), movement_sys_update, NULL);
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_render, NULL);
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER), render_collider_sys_render, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_KEYBOARD_CONTROL), keyboard_control_sys_update, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL
@@ -151,28 +153,19 @@ static void process_input(void)
         } break;
 
         case SDL_EVENT_KEY_DOWN: {
-            if (event.key.key == SDLK_Q || event.key.key == SDLK_ESCAPE) {
-                state.is_running = false;
-            }
-
-            if (event.key.key == SDLK_F11) {
-                SDL_SetWindowFullscreen(state.window, state.is_fullscreen);
-                state.is_fullscreen = !state.is_fullscreen;
-            }
+            keyboard_control_sys_update(&state, state.entmgr->live_entities[0], &event);
         } break;
 
         case SDL_EVENT_KEY_UP: {
+            keyboard_control_sys_update(&state, state.entmgr->live_entities[0], &event);
         } break;
 
         case SDL_EVENT_MOUSE_MOTION: {
-            // SDL_Log("x:%f y:%f", event.motion.x, event.motion.y);
-            // SDL_Log("xrel:%f yrel:%f", event.motion.xrel, event.motion.yrel);
+            mouse_control_sys_update(&state, state.entmgr->live_entities[0], &event);
         } break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                SDL_Log("Left mouse button clicked [%d]", event.button.clicks);
-            }
+            mouse_control_sys_update(&state, state.entmgr->live_entities[0], &event);
         } break;
 
         default: {
@@ -194,7 +187,7 @@ static void update(void)
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
         if (!state.entmgr->live_entities[e]) continue;
 
-        sysmgr_update_entity(state.sysmgr, state.entmgr, NULL, e);
+        sysmgr_update_entity(&state, e);
     }
 }
 
@@ -206,7 +199,7 @@ static void render(void)
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
         if (!state.entmgr->live_entities[e]) continue;
 
-        sysmgr_update_entity(state.sysmgr, state.entmgr, state.renderer, e);
+        sysmgr_update_entity(&state, e);
     }
 
     SDL_RenderPresent(state.renderer);
