@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)      # any recent version works
-project(Lemmings C)                        # your project name
+project(frostbit C)                        # your project name
 
 # ------------------------------------------------------------------
 # 1️⃣  Compiler options – match what you had in the Makefile
@@ -19,13 +19,14 @@ add_compile_options(
 # add_compile_options(-Werror)
 
 # ------------------------------------------------------------------
-# 2️⃣  Find SDL 3 via pkg‑config (same as `pkg-config --cflags sdl3`)
+# 2️⃣  Find SDL 3 via pkg‑config (same as `pkg-config --cflags sdl3 sdl3-image`)
 # ------------------------------------------------------------------
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(SDL3 REQUIRED sdl3)
+pkg_check_modules(SDL3 REQUIRED IMPORTED_TARGET sdl3)
+pkg_check_modules(SDL3_IMAGE REQUIRED IMPORTED_TARGET sdl3-image)
 
 # Include directories reported by pkg‑config
-include_directories(${SDL3_INCLUDE_DIRS})
+include_directories(${SDL3_INCLUDE_DIRS} ${SDL3_IMAGE_INCLUDE_DIRS})
 
 # ------------------------------------------------------------------
 # 3️⃣  Gather **all** source files that belong to the executable
@@ -41,6 +42,7 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         ${SDL3_LIBRARIES}
+        ${SDL3_IMAGE_LIBRARIES}
 )
 
 # ------------------------------------------------------------------

@@ -14,8 +14,6 @@ void movement_sys_update(GameState* state, Entity e, void* ctx)
 
     if (!t || !rb) return;
 
-    SDL_Log("%f", rb->vel.x);
-
     t->pos.x += rb->vel.x * dt;
     t->pos.y += rb->vel.y * dt;
 
@@ -62,23 +60,9 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx)
 {
     SDL_Event ev = *(SDL_Event*)ctx;
     KeyboardControlComponent* kb = &state->entmgr->keyboard_control_comps[e];
-
-    if (!kb) return;
-
-    if (ev.type == SDL_EVENT_KEY_DOWN) {
-        if (ev.key.key == SDLK_Q || ev.key.key == SDLK_ESCAPE) {
-            state->is_running = false;
-        }
-
-        if (ev.key.key == SDLK_F11) {
-            SDL_SetWindowFullscreen(state->window, state->is_fullscreen);
-            state->is_fullscreen = !state->is_fullscreen;
-        }
-    }
-
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
-    if (!rb) return;
+    if (!kb || !rb) return;
 
     if (ev.type == SDL_EVENT_KEY_DOWN) {
         if (ev.key.key == SDLK_A) rb->vel.x = -1.5f;

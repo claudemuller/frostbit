@@ -13,15 +13,13 @@ Entity entity_create(EntityManager* entmgr)
     entmgr->signatures[e] = 0;
     entmgr->live_entities[e] = true;
 
-    SDL_Log("entity created: %d", entmgr->next_entity_id - 1);
-    SDL_Log("%d", entmgr->live_entities[0]);
-
     return e;
 }
 
 void entity_destroy(EntityManager* entmgr, Entity e)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+
     entmgr->signatures[e] = 0;
     entmgr->live_entities[e] = false;
 }
@@ -90,10 +88,12 @@ void animation_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_ANIMATION);
 }
 
-void keyboard_control_add(EntityManager* entmgr, Entity e, KeyboardControlComponent kb)
+void keyboard_control_add(EntityManager* entmgr, Entity e)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
-    entmgr->keyboard_control_comps[e] = kb;
+
+    entmgr->keyboard_control_comps[e] = (KeyboardControlComponent){};
+
     SIGNATURE_SET(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
 }
 

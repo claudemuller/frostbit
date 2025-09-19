@@ -101,7 +101,7 @@ void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, S
 void sprite_remove(EntityManager* entmgr, Entity e);
 void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop);
 void animation_remove(EntityManager* entmgr, Entity e);
-void keyboard_control_add(EntityManager* entmgr, Entity e, KeyboardControlComponent kb);
+void keyboard_control_add(EntityManager* entmgr, Entity e);
 void keyboard_control_remove(EntityManager* entmgr, Entity e);
 void mouse_control_add(EntityManager* entmgr, Entity e, MouseControlComponent m);
 void mouse_control_remove(EntityManager* entmgr, Entity e);
