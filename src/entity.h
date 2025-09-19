@@ -99,7 +99,7 @@ void transform_add(EntityManager* entmgr, Entity e, Vector2 pos);
 void transform_remove(EntityManager* entmgr, Entity e);
 void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, SDL_FRect src, bool is_fixed);
 void sprite_remove(EntityManager* entmgr, Entity e);
-void animation_add(EntityManager* entmgr, Entity e, AnimationComponent a);
+void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop);
 void animation_remove(EntityManager* entmgr, Entity e);
 void keyboard_control_add(EntityManager* entmgr, Entity e, KeyboardControlComponent kb);
 void keyboard_control_remove(EntityManager* entmgr, Entity e);

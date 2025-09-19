@@ -1,6 +1,7 @@
 #include "entity.h"
 #include <SDL3/SDL_pixels.h>
 #include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_timer.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -34,10 +35,11 @@ void transform_add(EntityManager* entmgr, Entity e, Vector2 pos)
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 
     entmgr->transform_comps[e] = (TransformComponent){
-        .pos = {
-        .x = pos.x,
-        .y = pos.y,
-        },
+        .pos =
+            {
+                .x = pos.x,
+                .y = pos.y,
+            },
     };
 
     SIGNATURE_SET(entmgr->signatures[e], COMP_TRANSFORM);
@@ -69,10 +71,16 @@ void sprite_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_SPRITE);
 }
 
-void animation_add(EntityManager* entmgr, Entity e, AnimationComponent a)
+void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
-    entmgr->animation_comps[e] = a;
+
+    entmgr->animation_comps[e] = (AnimationComponent){
+        .num_frames = num_frames,
+        .frame_rate_speed = frame_rate_speed,
+        .loop = loop,
+    };
+
     SIGNATURE_SET(entmgr->signatures[e], COMP_ANIMATION);
 }
 

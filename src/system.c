@@ -4,6 +4,7 @@
 #include "texture.h"
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_timer.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
 {
@@ -111,4 +112,16 @@ void mouse_control_sys_update(GameState* state, Entity e, void* ctx)
     if (ev.button.button == SDL_BUTTON_LEFT) {
         SDL_Log("Left mouse button clicked [%d]", ev.button.clicks);
     }
+}
+
+void animation_sys_update(GameState* state, Entity e, void* ctx)
+{
+    (void)ctx;
+    AnimationComponent* a = &state->entmgr->animation_comps[e];
+    SpriteComponent* s = &state->entmgr->sprite_comps[e];
+
+    if (!a || !s) return;
+
+    a->cur_frame = ((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames;
+    s->src.x = a->cur_frame * s->size.x;
 }

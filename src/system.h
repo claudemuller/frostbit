@@ -43,5 +43,6 @@ void render_sys_render(GameState* state, Entity e, void* ctx);
 void render_collider_sys_render(GameState* state, Entity e, void* ctx);
 void keyboard_control_sys_update(GameState* state, Entity e, void* ctx);
 void mouse_control_sys_update(GameState* state, Entity e, void* ctx);
+void animation_sys_update(GameState* state, Entity e, void* ctx);
 
 #endif // !SYSTEM_H_

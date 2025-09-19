@@ -38,6 +38,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_SPRITE), render_sys_render, NULL);
     sysmgr_register(state.sysmgr, (1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER), render_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, (1U << COMP_KEYBOARD_CONTROL), keyboard_control_sys_update, NULL);
+    sysmgr_register(state.sysmgr, (1U << COMP_ANIMATION) | (1U << COMP_SPRITE), animation_sys_update, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL
@@ -122,6 +123,7 @@ static void load_level(MemoryArena* game_mem)
 
     rigid_body_add(state.entmgr, player, (Vector2){0});
     box_collider_add(state.entmgr, player, (Vector2){64, 64}, (Vector2){0});
+    animation_add(state.entmgr, player, 9, 30, true);
 
     g_player = player;
 }
