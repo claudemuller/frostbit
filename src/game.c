@@ -3,6 +3,7 @@
 #include "entity.h"
 #include "state.h"
 #include "system.h"
+#include "texture.h"
 #include <SDL3/SDL_log.h>
 #include <assert.h>
 
@@ -26,8 +27,8 @@ bool game_init(MemoryArena* game_mem)
     state.entmgr = (EntityManager*)arena_alloc_aligned(game_mem, sizeof(EntityManager), 16);
     assert(state.entmgr && "Failed to allocate entity manager.");
 
-    // state.texmgr = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
-    // assert(state.texmgr && "Failed to allocate texture manager.");
+    state.texmgr = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
+    assert(state.texmgr && "Failed to allocate texture manager.");
 
     // --------------------------------------------------------------------------------------------
     // Register systems
@@ -123,15 +124,10 @@ static void load_level(MemoryArena* game_mem)
                               .y = 10,
                           },
                   });
-    sprite_add(state.entmgr,
-               player,
-               (SpriteComponent){
-                   .size =
-                       {
-                           .x = 20,
-                           .y = 20,
-                       },
-               });
+
+    texmgr_add_texture(state.renderer, state.texmgr, "playersheet", "res/walk.png");
+    sprite_add(state.entmgr, player, "playersheet", (Vector2){32.0, 32.0f}, (SDL_FRect){0, 0, 32.0, 32.0f}, false);
+
     rigid_body_add(state.entmgr, player, (Vector2){0});
     box_collider_add(state.entmgr, player, (Vector2){20, 20}, (Vector2){0});
 

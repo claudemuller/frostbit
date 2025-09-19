@@ -1,5 +1,6 @@
 #include "entity.h"
 #include <SDL3/SDL_pixels.h>
+#include <SDL3/SDL_rect.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -41,10 +42,17 @@ void transform_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_TRANSFORM);
 }
 
-void sprite_add(EntityManager* entmgr, Entity e, SpriteComponent t)
+void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, SDL_FRect src, bool is_fixed)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
-    entmgr->sprite_comps[e] = t;
+
+    entmgr->sprite_comps[e] = (SpriteComponent){
+        .asset_id = id,
+        .size = size,
+        .src = src,
+        .is_fixed = is_fixed,
+    };
+
     SIGNATURE_SET(entmgr->signatures[e], COMP_SPRITE);
 }
 

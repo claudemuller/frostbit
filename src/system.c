@@ -1,6 +1,9 @@
 #include "system.h"
 #include "entity.h"
 #include "state.h"
+#include "texture.h"
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
 {
@@ -26,14 +29,14 @@ void render_sys_render(GameState* state, Entity e, void* ctx)
 
     if (!t || !s) return;
 
-    // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
-    // SDL_RenderRect(renderer,
-    //                &(SDL_FRect){
-    //                    .x = t->pos.x,
-    //                    .y = t->pos.y,
-    //                    .w = s->size.x,
-    //                    .h = s->size.y,
-    //                });
+    SDL_FRect dst = (SDL_FRect){
+        .x = t->pos.x,
+        .y = t->pos.y,
+        .w = s->size.x,
+        .h = s->size.y,
+    };
+    SDL_Texture* tex = texmgr_get_texture(state->texmgr, s->asset_id);
+    SDL_RenderTexture(state->renderer, tex, &s->src, &dst);
 }
 
 void render_collider_sys_render(GameState* state, Entity e, void* ctx)

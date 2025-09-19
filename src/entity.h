@@ -39,12 +39,12 @@ typedef struct {
 } TransformComponent;
 
 typedef struct {
-    char* asset_id;
-    Vector2 size;
+    const char* asset_id;
+    Vector2 size; // TODO: ??
     int z_index;
     bool is_fixed;
     SDL_FlipMode is_flipped;
-    SDL_Rect src;
+    SDL_FRect src;
 } SpriteComponent;
 
 typedef struct {
@@ -97,7 +97,7 @@ void entity_destroy(EntityManager* entmgr, Entity e);
 
 void transform_add(EntityManager* entmgr, Entity e, TransformComponent t);
 void transform_remove(EntityManager* entmgr, Entity e);
-void sprite_add(EntityManager* entmgr, Entity e, SpriteComponent t);
+void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, SDL_FRect src, bool is_fixed);
 void sprite_remove(EntityManager* entmgr, Entity e);
 void animation_add(EntityManager* entmgr, Entity e, AnimationComponent a);
 void animation_remove(EntityManager* entmgr, Entity e);

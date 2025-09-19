@@ -9,8 +9,8 @@ CFLAGS += -pedantic
 CFLAGS += -Wmissing-declarations
 CFLAGS += -I./libs/
 ASANFLAGS=-fsanitize=address -fno-common -fno-omit-frame-pointer
-CFLAGS += $(shell pkg-config --cflags sdl3)
-LDFLAGS = $(shell pkg-config --libs sdl3)
+CFLAGS += $(shell pkg-config --cflags sdl3 sdl3-image)
+LDFLAGS = $(shell pkg-config --libs sdl3 sdl3-image)
 LIBS =
 SRC = ./src/*.c
 BIN_DIR = ./bin
