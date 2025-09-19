@@ -123,7 +123,7 @@ static void load_level(MemoryArena* game_mem)
 
     rigid_body_add(state.entmgr, player, (Vector2){0});
     box_collider_add(state.entmgr, player, (Vector2){64, 64}, (Vector2){0});
-    animation_add(state.entmgr, player, 9, 30, true);
+    animation_add(state.entmgr, player, 9, 15, true);
 
     g_player = player;
 }

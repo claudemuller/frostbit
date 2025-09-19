@@ -119,9 +119,18 @@ void animation_sys_update(GameState* state, Entity e, void* ctx)
     (void)ctx;
     AnimationComponent* a = &state->entmgr->animation_comps[e];
     SpriteComponent* s = &state->entmgr->sprite_comps[e];
+    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
-    if (!a || !s) return;
+    if (!a || !s || !rb) return;
+
+    if (rb->vel.x == 0.0f && rb->vel.y == 0.0f) return;
 
     a->cur_frame = ((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames;
+
+    if (rb->vel.y < 0) s->src.y = 0.0f;
+    if (rb->vel.y > 0) s->src.y = s->size.y * 2.0f;
+    if (rb->vel.x < 0) s->src.y = s->size.y;
+    if (rb->vel.x > 0) s->src.y = s->size.y * 3.0f;
+
     s->src.x = a->cur_frame * s->size.x;
 }
