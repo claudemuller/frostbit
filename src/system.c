@@ -5,6 +5,7 @@
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
+#include <stdint.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
 {
@@ -117,4 +118,37 @@ void animation_sys_render(GameState* state, Entity e, void* ctx)
     if (rb->vel.x > 0) s->src.y = s->size.y * 3.0f;
 
     s->src.x = a->cur_frame * s->size.x;
+}
+
+void collision_sys_update(GameState* state, Entity e, void* ctx)
+{
+    (void)ctx;
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+
+    if (!t || !bc) return;
+
+    for (uint32_t i = 0; i < state->entmgr->next_entity_id - 1; ++i) {
+        Entity other_e = i;
+
+        if (other_e == e) continue;
+
+        TransformComponent* other_t = &state->entmgr->transform_comps[other_e];
+        BoxColliderComponent* other_bc = &state->entmgr->box_collider_comps[other_e];
+
+        if (check_aabb_collision(t->pos.x,
+                                 t->pos.y,
+                                 bc->size.x,
+                                 bc->size.x,
+                                 other_t->pos.x,
+                                 other_t->pos.y,
+                                 other_bc->size.x,
+                                 other_bc->size.x))
+            SDL_Log("collisios");
+    }
+}
+
+bool check_aabb_collision(double ax, double ay, double aw, double ah, double bx, double by, double bw, double bh)
+{
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }

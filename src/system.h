@@ -26,6 +26,7 @@ typedef struct SystemManager {
 #define SYS_SIG_KEYBOARD_CONTROL ((1U << COMP_KEYBOARD_CONTROL))
 #define SYS_SIG_MOUSE_CONTROL ((1U << COMP_MOUSE_CONTROL))
 #define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
+#define SYS_SIG_COLLISION ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
 
 static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn fn, void* ctx)
 {
@@ -49,11 +50,13 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
     }
 }
 
+bool check_aabb_collision(double ax, double ay, double aw, double ah, double bx, double by, double bw, double bh);
 void movement_sys_update(GameState* state, Entity e, void* ctx);
 void render_sys_render(GameState* state, Entity e, void* ctx);
 void render_collider_sys_render(GameState* state, Entity e, void* ctx);
 void keyboard_control_sys_update(GameState* state, Entity e, void* ctx);
 void mouse_control_sys_update(GameState* state, Entity e, void* ctx);
 void animation_sys_render(GameState* state, Entity e, void* ctx);
+void collision_sys_update(GameState* state, Entity e, void* ctx);
 
 #endif // !SYSTEM_H_
