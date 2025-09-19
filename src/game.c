@@ -109,6 +109,8 @@ void game_destroy(void)
 
 // ------------------------------------------------------------------------------------------------
 
+static Entity g_player;
+
 static void load_level(MemoryArena* game_mem)
 {
     Entity player = entity_create(state.entmgr);
@@ -130,8 +132,10 @@ static void load_level(MemoryArena* game_mem)
                            .y = 20,
                        },
                });
-    rigid_body_add(state.entmgr, player, (Vector2){.x = 0.1f});
+    rigid_body_add(state.entmgr, player, (Vector2){0});
     box_collider_add(state.entmgr, player, (Vector2){20, 20}, (Vector2){0});
+
+    g_player = player;
 }
 
 static void tick(void)
@@ -147,29 +151,16 @@ static void process_input(void)
     const bool* keystate = SDL_GetKeyboardState(NULL);
 
     while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_EVENT_QUIT: {
+        if (event.type == SDL_EVENT_QUIT) {
             state.is_running = false;
-        } break;
+        }
 
-        case SDL_EVENT_KEY_DOWN: {
-            keyboard_control_sys_update(&state, state.entmgr->live_entities[0], &event);
-        } break;
+        if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
+            keyboard_control_sys_update(&state, g_player, &event);
+        }
 
-        case SDL_EVENT_KEY_UP: {
-            keyboard_control_sys_update(&state, state.entmgr->live_entities[0], &event);
-        } break;
-
-        case SDL_EVENT_MOUSE_MOTION: {
-            mouse_control_sys_update(&state, state.entmgr->live_entities[0], &event);
-        } break;
-
-        case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-            mouse_control_sys_update(&state, state.entmgr->live_entities[0], &event);
-        } break;
-
-        default: {
-        } break;
+        if (event.type == SDL_EVENT_MOUSE_MOTION || event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            mouse_control_sys_update(&state, g_player, &event);
         }
     }
 }

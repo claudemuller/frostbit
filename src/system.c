@@ -10,6 +10,8 @@ void movement_sys_update(GameState* state, Entity e, void* ctx)
 
     if (!t || !rb) return;
 
+    SDL_Log("%f", rb->vel.x);
+
     t->pos.x += rb->vel.x * dt;
     t->pos.y += rb->vel.y * dt;
 
@@ -59,13 +61,40 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx)
 
     if (!kb) return;
 
-    if (ev.key.key == SDLK_Q || ev.key.key == SDLK_ESCAPE) {
-        state->is_running = false;
+    if (ev.type == SDL_EVENT_KEY_DOWN) {
+        if (ev.key.key == SDLK_Q || ev.key.key == SDLK_ESCAPE) {
+            state->is_running = false;
+        }
+
+        if (ev.key.key == SDLK_F11) {
+            SDL_SetWindowFullscreen(state->window, state->is_fullscreen);
+            state->is_fullscreen = !state->is_fullscreen;
+        }
     }
 
-    if (ev.key.key == SDLK_F11) {
-        SDL_SetWindowFullscreen(state->window, state->is_fullscreen);
-        state->is_fullscreen = !state->is_fullscreen;
+    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
+
+    if (!rb) return;
+
+    if (ev.type == SDL_EVENT_KEY_DOWN) {
+        if (ev.key.key == SDLK_A) rb->vel.x = -1.5f;
+        if (ev.key.key == SDLK_LEFT) rb->vel.x = -1.5f;
+
+        if (ev.key.key == SDLK_D) rb->vel.x = 0.5f;
+        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 0.5f;
+
+        if (ev.key.key == SDLK_W) rb->vel.y = -0.5f;
+        if (ev.key.key == SDLK_UP) rb->vel.y = -0.5f;
+
+        if (ev.key.key == SDLK_S) rb->vel.y = 0.5f;
+        if (ev.key.key == SDLK_DOWN) rb->vel.y = 0.5f;
+    }
+
+    if (ev.type == SDL_EVENT_KEY_UP) {
+        if (ev.key.key == SDLK_A || ev.key.key == SDLK_LEFT) rb->vel.x = 0.0;
+        if (ev.key.key == SDLK_D || ev.key.key == SDLK_RIGHT) rb->vel.x = 0.0;
+        if (ev.key.key == SDLK_W || ev.key.key == SDLK_UP) rb->vel.y = 0.0;
+        if (ev.key.key == SDLK_S || ev.key.key == SDLK_DOWN) rb->vel.y = 1.0;
     }
 }
 
