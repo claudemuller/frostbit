@@ -39,7 +39,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_KEYBOARD_CONTROL, keyboard_control_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_MOUSE_CONTROL, mouse_control_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_update, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL
@@ -117,7 +117,6 @@ static Entity g_player;
 static void load_level(MemoryArena* game_mem)
 {
     Entity player = entity_create(state.entmgr);
-    keyboard_control_add(state.entmgr, player);
     transform_add(state.entmgr, player, (Vector2){64, 64});
 
     texmgr_add_texture(state.renderer, state.texmgr, "playersheet", "res/walk.png");
@@ -126,6 +125,7 @@ static void load_level(MemoryArena* game_mem)
     rigid_body_add(state.entmgr, player, (Vector2){0});
     box_collider_add(state.entmgr, player, (Vector2){64, 64}, (Vector2){0});
     animation_add(state.entmgr, player, 9, 15, true);
+    keyboard_control_add(state.entmgr, player);
 
     g_player = player;
 }

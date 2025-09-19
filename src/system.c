@@ -98,7 +98,7 @@ void mouse_control_sys_update(GameState* state, Entity e, void* ctx)
     }
 }
 
-void animation_sys_update(GameState* state, Entity e, void* ctx)
+void animation_sys_render(GameState* state, Entity e, void* ctx)
 {
     (void)ctx;
     AnimationComponent* a = &state->entmgr->animation_comps[e];

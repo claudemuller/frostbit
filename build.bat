@@ -1,5 +1,5 @@
 @echo off
-set "CompilerFlags=-Wall -Wextra -std=c99 -Wno-microsoft -Wpre-c11-compat -Wno-pragma-pack -I^"C:\lib\SDL3-3.2.22\include^" -I^"C:\lib\SDL3_image-3.2.4\include^""
+set "CompilerFlags=-Wall -Wextra -std=c99 -Wno-microsoft -Wpre-c11-compat -Wno-pragma-pack -g -I^"C:\lib\SDL3-3.2.22\include^" -I^"C:\lib\SDL3_image-3.2.4\include^""
 
 set "LinkerFlags=/LIBPATH:^"C:\lib\SDL3-3.2.22\lib\x64^" /LIBPATH:^"C:\lib\SDL3_image-3.2.4\lib\x64^" SDL3.lib SDL3_image.lib /DEBUG /OUT:frostbit.exe"
 
