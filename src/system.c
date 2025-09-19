@@ -83,21 +83,21 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx)
         if (ev.key.key == SDLK_A) rb->vel.x = -1.5f;
         if (ev.key.key == SDLK_LEFT) rb->vel.x = -1.5f;
 
-        if (ev.key.key == SDLK_D) rb->vel.x = 0.5f;
-        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 0.5f;
+        if (ev.key.key == SDLK_D) rb->vel.x = 1.5f;
+        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 1.5f;
 
-        if (ev.key.key == SDLK_W) rb->vel.y = -0.5f;
-        if (ev.key.key == SDLK_UP) rb->vel.y = -0.5f;
+        if (ev.key.key == SDLK_W) rb->vel.y = -1.5f;
+        if (ev.key.key == SDLK_UP) rb->vel.y = -1.5f;
 
-        if (ev.key.key == SDLK_S) rb->vel.y = 0.5f;
-        if (ev.key.key == SDLK_DOWN) rb->vel.y = 0.5f;
+        if (ev.key.key == SDLK_S) rb->vel.y = 1.5f;
+        if (ev.key.key == SDLK_DOWN) rb->vel.y = 1.5f;
     }
 
     if (ev.type == SDL_EVENT_KEY_UP) {
         if (ev.key.key == SDLK_A || ev.key.key == SDLK_LEFT) rb->vel.x = 0.0;
         if (ev.key.key == SDLK_D || ev.key.key == SDLK_RIGHT) rb->vel.x = 0.0;
         if (ev.key.key == SDLK_W || ev.key.key == SDLK_UP) rb->vel.y = 0.0;
-        if (ev.key.key == SDLK_S || ev.key.key == SDLK_DOWN) rb->vel.y = 1.0;
+        if (ev.key.key == SDLK_S || ev.key.key == SDLK_DOWN) rb->vel.y = 0.0;
     }
 }
 

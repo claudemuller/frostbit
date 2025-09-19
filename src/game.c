@@ -115,21 +115,13 @@ static Entity g_player;
 static void load_level(MemoryArena* game_mem)
 {
     Entity player = entity_create(state.entmgr);
-    transform_add(state.entmgr,
-                  player,
-                  (TransformComponent){
-                      .pos =
-                          {
-                              .x = 10,
-                              .y = 10,
-                          },
-                  });
+    transform_add(state.entmgr, player, (Vector2){64, 64});
 
     texmgr_add_texture(state.renderer, state.texmgr, "playersheet", "res/walk.png");
-    sprite_add(state.entmgr, player, "playersheet", (Vector2){32.0, 32.0f}, (SDL_FRect){0, 0, 32.0, 32.0f}, false);
+    sprite_add(state.entmgr, player, "playersheet", (Vector2){64.0, 64.0f}, (SDL_FRect){0, 0, 64.0, 64.0f}, false);
 
     rigid_body_add(state.entmgr, player, (Vector2){0});
-    box_collider_add(state.entmgr, player, (Vector2){20, 20}, (Vector2){0});
+    box_collider_add(state.entmgr, player, (Vector2){64, 64}, (Vector2){0});
 
     g_player = player;
 }

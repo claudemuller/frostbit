@@ -29,10 +29,17 @@ void entity_destroy(EntityManager* entmgr, Entity e)
 // Components
 // ------------------------------------------------------------------------------------------------
 
-void transform_add(EntityManager* entmgr, Entity e, TransformComponent t)
+void transform_add(EntityManager* entmgr, Entity e, Vector2 pos)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
-    entmgr->transform_comps[e] = t;
+
+    entmgr->transform_comps[e] = (TransformComponent){
+        .pos = {
+        .x = pos.x,
+        .y = pos.y,
+        },
+    };
+
     SIGNATURE_SET(entmgr->signatures[e], COMP_TRANSFORM);
 }
 
