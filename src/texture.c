@@ -1,5 +1,6 @@
 #include "texture.h"
 #include "SDL3/SDL_render.h"
+#include "utils/utils.h"
 #include <SDL3_image/SDL_image.h>
 
 void texmgr_add_texture(SDL_Renderer* r, TextureManager* mgr, const char* id, const char* fname)
@@ -8,13 +9,13 @@ void texmgr_add_texture(SDL_Renderer* r, TextureManager* mgr, const char* id, co
 
     SDL_Surface* surface = IMG_Load(fname);
     if (!surface) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load .bmp: %s", SDL_GetError());
+        util_error("Failed to load .bmp: %s", SDL_GetError());
         return;
     }
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(r, surface);
     if (!tex) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to create texture: %s", SDL_GetError());
+        util_error("Failed to create texture: %s", SDL_GetError());
         return;
     }
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);

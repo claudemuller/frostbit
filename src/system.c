@@ -96,7 +96,7 @@ void mouse_control_sys_update(GameState* state, Entity e, void* ctx)
     if (!m) return;
 
     if (ev.button.button == SDL_BUTTON_LEFT) {
-        SDL_Log("Left mouse button clicked [%d]", ev.button.clicks);
+        util_info("Left mouse button clicked [%d]", ev.button.clicks);
     }
 }
 

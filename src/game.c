@@ -5,6 +5,7 @@
 #include "state.h"
 #include "system.h"
 #include "texture.h"
+#include "utils/utils.h"
 #include <SDL3/SDL_log.h>
 #include <assert.h>
 
@@ -18,7 +19,7 @@ static void render(void);
 
 static void on_collision(EventArgs args)
 {
-    SDL_Log("collision");
+    util_info("collision");
 }
 
 GameState state = {0};
@@ -60,29 +61,29 @@ bool game_init(MemoryArena* game_mem)
     // --------------------------------------------------------------------------------------------
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error init'ing SDL: %s", SDL_GetError());
+        util_error("Error init'ing SDL: %s", SDL_GetError());
         return false;
     }
 
     state.window = SDL_CreateWindow("DEV SDL3", 320, 240, SDL_WINDOW_RESIZABLE);
     if (!state.window) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error creating SDL window: %s", SDL_GetError());
+        util_error("Error creating SDL window: %s", SDL_GetError());
         return false;
     }
 
-    SDL_Log("Available renderer drivers:");
+    util_info("Available renderer drivers:");
     for (int i = 0; i < SDL_GetNumRenderDrivers(); ++i) {
-        SDL_Log("%d - %s", i + 1, SDL_GetRenderDriver(i));
+        util_info("%d - %s", i + 1, SDL_GetRenderDriver(i));
     }
 
     state.renderer = SDL_CreateRenderer(state.window, NULL);
     if (!state.renderer) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Error creating SDL renderer: %s", SDL_GetError());
+        util_error("Error creating SDL renderer: %s", SDL_GetError());
         return false;
     }
     SDL_SetRenderLogicalPresentation(state.renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    SDL_Log("Renderer: %s", SDL_GetRendererName(state.renderer));
+    util_info("Renderer: %s", SDL_GetRendererName(state.renderer));
 
     int w, h;
     if (SDL_GetWindowSize(state.window, &w, &h)) {
