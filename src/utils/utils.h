@@ -17,7 +17,7 @@ static size_t mlogCount;
 static MemLog mlog[50];
 
 #define util_error(fmt, ...) util_err("ERROR [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define util_info(fmt, ...) util_inf("INFO : " fmt, ##__VA_ARGS__)
+#define util_info(fmt, ...) util_inf("INFO: " fmt, ##__VA_ARGS__)
 #define util_debug(fmt, ...) util_inf("DEBUG [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 
 static inline void util_inf(const char* fmt, ...)
