@@ -1,6 +1,7 @@
 #ifndef ARENA_H_
 #define ARENA_H_
 
+#include "utils/utils.h"
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -16,7 +17,7 @@ typedef size_t ArenaMarker;
 
 static inline void arena_init(MemoryArena* arena, size_t cap)
 {
-    arena->base = (unsigned char*)malloc(cap);
+    arena->base = (unsigned char*)debug_malloc(cap, __FILE__, __LINE__);
     arena->cap = cap;
     arena->offset = 0;
 }

@@ -1,19 +1,28 @@
 #include "game.h"
 #include "arena.h"
 #include "entity.h"
+#include "event_bus.h"
 #include "state.h"
 #include "system.h"
 #include "texture.h"
 #include <SDL3/SDL_log.h>
 #include <assert.h>
 
-static void load_level(MemoryArena* game_mem);
-static void tick(void);
+#define FPS 60
+#define MILLISECS_PER_FRAME 1000 / FPS
+
+static void load_level(void);
 static void process_input(void);
-static void update(void);
+static void update(float dt);
 static void render(void);
 
+static void on_collision(EventArgs args)
+{
+    SDL_Log("collision");
+}
+
 GameState state = {0};
+static int prev_frame_ms = 0;
 
 bool game_init(MemoryArena* game_mem)
 {
@@ -29,6 +38,10 @@ bool game_init(MemoryArena* game_mem)
 
     state.texmgr = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
     assert(state.texmgr && "Failed to allocate texture manager.");
+
+    state.eventbus = (EventBus*)arena_alloc_aligned(game_mem, sizeof(EventBus), 16);
+    assert(state.eventbus && "Failed to allocate event bus.");
+    event_bus_init(state.eventbus);
 
     // --------------------------------------------------------------------------------------------
     // Register systems
@@ -90,12 +103,23 @@ bool game_init(MemoryArena* game_mem)
     return true;
 }
 
-bool game_run(MemoryArena* game_mem)
+bool game_run(void)
 {
-    load_level(game_mem);
+    load_level();
 
     while (state.is_running) {
-        tick();
+        int time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
+        if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
+            SDL_Delay(time_to_wait);
+        }
+
+        double dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
+        prev_frame_ms = SDL_GetTicks();
+
+        process_input();
+        state.eventbus->process_events(state.eventbus);
+        update(dt);
+        render();
 
         // TODO: fix
         SDL_Delay(16);
@@ -115,7 +139,7 @@ void game_destroy(void)
 
 static Entity g_player;
 
-static void load_level(MemoryArena* game_mem)
+static void load_level(void)
 {
     Entity player = entity_create(state.entmgr);
     transform_add(state.entmgr, player, (Vector2){64, 64});
@@ -132,20 +156,15 @@ static void load_level(MemoryArena* game_mem)
     transform_add(state.entmgr, floor, (Vector2){10, 200});
     box_collider_add(state.entmgr, floor, (Vector2){100, 10}, (Vector2){0});
 
-    g_player = player;
-}
+    state.eventbus->on_event(state.eventbus, EVT_DEAD, &on_collision);
 
-static void tick(void)
-{
-    process_input();
-    update();
-    render();
+    g_player = player;
 }
 
 static void process_input(void)
 {
     SDL_Event ev;
-    const bool* keystate = SDL_GetKeyboardState(NULL);
+    // const bool* keystate = SDL_GetKeyboardState(NULL);
 
     while (SDL_PollEvent(&ev)) {
         if (ev.type == SDL_EVENT_QUIT) {
@@ -177,10 +196,8 @@ static void process_input(void)
     }
 }
 
-static void update(void)
+static void update(float dt)
 {
-    float dt = 1.0f;
-
     // TODO: update to map
     for (uint32_t i = 0; i < state.sysmgr->count; ++i) {
         if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = &dt;

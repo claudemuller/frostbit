@@ -1,5 +1,6 @@
 #include "system.h"
 #include "entity.h"
+#include "event_bus.h"
 #include "state.h"
 #include "texture.h"
 #include <SDL3/SDL_rect.h>
@@ -66,17 +67,17 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx)
     if (!kb || !rb) return;
 
     if (ev.type == SDL_EVENT_KEY_DOWN) {
-        if (ev.key.key == SDLK_A) rb->vel.x = -1.5f;
-        if (ev.key.key == SDLK_LEFT) rb->vel.x = -1.5f;
+        if (ev.key.key == SDLK_A) rb->vel.x = -50.5f;
+        if (ev.key.key == SDLK_LEFT) rb->vel.x = -50.5f;
 
-        if (ev.key.key == SDLK_D) rb->vel.x = 1.5f;
-        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 1.5f;
+        if (ev.key.key == SDLK_D) rb->vel.x = 50.5f;
+        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 50.5f;
 
-        if (ev.key.key == SDLK_W) rb->vel.y = -1.5f;
-        if (ev.key.key == SDLK_UP) rb->vel.y = -1.5f;
+        if (ev.key.key == SDLK_W) rb->vel.y = -50.5f;
+        if (ev.key.key == SDLK_UP) rb->vel.y = -50.5f;
 
-        if (ev.key.key == SDLK_S) rb->vel.y = 1.5f;
-        if (ev.key.key == SDLK_DOWN) rb->vel.y = 1.5f;
+        if (ev.key.key == SDLK_S) rb->vel.y = 50.5f;
+        if (ev.key.key == SDLK_DOWN) rb->vel.y = 50.5f;
     }
 
     if (ev.type == SDL_EVENT_KEY_UP) {
@@ -143,8 +144,9 @@ void collision_sys_update(GameState* state, Entity e, void* ctx)
                                  other_t->pos.x,
                                  other_t->pos.y,
                                  other_bc->size.x,
-                                 other_bc->size.x))
-            SDL_Log("collisios");
+                                 other_bc->size.x)) {
+            state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
+        }
     }
 }
 

@@ -2,11 +2,13 @@
 #define STATE_H_
 
 #include "entity.h"
+#include "event_bus.h"
 #include <SDL3/SDL.h>
 
 struct EntityManager;
 struct SystemManager;
 struct TextureManager;
+struct EventBus;
 
 typedef struct GameState {
     bool is_running;
@@ -19,6 +21,7 @@ typedef struct GameState {
     struct EntityManager* entmgr;
     struct SystemManager* sysmgr;
     struct TextureManager* texmgr;
+    struct EventBus* eventbus;
 } GameState;
 
 extern GameState state;

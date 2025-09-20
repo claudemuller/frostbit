@@ -12,7 +12,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    if (!game_run(&game_mem)) {
+    if (!game_run()) {
         SDL_Log("Failed to start game");
         return EXIT_FAILURE;
     }

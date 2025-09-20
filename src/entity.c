@@ -92,7 +92,7 @@ void keyboard_control_add(EntityManager* entmgr, Entity e)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 
-    entmgr->keyboard_control_comps[e] = (KeyboardControlComponent){};
+    entmgr->keyboard_control_comps[e] = (KeyboardControlComponent){0};
     SIGNATURE_SET(entmgr->signatures[e], COMP_KEYBOARD_CONTROL);
 }
 
