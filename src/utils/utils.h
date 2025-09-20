@@ -16,6 +16,30 @@ typedef struct MemLog {
 static size_t mlogCount;
 static MemLog mlog[50];
 
+#define util_error(fmt, ...) util_err("ERROR [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+#define util_info(fmt, ...) util_inf("INFO : " fmt, ##__VA_ARGS__)
+#define util_debug(fmt, ...) util_inf("DEBUG [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+
+static inline void util_inf(const char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, fmt, ap);
+
+    va_end(ap);
+}
+
+static inline void util_err(const char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, fmt, ap);
+
+    va_end(ap);
+}
+
 static inline void* debug_malloc(size_t size, char* fname, unsigned int lnum)
 {
     void* m = malloc(size);
@@ -28,50 +52,9 @@ static inline void* debug_malloc(size_t size, char* fname, unsigned int lnum)
     };
     memcpy(mlog[mlogCount - 1].fname, fname, strlen(fname));
 
-    printf("%s:L%d\n", fname, lnum);
+    util_info("malloc at %s:L%d\n", fname, lnum);
 
     return m;
-}
-
-/**
- * A log printing function that wraps the current library of the day.
- */
-static inline void util_log(const char* pre, const char* fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-
-    size_t fmtlen = strlen(fmt);
-    char* f = (char*)malloc(sizeof(char) * fmtlen + 3);
-
-    memcpy(f, "%s", 2);
-    memcpy(f + 2, fmt, fmtlen);
-    f[fmtlen + 2] = '\0';
-
-    SDL_Log(f, pre, args);
-    free(f);
-
-    va_end(args);
-}
-
-static inline void util_info(const char* fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-
-    util_log("LOG: ", fmt, args);
-
-    va_end(args);
-}
-
-static inline void util_error(const char* fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-
-    util_log("ERROR: ", fmt, args);
-
-    va_end(args);
 }
 
 #endif // !UTILS_H_

@@ -1,4 +1,4 @@
-CC = gcc
+CC = tcc
 DBG_BIN = lldb
 CFLAGS = #-D_GNU_SOURCE
 CFLAGS += -std=c11
