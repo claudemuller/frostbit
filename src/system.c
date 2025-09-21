@@ -28,10 +28,10 @@ void render_sys_render(GameState* state, Entity e, void* ctx)
     if (!t || !s) return;
 
     SDL_FRect dst = (SDL_FRect){
-        .x = t->pos.x,
-        .y = t->pos.y,
-        .w = s->size.w,
-        .h = s->size.h,
+        .x = t->pos.x,  // * state->scale,
+        .y = t->pos.y,  // * state->scale,
+        .w = s->size.w, // * state->scale,
+        .h = s->size.h, // * state->scale,
     };
     SDL_Texture* tex = texmgr_get_texture(state->texmgr, s->asset_id);
     SDL_RenderTexture(state->renderer, tex, &s->src, &dst);
@@ -48,10 +48,10 @@ void render_collider_sys_render(GameState* state, Entity e, void* ctx)
     SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
     SDL_RenderRect(state->renderer,
                    &(SDL_FRect){
-                       .x = t->pos.x + bc->offset.x,
-                       .y = t->pos.y + bc->offset.y,
-                       .w = bc->size.w,
-                       .h = bc->size.h,
+                       .x = (t->pos.x + bc->offset.x), // * state->scale,
+                       .y = (t->pos.y + bc->offset.y), // * state->scale,
+                       .w = bc->size.w,                // * state->scale,
+                       .h = bc->size.h,                // * state->scale,
                    });
 }
 
@@ -142,7 +142,7 @@ void collision_sys_update(GameState* state, Entity e, void* ctx)
                                  other_t->pos.y,
                                  other_bc->size.w,
                                  other_bc->size.w)) {
-            state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
+            //state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
         }
     }
 }

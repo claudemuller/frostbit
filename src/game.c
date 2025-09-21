@@ -12,6 +12,8 @@
 
 #define FPS 60
 #define MILLISECS_PER_FRAME 1000 / FPS
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 void* SDL_tex_loader(const char* path);
 
@@ -68,7 +70,7 @@ bool game_init(MemoryArena* game_mem)
         return false;
     }
 
-    state.window = SDL_CreateWindow("DEV SDL3", 800, 600, SDL_WINDOW_RESIZABLE);
+    state.window = SDL_CreateWindow("DEV SDL3", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE);
     if (!state.window) {
         util_error("Error creating SDL window: %s", SDL_GetError());
         return false;
@@ -84,10 +86,9 @@ bool game_init(MemoryArena* game_mem)
         util_error("Error creating SDL renderer: %s", SDL_GetError());
         return false;
     }
-    SDL_SetRenderLogicalPresentation(state.renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     // Init components that need the renderer
-    texmgr_init(state.renderer);
+    texmgr_init(state.renderer, state.texmgr);
     tilemap_init(state.renderer);
 
     util_info("Renderer: %s", SDL_GetRendererName(state.renderer));
@@ -97,10 +98,6 @@ bool game_init(MemoryArena* game_mem)
         // Move mouse to a location in the window
         SDL_WarpMouseInWindow(state.window, w / 2.0f, h / 2.0f);
     }
-
-    SDL_SetWindowSize(state.window, 320 * 2, 240 * 2);
-    const char* platform = SDL_GetPlatform();
-    if (strncmp(platform, "Linux", strlen("Linux")) == 0) SDL_SetWindowPosition(state.window, 3200, 300);
 
     // --------------------------------------------------------------------------------------------
     // Setup tile mapper
@@ -113,6 +110,16 @@ bool game_init(MemoryArena* game_mem)
         util_error("Failed to load level1");
         return false;
     }
+
+    state.scale = 2.0f;
+    u32 render_w = state.level->width * state.level->tile_width * state.scale / 3.0f;
+    u32 render_h = state.level->height * state.level->tile_height * state.scale / 3.0f;
+    SDL_SetRenderLogicalPresentation(
+        state.renderer, WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+    // SDL_SetWindowPosition(state.window, state.win_width, 300);
+    // const char* platform = SDL_GetPlatform();
+    // if (strncmp(platform, "Linux", strlen("Linux")) == 0) SDL_SetWindowPosition(state.window, 3200, 300);
 
     // --------------------------------------------------------------------------------------------
     // Setup game state
@@ -154,28 +161,11 @@ void game_destroy(void)
 
 // ------------------------------------------------------------------------------------------------
 
-static Entity g_player;
-
 static void load_level(void)
 {
-    Entity player = entity_create(state.entmgr);
-    transform_add(state.entmgr, player, (Vector2){64, 64});
-
-    texmgr_add_texture(state.texmgr, "playersheet", "res/walk.png");
-    sprite_add(state.entmgr, player, "playersheet", (Vector2){64.0, 64.0f}, (SDL_FRect){0, 0, 64.0, 64.0f}, false);
-
-    rigid_body_add(state.entmgr, player, (Vector2){0});
-    box_collider_add(state.entmgr, player, (Vector2){64, 64}, (Vector2){0});
-    animation_add(state.entmgr, player, 9, 15, true);
-    keyboard_control_add(state.entmgr, player);
-
-    Entity floor = entity_create(state.entmgr);
-    transform_add(state.entmgr, floor, (Vector2){10, 200});
-    box_collider_add(state.entmgr, floor, (Vector2){100, 10}, (Vector2){0});
+    tilemap_load_level(&state);
 
     state.eventbus->on_event(state.eventbus, EVT_DEAD, &on_collision);
-
-    g_player = player;
 }
 
 static void process_input(void)
@@ -202,13 +192,13 @@ static void process_input(void)
 
         // Process player key events
         if (ev.type == SDL_EVENT_KEY_DOWN || ev.type == SDL_EVENT_KEY_UP) {
-            if (SIGNATURE_MATCH(state.entmgr->signatures[g_player], SYS_SIG_KEYBOARD_CONTROL))
-                keyboard_control_sys_update(&state, g_player, &ev);
+            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_KEYBOARD_CONTROL))
+                keyboard_control_sys_update(&state, state.player, &ev);
         }
 
         if (ev.type == SDL_EVENT_MOUSE_MOTION || ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            if (SIGNATURE_MATCH(state.entmgr->signatures[g_player], SYS_SIG_MOUSE_CONTROL))
-                mouse_control_sys_update(&state, g_player, &ev);
+            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_MOUSE_CONTROL))
+                mouse_control_sys_update(&state, state.player, &ev);
         }
     }
 }
@@ -233,7 +223,7 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    tilemap_render_map(state.level);
+    tilemap_render_map(&state, state.level);
 
     // TODO: split system render and update types so that we don't call them twice?
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {

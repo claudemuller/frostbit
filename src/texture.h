@@ -12,7 +12,7 @@ typedef struct TextureManager {
     SDL_Texture* textures[MAX_TEXTURES];
 } TextureManager;
 
-void texmgr_init(SDL_Renderer* r);
+void texmgr_init(SDL_Renderer* r, TextureManager* tm);
 void texmgr_add_texture(TextureManager* mgr, const char* id, const char* fname);
 SDL_Texture* texmgr_get_texture(TextureManager* mgr, const char* id);
 

@@ -23,6 +23,8 @@ typedef struct GameState {
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    Entity player;
+    f32 scale;
     bool is_running;
     bool is_fullscreen;
 } GameState;

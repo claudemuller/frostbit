@@ -69,4 +69,24 @@ static inline void* debug_malloc(size_t size, char* fname, unsigned int lnum)
     return m;
 }
 
+// static inline u32 util_str_concat(char* dest, char* src)
+// {
+//     char buf[50];
+//     u8 slen = 5 + strlen(src);
+//
+//     if (slen > (sizeof buf)) {
+//         util_error("Size of string buffer is too small");
+//         break;
+//     } else {
+//         u8 rlen = snprintf(buf, slen, "res/%s", ts->image->source);
+//         if (rlen < 0) {
+//             util_error("Failed with encoding issue when concatenating strings");
+//             break;
+//         } else if (rlen >= sizeof buf) {
+//             util_error("Output was truncated when concatenating strings");
+//             break;
+//         }
+//     }
+// }
+
 #endif // !UTILS_H_
