@@ -32,7 +32,7 @@ debug: debug-build
 debug-build: bin-dir
 	$(CC) $(CFLAGS) -g $(LIBS) $(SRC) -o $(BIN) $(LDFLAGS)
 
-run: build
+run: dev-build
 	@$(BIN) $(ARGS)
 
 memcheck:

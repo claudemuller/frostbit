@@ -1,11 +1,11 @@
-#include "event_bus.h"
+#include "eventbus.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // static EventBus event_bus = {0};
 
-bool event_bus_init(EventBus* ebus)
+bool eventbus_init(EventBus* ebus)
 {
     // EventBus* event_bus = debug_malloc(sizeof(EventBus), __FILE__, __LINE__);
     // if (!event_bus) {
@@ -15,15 +15,15 @@ bool event_bus_init(EventBus* ebus)
     // event_bus->handlers = {};
     // ebus->poll = NULL;
 
-    ebus->on_event = event_bus_on_event;
-    ebus->emit = event_bus_emit;
-    ebus->process_events = event_bus_process_events;
-    ebus->destroy = event_bus_destroy;
+    ebus->on_event = eventbus_on_event;
+    ebus->emit = eventbus_emit;
+    ebus->process_events = eventbus_process_events;
+    ebus->destroy = eventbus_destroy;
 
     return true;
 }
 
-void event_bus_on_event(EventBus* ebus, EventType type, EventHandlerFn EventHandlerFn)
+void eventbus_on_event(EventBus* ebus, EventType type, EventHandlerFn EventHandlerFn)
 {
     EventHandler handler = {
         .type = type,
@@ -33,7 +33,7 @@ void event_bus_on_event(EventBus* ebus, EventType type, EventHandlerFn EventHand
     ebus->handlers[ebus->handler_count++] = handler;
 }
 
-void event_bus_emit(EventBus* ebus, EventType type, EventArgs args)
+void eventbus_emit(EventBus* ebus, EventType type, EventArgs args)
 {
     Event ev = {
         .type = type,
@@ -43,7 +43,7 @@ void event_bus_emit(EventBus* ebus, EventType type, EventArgs args)
     ebus->poll[ebus->poll_count++] = ev;
 }
 
-void event_bus_process_events(EventBus* ebus)
+void eventbus_process_events(EventBus* ebus)
 {
     // size_t poll_len = array_length(event_bus.poll);
     if (ebus->poll_count == 0) {
@@ -70,7 +70,7 @@ void event_bus_process_events(EventBus* ebus)
     }
 }
 
-void event_bus_destroy(void)
+void eventbus_destroy(void)
 {
     // free(event_bus.handlers);
     // free(event_bus.poll);

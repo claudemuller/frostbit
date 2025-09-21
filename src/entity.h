@@ -29,35 +29,36 @@ enum ComponentID {
 
 typedef union {
     struct {
-        float x;
-        float y;
+        f32 x;
+        f32 y;
     };
     struct {
-        float w;
-        float h;
+        f32 w;
+        f32 h;
     };
 } Vector2;
 
 typedef struct {
     Vector2 pos;
     Vector2 scale;
-    float rotation;
+    f32 rotation;
 } TransformComponent;
 
 typedef struct {
     const char* asset_id;
     Vector2 size; // TODO: ??
-    int z_index;
+    u8 z_index;
     bool is_fixed;
     SDL_FlipMode is_flipped;
     SDL_FRect src;
 } SpriteComponent;
 
 typedef struct {
-    int num_frames;
-    int cur_frame;
-    int frame_rate_speed;
+    u8 num_frames;
+    u8 cur_frame;
+    i16 frame_rate_speed;
     bool loop;
+    // TODO: ??
     int start_time;
 } AnimationComponent;
 

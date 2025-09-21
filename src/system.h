@@ -40,7 +40,7 @@ static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn f
 
 static inline void sysmgr_update_entity(GameState* state, Entity e)
 {
-    for (uint32_t i = 0; i < state->sysmgr->count; ++i) {
+    for (size_t i = 0; i < state->sysmgr->count; ++i) {
         System* s = &state->sysmgr->systems[i];
 
         // Keyboard system is called manually on key event
@@ -50,7 +50,7 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
     }
 }
 
-bool check_aabb_collision(double ax, double ay, double aw, double ah, double bx, double by, double bw, double bh);
+bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
 void movement_sys_update(GameState* state, Entity e, void* ctx);
 void render_sys_render(GameState* state, Entity e, void* ctx);
 void render_collider_sys_render(GameState* state, Entity e, void* ctx);

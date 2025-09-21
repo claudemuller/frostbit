@@ -1,13 +1,13 @@
 #include "system.h"
 #include "entity.h"
-#include "event_bus.h"
+#include "eventbus.h"
 #include "state.h"
 #include "texture.h"
 #include <stdint.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
 {
-    float dt = *(float*)ctx;
+    f64 dt = *(float*)ctx;
     TransformComponent* t = &state->entmgr->transform_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
@@ -147,7 +147,7 @@ void collision_sys_update(GameState* state, Entity e, void* ctx)
     }
 }
 
-bool check_aabb_collision(double ax, double ay, double aw, double ah, double bx, double by, double bw, double bh)
+bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh)
 {
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }

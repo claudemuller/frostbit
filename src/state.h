@@ -2,7 +2,7 @@
 #define STATE_H_
 
 #include "entity.h"
-#include "event_bus.h"
+#include "eventbus.h"
 #include <SDL3/SDL.h>
 #include <tmx.h>
 

@@ -1,8 +1,6 @@
 #include "texture.h"
-#include "SDL3/SDL_render.h"
 #include "tilemap.h"
 #include "utils/utils.h"
-#include <SDL3/SDL_error.h>
 #include <SDL3_image/SDL_image.h>
 
 static SDL_Renderer* renderer;

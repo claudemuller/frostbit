@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    util_info("starting game...");
+    util_info("Starting game...");
 
     MemoryArena game_mem;
     arena_init(&game_mem, 1 * MB);

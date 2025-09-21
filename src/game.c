@@ -1,7 +1,7 @@
 #include "game.h"
 #include "arena.h"
 #include "entity.h"
-#include "event_bus.h"
+#include "eventbus.h"
 #include "state.h"
 #include "system.h"
 #include "texture.h"
@@ -26,7 +26,7 @@ static void on_collision(EventArgs args)
 }
 
 GameState state = {0};
-static int prev_frame_ms = 0;
+static u32 prev_frame_ms = 0;
 
 bool game_init(MemoryArena* game_mem)
 {
@@ -45,7 +45,7 @@ bool game_init(MemoryArena* game_mem)
 
     state.eventbus = (EventBus*)arena_alloc_aligned(game_mem, sizeof(EventBus), 16);
     assert(state.eventbus && "Failed to allocate event bus.");
-    event_bus_init(state.eventbus);
+    eventbus_init(state.eventbus);
 
     // --------------------------------------------------------------------------------------------
     // Register systems
@@ -85,12 +85,14 @@ bool game_init(MemoryArena* game_mem)
         return false;
     }
     SDL_SetRenderLogicalPresentation(state.renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+    // Init components that need the renderer
     texmgr_init(state.renderer);
     tilemap_init(state.renderer);
 
     util_info("Renderer: %s", SDL_GetRendererName(state.renderer));
 
-    int w, h;
+    i32 w, h;
     if (SDL_GetWindowSize(state.window, &w, &h)) {
         // Move mouse to a location in the window
         SDL_WarpMouseInWindow(state.window, w / 2.0f, h / 2.0f);
@@ -126,21 +128,18 @@ bool game_run(void)
     load_level();
 
     while (state.is_running) {
-        int time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
+        u32 time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
         if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
             SDL_Delay(time_to_wait);
         }
 
-        double dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
+        f64 dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
         prev_frame_ms = SDL_GetTicks();
 
         process_input();
         state.eventbus->process_events(state.eventbus);
         update(dt);
         render();
-
-        // TODO: fix
-        SDL_Delay(16);
     }
 
     return true;
@@ -217,7 +216,7 @@ static void process_input(void)
 static void update(float dt)
 {
     // TODO: update to map
-    for (uint32_t i = 0; i < state.sysmgr->count; ++i) {
+    for (size_t i = 0; i < state.sysmgr->count; ++i) {
         if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = &dt;
     }
 

@@ -1,21 +1,13 @@
 #include "tilemap.h"
 #include "utils/utils.h"
 
-static void set_color(int color);
-static void draw_polyline(double** points, double x, double y, int pointsc);
-static void draw_polygon(double** points, double x, double y, int pointsc);
-static void draw_polyline(double** points, double x, double y, int pointsc);
-static void draw_polygon(double** points, double x, double y, int pointsc);
+static void set_color(i32 color);
+static void draw_polyline(f64** points, f64 x, f64 y, i32 pointsc);
+static void draw_polygon(f64** points, f64 x, f64 y, i32 pointsc);
+static void draw_polyline(f64** points, f64 x, f64 y, i32 pointsc);
+static void draw_polygon(f64** points, f64 x, f64 y, i32 pointsc);
 static void draw_objects(tmx_object_group* objgr);
-static void draw_tile(void* image,
-                      unsigned int sx,
-                      unsigned int sy,
-                      unsigned int sw,
-                      unsigned int sh,
-                      unsigned int dx,
-                      unsigned int dy,
-                      float opacity,
-                      unsigned int flags);
+static void draw_tile(void* image, u32 sx, u32 sy, u32 sw, u32 sh, u32 dx, u32 dy, float opacity, u32 flags);
 static void draw_layer(tmx_map* map, tmx_layer* layer);
 static void draw_image_layer(tmx_image* image);
 static void draw_all_layers(tmx_map* map, tmx_layer* layers);
@@ -58,20 +50,20 @@ Uint32 timer_func(Uint32 interval, void* param)
 
 // ------------------------------------------------------------------------------------------------
 
-static void set_color(int color)
+static void set_color(i32 color)
 {
     tmx_col_bytes col = tmx_col_to_bytes(color);
     SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 }
 
-static void draw_polyline(double** points, double x, double y, int pointsc)
+static void draw_polyline(f64** points, f64 x, f64 y, int pointsc)
 {
     for (size_t i = 1; i < pointsc; i++) {
         SDL_RenderLine(renderer, x + points[i - 1][0], y + points[i - 1][1], x + points[i][0], y + points[i][1]);
     }
 }
 
-static void draw_polygon(double** points, double x, double y, int pointsc)
+static void draw_polygon(f64** points, f64 x, f64 y, int pointsc)
 {
     draw_polyline(points, x, y, pointsc);
     if (pointsc > 2) {
