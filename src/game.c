@@ -5,12 +5,15 @@
 #include "state.h"
 #include "system.h"
 #include "texture.h"
+#include "tilemap.h"
 #include "utils/utils.h"
-#include <SDL3/SDL_log.h>
 #include <assert.h>
+#include <tmx.h>
 
 #define FPS 60
 #define MILLISECS_PER_FRAME 1000 / FPS
+
+void* SDL_tex_loader(const char* path);
 
 static void load_level(void);
 static void process_input(void);
@@ -65,7 +68,7 @@ bool game_init(MemoryArena* game_mem)
         return false;
     }
 
-    state.window = SDL_CreateWindow("DEV SDL3", 320, 240, SDL_WINDOW_RESIZABLE);
+    state.window = SDL_CreateWindow("DEV SDL3", 800, 600, SDL_WINDOW_RESIZABLE);
     if (!state.window) {
         util_error("Error creating SDL window: %s", SDL_GetError());
         return false;
@@ -82,6 +85,8 @@ bool game_init(MemoryArena* game_mem)
         return false;
     }
     SDL_SetRenderLogicalPresentation(state.renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    texmgr_init(state.renderer);
+    tilemap_init(state.renderer);
 
     util_info("Renderer: %s", SDL_GetRendererName(state.renderer));
 
@@ -94,6 +99,18 @@ bool game_init(MemoryArena* game_mem)
     SDL_SetWindowSize(state.window, 320 * 2, 240 * 2);
     const char* platform = SDL_GetPlatform();
     if (strncmp(platform, "Linux", strlen("Linux")) == 0) SDL_SetWindowPosition(state.window, 3200, 300);
+
+    // --------------------------------------------------------------------------------------------
+    // Setup tile mapper
+    // --------------------------------------------------------------------------------------------
+    tmx_img_load_func = texmgr_load_texture;
+    tmx_img_free_func = (void (*)(void*))SDL_DestroyTexture;
+
+    state.level = tmx_load("res/level1.tmx");
+    if (!state.level) {
+        util_error("Failed to load level1");
+        return false;
+    }
 
     // --------------------------------------------------------------------------------------------
     // Setup game state
@@ -145,7 +162,7 @@ static void load_level(void)
     Entity player = entity_create(state.entmgr);
     transform_add(state.entmgr, player, (Vector2){64, 64});
 
-    texmgr_add_texture(state.renderer, state.texmgr, "playersheet", "res/walk.png");
+    texmgr_add_texture(state.texmgr, "playersheet", "res/walk.png");
     sprite_add(state.entmgr, player, "playersheet", (Vector2){64.0, 64.0f}, (SDL_FRect){0, 0, 64.0, 64.0f}, false);
 
     rigid_body_add(state.entmgr, player, (Vector2){0});
@@ -216,6 +233,8 @@ static void render(void)
 {
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
+
+    tilemap_render_map(state.level);
 
     // TODO: split system render and update types so that we don't call them twice?
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {

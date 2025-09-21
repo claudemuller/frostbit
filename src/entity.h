@@ -27,9 +27,15 @@ enum ComponentID {
     COMP_COUNT = MAX_COMPONENTS,
 };
 
-typedef struct {
-    float x;
-    float y;
+typedef union {
+    struct {
+        float x;
+        float y;
+    };
+    struct {
+        float w;
+        float h;
+    };
 } Vector2;
 
 typedef struct {

@@ -3,9 +3,6 @@
 #include "event_bus.h"
 #include "state.h"
 #include "texture.h"
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_render.h>
-#include <SDL3/SDL_timer.h>
 #include <stdint.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
@@ -33,8 +30,8 @@ void render_sys_render(GameState* state, Entity e, void* ctx)
     SDL_FRect dst = (SDL_FRect){
         .x = t->pos.x,
         .y = t->pos.y,
-        .w = s->size.x,
-        .h = s->size.y,
+        .w = s->size.w,
+        .h = s->size.h,
     };
     SDL_Texture* tex = texmgr_get_texture(state->texmgr, s->asset_id);
     SDL_RenderTexture(state->renderer, tex, &s->src, &dst);
@@ -53,8 +50,8 @@ void render_collider_sys_render(GameState* state, Entity e, void* ctx)
                    &(SDL_FRect){
                        .x = t->pos.x + bc->offset.x,
                        .y = t->pos.y + bc->offset.y,
-                       .w = bc->size.x,
-                       .h = bc->size.y,
+                       .w = bc->size.w,
+                       .h = bc->size.h,
                    });
 }
 
@@ -114,11 +111,11 @@ void animation_sys_render(GameState* state, Entity e, void* ctx)
     a->cur_frame = ((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames;
 
     if (rb->vel.y < 0) s->src.y = 0.0f;
-    if (rb->vel.y > 0) s->src.y = s->size.y * 2.0f;
-    if (rb->vel.x < 0) s->src.y = s->size.y;
-    if (rb->vel.x > 0) s->src.y = s->size.y * 3.0f;
+    if (rb->vel.y > 0) s->src.y = s->size.h * 2.0f;
+    if (rb->vel.x < 0) s->src.y = s->size.h;
+    if (rb->vel.x > 0) s->src.y = s->size.h * 3.0f;
 
-    s->src.x = a->cur_frame * s->size.x;
+    s->src.x = a->cur_frame * s->size.w;
 }
 
 void collision_sys_update(GameState* state, Entity e, void* ctx)
@@ -139,12 +136,12 @@ void collision_sys_update(GameState* state, Entity e, void* ctx)
 
         if (check_aabb_collision(t->pos.x,
                                  t->pos.y,
-                                 bc->size.x,
-                                 bc->size.x,
+                                 bc->size.w,
+                                 bc->size.w,
                                  other_t->pos.x,
                                  other_t->pos.y,
-                                 other_bc->size.x,
-                                 other_bc->size.x)) {
+                                 other_bc->size.w,
+                                 other_bc->size.w)) {
             state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
         }
     }
