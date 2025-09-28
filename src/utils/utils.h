@@ -44,7 +44,7 @@ typedef struct {
 
 void util_inf(const char* fmt, ...);
 void util_err(const char* fmt, ...);
-void* debug_malloc(size_t size, const char* fname, unsigned int lnum);
-void debug_free(void* ptr, const char* fname, unsigned int lnum);
+void* util_malloc(size_t size, const char* fname, unsigned int lnum);
+void util_free(void* ptr, const char* fname, unsigned int lnum);
 
 #endif // UTILS_H_

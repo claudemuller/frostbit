@@ -17,7 +17,7 @@ typedef size_t ArenaMarker;
 
 static inline void arena_init(MemoryArena* arena, size_t cap)
 {
-    arena->base = (unsigned char*)debug_malloc(cap, __FILE__, __LINE__);
+    arena->base = (unsigned char*)util_malloc(cap, __FILE__, __LINE__);
     arena->cap = cap;
     arena->offset = 0;
 }
@@ -55,7 +55,7 @@ static inline void arena_reset(MemoryArena* arena)
 
 static inline void arena_free(MemoryArena* arena)
 {
-    debug_free(arena->base, __FILE__, __LINE__);
+    util_free(arena->base, __FILE__, __LINE__);
     arena->cap = 0;
     arena->offset = 0;
 }
