@@ -1,7 +1,6 @@
 CC = clang
-DEVCC = tcc
 DBG_BIN = lldb
-CFLAGS = #-D_GNU_SOURCE
+#CFLAGS = -D_GNU_SOURCE
 CFLAGS += -std=c11
 CFLAGS += -Wall
 CFLAGS += -Wextra
@@ -9,16 +8,14 @@ CFLAGS += -pedantic
 # CFLAGS += -Werror
 CFLAGS += -Wmissing-declarations
 CFLAGS += -I./lib/
-ASANFLAGS=-fsanitize=address -fno-common -fno-omit-frame-pointer
+ASANFLAGS = -fsanitize=address -fno-omit-frame-pointer
+#ASANFLAGS += -fno-common
 CFLAGS += $(shell pkg-config --cflags sdl3 sdl3-image)
 LDFLAGS = $(shell pkg-config --libs sdl3 sdl3-image) -ltmx
 LIBS =
-SRC = ./src/*.c
+SRC = ./src/*.c ./src/utils/*.c
 BIN_DIR = ./bin
 BIN = $(BIN_DIR)/frostbit
-
-dev-build: bin-dir
-	$(DEVCC) $(CFLAGS) $(LIBS) $(SRC) -o $(BIN) $(LDFLAGS)
 
 build: bin-dir
 	$(CC) $(CFLAGS) $(LIBS) $(SRC) -o $(BIN) $(LDFLAGS)
@@ -30,9 +27,9 @@ debug: debug-build
 	$(DBG_BIN) $(BIN) $(ARGS)
 
 debug-build: bin-dir
-	$(CC) $(CFLAGS) -g $(LIBS) $(SRC) -o $(BIN) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(ASANFLAGS) -g -O0 $(LIBS) $(SRC) -o $(BIN) $(LDFLAGS)
 
-run: dev-build
+run: debug-build
 	@$(BIN) $(ARGS)
 
 memcheck:

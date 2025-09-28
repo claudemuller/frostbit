@@ -17,14 +17,14 @@
 
 void* SDL_tex_loader(const char* path);
 
-static void load_level(void);
+static void load_level(MemoryArena* game_mem);
 static void process_input(void);
-static void update(float dt);
+static void update(float* dt);
 static void render(void);
 
 static void on_collision(EventArgs args)
 {
-    util_info("collision");
+    util_info("collision %d", args.i);
 }
 
 GameState state = {0};
@@ -35,12 +35,8 @@ bool game_init(MemoryArena* game_mem)
     // --------------------------------------------------------------------------------------------
     // Allocate managers
     // --------------------------------------------------------------------------------------------
-
-    state.sysmgr = (SystemManager*)arena_alloc_aligned(game_mem, sizeof(SystemManager), 16);
-    assert(state.sysmgr && "Failed to allocate system manager.");
-
-    state.entmgr = (EntityManager*)arena_alloc_aligned(game_mem, sizeof(EntityManager), 16);
-    assert(state.entmgr && "Failed to allocate entity manager.");
+    state.sysmgr = sysmgr_init(game_mem);
+    state.entmgr = entitymgr_init(game_mem);
 
     state.texmgr = (TextureManager*)arena_alloc_aligned(game_mem, sizeof(TextureManager), 16);
     assert(state.texmgr && "Failed to allocate texture manager.");
@@ -88,7 +84,7 @@ bool game_init(MemoryArena* game_mem)
     }
 
     // Init components that need the renderer
-    texmgr_init(state.renderer, state.texmgr);
+    texmgr_init(game_mem, state.renderer, state.texmgr);
     tilemap_init(state.renderer);
 
     util_info("Renderer: %s", SDL_GetRendererName(state.renderer));
@@ -112,8 +108,8 @@ bool game_init(MemoryArena* game_mem)
     }
 
     state.scale = 2.0f;
-    u32 render_w = state.level->width * state.level->tile_width * state.scale / 3.0f;
-    u32 render_h = state.level->height * state.level->tile_height * state.scale / 3.0f;
+    // u32 render_w = state.level->width * state.level->tile_width * state.scale / 3.0f;
+    // u32 render_h = state.level->height * state.level->tile_height * state.scale / 3.0f;
     SDL_SetRenderLogicalPresentation(
         state.renderer, WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
@@ -130,40 +126,49 @@ bool game_init(MemoryArena* game_mem)
     return true;
 }
 
-bool game_run(void)
+bool game_run(MemoryArena* game_mem)
 {
-    load_level();
+    load_level(game_mem);
+
+    MemoryArena frame_mem;
 
     while (state.is_running) {
-        u32 time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
-        if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
-            SDL_Delay(time_to_wait);
+        arena_init(&frame_mem, sizeof(SystemCtx));
+        {
+            u32 time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
+            if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
+                SDL_Delay(time_to_wait);
+            }
+
+            float* dt = arena_alloc_aligned(&frame_mem, sizeof(float), 16);
+            *dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
+            prev_frame_ms = SDL_GetTicks();
+
+            process_input();
+            state.eventbus->process_events(state.eventbus);
+            update(dt);
+            render();
         }
-
-        f64 dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
-        prev_frame_ms = SDL_GetTicks();
-
-        process_input();
-        state.eventbus->process_events(state.eventbus);
-        update(dt);
-        render();
+        arena_free(&frame_mem);
     }
 
     return true;
 }
 
-void game_destroy(void)
+void game_destroy(MemoryArena* game_mem)
 {
+    texmgr_destroy();
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
+    arena_free(game_mem);
     SDL_Quit();
 }
 
 // ------------------------------------------------------------------------------------------------
 
-static void load_level(void)
+static void load_level(MemoryArena* game_mem)
 {
-    tilemap_load_level(&state);
+    tilemap_load_level(game_mem, &state);
 
     state.eventbus->on_event(state.eventbus, EVT_DEAD, &on_collision);
 }
@@ -203,11 +208,11 @@ static void process_input(void)
     }
 }
 
-static void update(float dt)
+static void update(float* dt)
 {
     // TODO: update to map
     for (size_t i = 0; i < state.sysmgr->count; ++i) {
-        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = &dt;
+        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = dt;
     }
 
     // TODO: split system render and update types so that we don't call them twice?
@@ -223,7 +228,7 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    tilemap_render_map(&state, state.level);
+    // tilemap_render_map(&state, state.level);
 
     // TODO: split system render and update types so that we don't call them twice?
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {

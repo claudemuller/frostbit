@@ -1,0 +1,14 @@
+[
+  {
+    "directory": "C:/lib/SDL3-3.2.22",
+    "command": "\"C:/Program Files/LLVM/bin/clang.exe\" -Wall -Wextra -Wno-microsoft -Wno-pragma-pack -I\"C:/lib/SDL3-3.2.22/include\" -c \"src/main.c\" -o \"bin/main.obj\"",
+    "file": "src/main.c",
+    "output": "bin/main.obj"
+  },
+  {
+    "directory": "C:/lib/SDL3-3.2.22",
+    "command": "\"C:/Program Files/LLVM/bin/link.exe\" bin/main.obj /LIBPATH:\"C:/lib/SDL3-3.2.22/lib/x64\" SDL3.lib SDL3main.lib /DEBUG /OUT:\"bin/sdl3.exe\"",
+    "file": "src/main.c",
+    "output": "bin/sdl3.exe"
+  }
+]

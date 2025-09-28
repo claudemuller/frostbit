@@ -2,8 +2,8 @@
 #define ENTITY_H_
 
 #include "arena.h"
+#include "utils/utils.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_pixels.h>
 #include <stdint.h>
 
 #define MAX_ENTITIES 32
@@ -98,6 +98,8 @@ typedef struct EntityManager {
     Signature signatures[MAX_ENTITIES];
     bool live_entities[MAX_ENTITIES];
 } EntityManager;
+
+EntityManager* entitymgr_init(MemoryArena* mem);
 
 Entity entity_create(EntityManager* entmgr);
 void entity_destroy(EntityManager* entmgr, Entity e);

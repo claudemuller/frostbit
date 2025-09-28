@@ -1,45 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down"
-	width="10" height="10" tilewidth="40" tileheight="40" infinite="0" nextlayerid="4"
-	nextobjectid="21">
-	<tileset firstgid="1" source="tileset.tsx" />
-	<tileset firstgid="22" source="guy.tsx" />
-	<layer id="1" name="terrain" width="10" height="10">
-		<data encoding="csv">
-			4,16,16,16,16,16,16,16,5,13,
-			10,1,2,2,2,3,18,18,15,5,
-			10,8,9,13,9,11,2,3,18,8,
-			10,15,5,9,9,9,9,11,3,8,
-			10,1,12,9,4,5,9,9,10,8,
-			10,8,9,13,10,15,5,13,10,8,
-			10,8,9,9,10,18,8,9,10,8,
-			10,15,5,9,10,1,12,4,17,8,
-			11,3,15,16,17,15,16,17,18,8,
-			9,11,2,2,3,18,18,18,1,12
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="40" tileheight="40" infinite="0" nextlayerid="4" nextobjectid="23">
+ <tileset firstgid="1" source="tileset.tsx"/>
+ <tileset firstgid="22" source="guy.tsx"/>
+ <layer id="1" name="terrain" width="10" height="10">
+  <data encoding="csv">
+4,16,16,16,16,16,16,16,5,13,
+10,1,2,2,2,3,18,18,15,5,
+10,8,9,13,9,11,2,3,18,8,
+10,15,5,9,9,9,9,11,3,8,
+10,1,12,9,4,5,9,9,10,8,
+10,8,9,13,10,15,5,13,10,8,
+10,8,9,9,10,18,8,9,10,8,
+10,15,5,9,10,1,12,4,17,8,
+11,3,15,16,17,15,16,17,18,8,
+9,11,2,2,3,18,18,18,1,12
 </data>
-	</layer>
-	<objectgroup id="2" name="obstacles">
-		<object id="1" name="rock" gid="19" x="223.888" y="95.5988" width="40" height="40" />
-		<object id="2" name="rock" gid="19" x="320.523" y="346.39" width="40" height="40" />
-		<object id="3" name="rock" gid="19" x="23.0585" y="57.4707" width="40" height="40" />
-		<object id="4" name="rock" gid="19" x="64.4735" y="376.301" width="40" height="40" />
-		<object id="5" name="bridge" gid="6" x="339.916" y="203.081" width="40" height="40" />
-		<object id="6" name="bridge" gid="6" x="19.1142" y="278.351" width="40" height="40" />
-		<object id="7" name="island" gid="20" x="280.094" y="78.8356" width="40" height="40" />
-		<object id="8" name="island" gid="20" x="299.816" y="397.994" width="40" height="40" />
-		<object id="9" name="island" gid="20" x="20.1003" y="180.401" width="40" height="40" />
-		<object id="10" name="house" gid="14" x="120.022" y="319.437" width="40" height="40" />
-		<object id="11" name="house" gid="14" x="239.666" y="158.379" width="40" height="40" />
-		<object id="12" name="house-roof" gid="7" x="120" y="280" width="40" height="40" />
-		<object id="13" name="house-roof" gid="7" x="239.545" y="118.364" width="40" height="40" />
-		<object id="14" name="tree" gid="21" x="266" y="293.333" width="40" height="40" />
-		<object id="15" name="tree" gid="21" x="127" y="176.333" width="40" height="40" />
-		<object id="16" name="tree" gid="21" x="63" y="101.333" width="40" height="40" />
-		<object id="17" name="tree" gid="21" x="178.333" y="83" width="40" height="40" />
-		<object id="18" name="tree" gid="21" x="19" y="362.667" width="40" height="40" />
-		<object id="19" name="tree" gid="21" x="282.333" y="225.667" width="40" height="40" />
-	</objectgroup>
-	<objectgroup id="3" name="entities">
-		<object id="20" name="player" type="entity" gid="22" x="76" y="273" width="35" height="39" />
-	</objectgroup>
+ </layer>
+ <objectgroup id="2" name="obstacles">
+  <object id="1" name="rock" gid="19" x="223.888" y="95.5988" width="40" height="40"/>
+  <object id="2" name="rock" gid="19" x="320.523" y="346.39" width="40" height="40"/>
+  <object id="3" name="rock" gid="19" x="23.0585" y="57.4707" width="40" height="40"/>
+  <object id="4" name="rock" gid="19" x="64.4735" y="376.301" width="40" height="40"/>
+  <object id="5" name="bridge" gid="6" x="339.916" y="203.081" width="40" height="40"/>
+  <object id="6" name="bridge" gid="6" x="19.1142" y="278.351" width="40" height="40"/>
+  <object id="7" name="island" gid="20" x="280.094" y="78.8356" width="40" height="40"/>
+  <object id="8" name="island" gid="20" x="299.816" y="397.994" width="40" height="40"/>
+  <object id="9" name="island" gid="20" x="20.1003" y="180.401" width="40" height="40"/>
+  <object id="10" name="house" gid="14" x="120.022" y="319.437" width="40" height="40"/>
+  <object id="11" name="house" gid="14" x="239.666" y="158.379" width="40" height="40"/>
+  <object id="12" name="house-roof" gid="7" x="120" y="280" width="40" height="40"/>
+  <object id="13" name="house-roof" gid="7" x="239.545" y="118.364" width="40" height="40"/>
+  <object id="14" name="tree" gid="21" x="266" y="293.333" width="40" height="40"/>
+  <object id="15" name="tree" gid="21" x="127" y="176.333" width="40" height="40"/>
+  <object id="16" name="tree" gid="21" x="63" y="101.333" width="40" height="40"/>
+  <object id="17" name="tree" gid="21" x="178.333" y="83" width="40" height="40"/>
+  <object id="18" name="tree" gid="21" x="19" y="362.667" width="40" height="40"/>
+  <object id="19" name="tree" gid="21" x="282.333" y="225.667" width="40" height="40"/>
+ </objectgroup>
+ <objectgroup id="3" name="entities">
+  <object id="20" name="player" type="entity" gid="22" x="76" y="273" width="35" height="39"/>
+ </objectgroup>
 </map>

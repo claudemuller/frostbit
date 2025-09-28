@@ -1,9 +1,16 @@
 #include "entity.h"
-#include <SDL3/SDL_pixels.h>
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_timer.h>
+#include "arena.h"
 #include <assert.h>
 #include <stdint.h>
+
+EntityManager* entitymgr_init(MemoryArena* mem)
+{
+    EntityManager* entmgr = (EntityManager*)arena_alloc_aligned(mem, sizeof(EntityManager), 16);
+    util_debug("%ld\n", sizeof(EntityManager));
+    assert(entmgr && "Failed to allocate entity manager.");
+    entmgr->next_entity_id = 0;
+    return entmgr;
+}
 
 Entity entity_create(EntityManager* entmgr)
 {

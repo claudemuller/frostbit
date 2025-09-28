@@ -7,6 +7,8 @@ project(frostbit C)                        # your project name
 set(CMAKE_C_STANDARD 11)                   # -std=c11
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g")
+
 # Base warnings (‑Wall ‑Wextra ‑pedantic …)
 add_compile_options(
         -Wall

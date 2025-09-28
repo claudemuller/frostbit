@@ -1,8 +1,8 @@
 #include "system.h"
 #include "entity.h"
-#include "eventbus.h"
 #include "state.h"
 #include "texture.h"
+#include <assert.h>
 #include <stdint.h>
 
 void movement_sys_update(GameState* state, Entity e, void* ctx)
@@ -142,7 +142,7 @@ void collision_sys_update(GameState* state, Entity e, void* ctx)
                                  other_t->pos.y,
                                  other_bc->size.w,
                                  other_bc->size.w)) {
-            //state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
+            // state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
         }
     }
 }

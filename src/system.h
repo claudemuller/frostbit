@@ -3,6 +3,7 @@
 
 #include "entity.h"
 #include "state.h"
+#include <assert.h>
 #include <stdint.h>
 
 #define MAX_SYSTEMS 16
@@ -27,6 +28,31 @@ typedef struct SystemManager {
 #define SYS_SIG_MOUSE_CONTROL ((1U << COMP_MOUSE_CONTROL))
 #define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
 #define SYS_SIG_COLLISION ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
+
+typedef struct {
+    float dt;
+} MovementCtx;
+
+typedef enum {
+    CTX_NONE,
+    CTX_MOVEMENT,
+    CTX_COUNT,
+} CtxTag;
+
+typedef struct {
+    CtxTag tag;
+    union {
+        MovementCtx movement;
+    };
+} SystemCtx;
+
+static inline SystemManager* sysmgr_init(MemoryArena* mem)
+{
+    SystemManager* sysmgr = (SystemManager*)arena_alloc_aligned(mem, sizeof(SystemManager), 16);
+    assert(sysmgr && "Failed to allocate system manager.");
+    sysmgr->count = 0;
+    return sysmgr;
+}
 
 static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn fn, void* ctx)
 {

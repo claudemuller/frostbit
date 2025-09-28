@@ -1,30 +1,27 @@
 #include "texture.h"
 #include "tilemap.h"
 #include "utils/utils.h"
+#include <SDL3/SDL_surface.h>
 #include <SDL3_image/SDL_image.h>
 
 static SDL_Renderer* renderer;
 static TextureManager* mgr;
+static MemoryArena* game_mem;
 
-void texmgr_init(SDL_Renderer* r, TextureManager* tm)
+void texmgr_init(MemoryArena* gmem, SDL_Renderer* r, TextureManager* tm)
 {
     renderer = r;
     mgr = tm;
+    game_mem = gmem;
 }
 
-void texmgr_add_texture(TextureManager* mgr, const char* id, const char* fname)
+void texmgr_add_texture(const char* fname)
 {
-    if (mgr->count >= MAX_TEXTURES) return;
-
     SDL_Texture* tex = texmgr_load_texture(fname);
     if (!tex) {
         util_error("Failed to load texture: %s", SDL_GetError());
         return;
     }
-
-    mgr->textures[mgr->count] = tex;
-    mgr->texture_ids[mgr->count] = id;
-    mgr->count++;
 }
 
 void* texmgr_load_texture(const char* fname)
@@ -33,6 +30,8 @@ void* texmgr_load_texture(const char* fname)
         util_error("Renderer is NULL :(");
         return NULL;
     }
+
+    if (mgr->count >= MAX_TEXTURES) return NULL;
 
     // If the texture already exists, return that
     for (size_t i = 0; i < mgr->count; ++i) {
@@ -53,9 +52,11 @@ void* texmgr_load_texture(const char* fname)
         return NULL;
     }
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+    SDL_DestroySurface(surface);
 
+    char* texid = (char*)arena_alloc_aligned(game_mem, strlen(fname), 16);
     mgr->textures[mgr->count] = tex;
-    mgr->texture_ids[mgr->count] = strdup(fname);
+    mgr->texture_ids[mgr->count] = texid;
     mgr->count++;
 
     return tex;
@@ -69,4 +70,11 @@ SDL_Texture* texmgr_get_texture(TextureManager* mgr, const char* id)
         }
     }
     return NULL;
+}
+
+void texmgr_destroy(void)
+{
+    for (size_t i = 0; i < mgr->count; ++i) {
+        SDL_DestroyTexture(mgr->textures[i]);
+    }
 }

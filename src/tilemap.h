@@ -6,7 +6,7 @@
 #include <tmx.h>
 
 void tilemap_init(SDL_Renderer* r);
-void tilemap_load_level(GameState* state);
+void tilemap_load_level(MemoryArena* game_mem, GameState* state);
 void tilemap_render_map(GameState* state, tmx_map* map);
 void* texmgr_load_texture(const char* fname);
 

@@ -15,12 +15,12 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    if (!game_run()) {
+    if (!game_run(&game_mem)) {
         util_error("Failed to start game");
         return EXIT_FAILURE;
     }
 
-    game_destroy();
+    game_destroy(&game_mem);
 
     return EXIT_SUCCESS;
 }

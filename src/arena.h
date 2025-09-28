@@ -55,7 +55,7 @@ static inline void arena_reset(MemoryArena* arena)
 
 static inline void arena_free(MemoryArena* arena)
 {
-    free(arena->base);
+    debug_free(arena->base, __FILE__, __LINE__);
     arena->cap = 0;
     arena->offset = 0;
 }
