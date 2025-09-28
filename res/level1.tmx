@@ -2,7 +2,7 @@
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="40" tileheight="40" infinite="0" nextlayerid="4" nextobjectid="25">
  <tileset firstgid="1" source="tileset.tsx"/>
  <tileset firstgid="22" source="guy.tsx"/>
- <layer id="1" name="terrain" width="10" height="10">
+ <layer id="1" name="terrain" class="terrain" width="10" height="10">
   <data encoding="csv">
 4,16,16,16,16,16,16,16,5,13,
 10,1,2,2,2,3,18,18,15,5,

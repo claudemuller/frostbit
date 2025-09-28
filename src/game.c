@@ -7,6 +7,8 @@
 #include "texture.h"
 #include "tilemap.h"
 #include "utils/utils.h"
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
 #include <assert.h>
 #include <tmx.h>
 
@@ -228,7 +230,23 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    // tilemap_render_map(&state, state.level);
+    for (size_t i = 0; i < state.n_terrain_tiles; ++i) {
+        Tile tile = state.terrain_tiles[i];
+        SDL_RenderTexture(state.renderer,
+                          tile.texture,
+                          &(SDL_FRect){
+                              .x = tile.src.x,
+                              .y = tile.src.y,
+                              .w = tile.size.w,
+                              .h = tile.size.h,
+                          },
+                          &(SDL_FRect){
+                              .x = tile.pos.x,
+                              .y = tile.pos.y,
+                              .w = tile.size.w,
+                              .h = tile.size.h,
+                          });
+    }
 
     // TODO: split system render and update types so that we don't call them twice?
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {

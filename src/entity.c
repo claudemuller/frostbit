@@ -8,7 +8,8 @@ EntityManager* entitymgr_init(MemoryArena* mem)
     EntityManager* entmgr = (EntityManager*)arena_alloc_aligned(mem, sizeof(EntityManager), 16);
     util_debug("%ld\n", sizeof(EntityManager));
     assert(entmgr && "Failed to allocate entity manager.");
-    entmgr->next_entity_id = 0;
+    // 0 is reserved for error handling
+    entmgr->next_entity_id = 1;
     return entmgr;
 }
 
