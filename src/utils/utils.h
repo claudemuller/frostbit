@@ -22,10 +22,11 @@ typedef double f64;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 
-#define util_error(fmt, ...) util_err("ERROR [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define util_info(fmt, ...) util_inf("INFO: " fmt, ##__VA_ARGS__)
-#define util_warn(fmt, ...) util_inf("WARN [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
-#define util_debug(fmt, ...) util_inf("DEBUG [%s:%d]: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+#define util_error(fmt, ...) util_err("ERROR [%s:%d]: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define util_info(fmt, ...) util_inf("INFO: " fmt "\n", ##__VA_ARGS__)
+#define util_warn(fmt, ...) util_inf("WARN [%s:%d]: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define util_debug(fmt, ...) util_inf("DEBUG [%s:%d]: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define util_fatal(fmt, ...) util_fat("FATAL [%s:%d]: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
 #pragma clang diagnostic pop
 
@@ -44,6 +45,7 @@ typedef struct {
 
 void util_inf(const char* fmt, ...);
 void util_err(const char* fmt, ...);
+void util_fat(const char* fmt, ...);
 void* util_malloc(size_t size, const char* fname, unsigned int lnum);
 void util_free(void* ptr, const char* fname, unsigned int lnum);
 

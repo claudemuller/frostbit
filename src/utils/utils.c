@@ -50,7 +50,7 @@ void util_inf(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, fmt, ap);
+    vprintf(fmt, ap);
 
     va_end(ap);
 }
@@ -60,9 +60,21 @@ void util_err(const char* fmt, ...)
     va_list ap;
     va_start(ap, fmt);
 
-    SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, fmt, ap);
+    vprintf(fmt, ap);
 
     va_end(ap);
+}
+
+void util_fat(const char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+    vprintf(fmt, ap);
+
+    va_end(ap);
+
+    exit(1);
 }
 
 // ------------------------------------------------------------------------------------------------

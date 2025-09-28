@@ -17,6 +17,7 @@
 
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
 static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr);
+static Entity parse_entity(MemoryArena* game_mem, EntityManager* entmgr, tmx_object* obj, const char* texid);
 
 static SDL_Renderer* renderer;
 
@@ -105,6 +106,23 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
             switch (obj->obj_type) {
             case OT_TILE: {
                 tmx_tileset* ts = map->tiles[obj->content.gid]->tileset;
+                if (!ts) {
+                    util_error("no tileset");
+                    continue;
+                }
+
+                u8 slen = 5 + strlen(ts->image->source);
+                char* texid = (char*)arena_alloc_aligned(game_mem, slen, 16);
+                if (!texid) {
+                    util_fatal("ran out of memory in game_mem");
+                }
+
+                u8 rlen = snprintf(texid, slen, "res/%s", ts->image->source);
+                if (rlen < 0) {
+                    util_error("Failed concatenating strings");
+                    break;
+                }
+
                 // tmx_image* im = map->tiles[obj->content.gid]->image;
                 // f32 op;
 
@@ -122,32 +140,19 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
                 //
                 // u32 flags = obj->id & ~TMX_FLIP_BITS_REMOVAL;
 
-                if (strncmp(obj->name, "player", strlen("player")) == 0) {
-                    state->player = entity_create(state->entmgr);
-                    transform_add(state->entmgr, state->player, (Vector2){.x = obj->x, .y = obj->y - obj->height});
-
-                    // char buf[50];
-                    u8 slen = 5 + strlen(ts->image->source);
-                    char* texid = (char*)arena_alloc_aligned(game_mem, slen, 16);
-
-                    u8 rlen = snprintf(texid, slen, "res/%s", ts->image->source);
-                    if (rlen < 0) {
-                        util_error("Failed concatenating strings");
-                        break;
+                if (obj->type && strncmp(obj->type, "entity", strlen("entity")) == 0) {
+                    if (strncmp(obj->name, "player", strlen("player")) == 0) {
+                        state->player = parse_entity(game_mem, state->entmgr, obj, texid);
+                        if (state->player < 0) {
+                            break;
+                        }
+                        continue;
                     }
 
-                    sprite_add(state->entmgr,
-                               state->player,
-                               texid,
-                               (Vector2){.h = obj->height, .w = obj->width},
-                               (SDL_FRect){0, 0, obj->width, obj->height},
-                               false);
-
-                    rigid_body_add(state->entmgr, state->player, (Vector2){0});
-                    box_collider_add(
-                        state->entmgr, state->player, (Vector2){.x = obj->width, .y = obj->height}, (Vector2){0});
-                    animation_add(state->entmgr, state->player, 3, 15, true);
-                    keyboard_control_add(state->entmgr, state->player);
+                    Entity ent = parse_entity(game_mem, state->entmgr, obj, texid);
+                    if (ent < 0) {
+                        break;
+                    }
                 }
             } break;
 
@@ -179,6 +184,27 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
 
         obj = obj->next;
     }
+}
+
+static Entity parse_entity(MemoryArena* game_mem, EntityManager* entmgr, tmx_object* obj, const char* texid)
+{
+    Entity ent = entity_create(entmgr);
+
+    transform_add(entmgr, ent, (Vector2){.x = obj->x, .y = obj->y - obj->height});
+
+    sprite_add(entmgr,
+               ent,
+               texid,
+               (Vector2){.h = obj->height, .w = obj->width},
+               (SDL_FRect){0, 0, obj->width, obj->height},
+               false);
+
+    rigid_body_add(entmgr, ent, (Vector2){0});
+    box_collider_add(entmgr, ent, (Vector2){.x = obj->width, .y = obj->height}, (Vector2){0});
+    animation_add(entmgr, ent, 3, 15, true);
+    keyboard_control_add(entmgr, ent);
+
+    return ent;
 }
 
 // ---------
