@@ -54,7 +54,10 @@ void* texmgr_load_texture(const char* fname)
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
     SDL_DestroySurface(surface);
 
-    char* texid = (char*)arena_alloc_aligned(game_mem, strlen(fname), 16);
+    size_t fnamelen = strlen(fname);
+    char* texid = (char*)arena_alloc_aligned(game_mem, fnamelen, 16);
+    strncpy(texid, fname, fnamelen);
+
     mgr->textures[mgr->count] = tex;
     mgr->texture_ids[mgr->count] = texid;
     mgr->count++;

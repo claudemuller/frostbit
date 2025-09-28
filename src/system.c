@@ -59,21 +59,30 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx)
     SDL_Event ev = *(SDL_Event*)ctx;
     KeyboardControlComponent* kb = &state->entmgr->keyboard_control_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
+    SpriteComponent* s = &state->entmgr->sprite_comps[e];
 
-    if (!kb || !rb) return;
+    if (!kb || !rb || !s) return;
 
     if (ev.type == SDL_EVENT_KEY_DOWN) {
-        if (ev.key.key == SDLK_A) rb->vel.x = -50.5f;
-        if (ev.key.key == SDLK_LEFT) rb->vel.x = -50.5f;
+        if (ev.key.key == SDLK_A || ev.key.key == SDLK_LEFT) {
+            rb->vel.x = -50.5f;
+            s->is_h_flipped = true;
+        }
 
-        if (ev.key.key == SDLK_D) rb->vel.x = 50.5f;
-        if (ev.key.key == SDLK_RIGHT) rb->vel.x = 50.5f;
+        if (ev.key.key == SDLK_D || ev.key.key == SDLK_RIGHT) {
+            rb->vel.x = 50.5f;
+            s->is_h_flipped = false;
+        }
 
-        if (ev.key.key == SDLK_W) rb->vel.y = -50.5f;
-        if (ev.key.key == SDLK_UP) rb->vel.y = -50.5f;
+        if (ev.key.key == SDLK_W || ev.key.key == SDLK_UP) {
+            rb->vel.y = -50.5f;
+            s->is_v_flipped = true;
+        }
 
-        if (ev.key.key == SDLK_S) rb->vel.y = 50.5f;
-        if (ev.key.key == SDLK_DOWN) rb->vel.y = 50.5f;
+        if (ev.key.key == SDLK_S || ev.key.key == SDLK_DOWN) {
+            rb->vel.y = 50.5f;
+            s->is_v_flipped = false;
+        }
     }
 
     if (ev.type == SDL_EVENT_KEY_UP) {
@@ -107,14 +116,12 @@ void animation_sys_render(GameState* state, Entity e, void* ctx)
 
     if (rb->vel.x == 0.0f && rb->vel.y == 0.0f) return;
 
-    a->cur_frame = ((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames;
+    a->cur_frame = (((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames) + a->start_frame;
 
-    if (rb->vel.y < 0) s->src.y = 0.0f;
-    if (rb->vel.y > 0) s->src.y = s->size.h * 2.0f;
-    if (rb->vel.x < 0) s->src.y = s->size.h;
-    if (rb->vel.x > 0) s->src.y = s->size.h * 3.0f;
-
-    s->src.x = a->cur_frame * s->size.w;
+    s->src.x = (i32)(a->cur_frame * s->size.w) % (i32)s->texture->w;
+    // s->src.w = s->is_h_flipped ? -s->src.w : s->src.w;
+    s->src.y = (i32)((a->cur_frame * s->size.w) / s->texture->w) + s->size.h;
+    // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
 }
 
 void collision_sys_update(GameState* state, Entity e, void* ctx)

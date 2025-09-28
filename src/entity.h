@@ -49,12 +49,14 @@ typedef struct {
     Vector2 size; // TODO: ??
     u8 z_index;
     bool is_fixed;
-    SDL_FlipMode is_flipped;
+    SDL_FlipMode is_h_flipped;
+    SDL_FlipMode is_v_flipped;
     SDL_FRect src;
 } SpriteComponent;
 
 typedef struct {
     u8 num_frames;
+    u8 start_frame;
     u8 cur_frame;
     i16 frame_rate_speed;
     bool loop;
@@ -108,7 +110,7 @@ void transform_add(EntityManager* entmgr, Entity e, Vector2 pos);
 void transform_remove(EntityManager* entmgr, Entity e);
 void sprite_add(EntityManager* entmgr, Entity e, SDL_Texture* tex, Vector2 size, SDL_FRect src, bool is_fixed);
 void sprite_remove(EntityManager* entmgr, Entity e);
-void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop);
+void animation_add(EntityManager* entmgr, Entity e, u8 start_frame, int num_frames, int frame_rate_speed, bool loop);
 void animation_remove(EntityManager* entmgr, Entity e);
 void keyboard_control_add(EntityManager* entmgr, Entity e);
 void keyboard_control_remove(EntityManager* entmgr, Entity e);

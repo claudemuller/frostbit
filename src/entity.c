@@ -76,12 +76,14 @@ void sprite_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_SPRITE);
 }
 
-void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop)
+void animation_add(EntityManager* entmgr, Entity e, u8 start_frame, int num_frames, int frame_rate_speed, bool loop)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 
     entmgr->animation_comps[e] = (AnimationComponent){
         .num_frames = num_frames,
+        .cur_frame = start_frame,
+        .start_frame = start_frame,
         .frame_rate_speed = frame_rate_speed,
         .loop = loop,
     };

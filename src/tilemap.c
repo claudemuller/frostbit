@@ -19,7 +19,7 @@
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
 static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr);
 static Entity
-parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tileset* ts);
+parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile);
 
 static SDL_Renderer* renderer;
 
@@ -107,14 +107,8 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
         if (obj->visible) {
             switch (obj->obj_type) {
             case OT_TILE: {
-                tmx_tileset* ts = map->tiles[obj->content.gid]->tileset;
-                if (!ts) {
-                    util_error("no tileset");
-                    obj = obj->next;
-                    continue;
-                }
+                tmx_tile* tile = map->tiles[obj->content.gid];
 
-                // tmx_image* im = map->tiles[obj->content.gid]->image;
                 // f32 op;
 
                 // u32 x = map->tiles[obj->content.gid]->ul_x;
@@ -132,18 +126,14 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
                 // u32 flags = obj->id & ~TMX_FLIP_BITS_REMOVAL;
 
                 if (obj->type && strncmp(obj->type, "entity", strlen("entity")) == 0) {
-                    if (strncmp(obj->name, "player", strlen("player")) == 0) {
-                        state->player = parse_entity(game_mem, state->entmgr, state->texmgr, obj, ts);
-                        if (state->player < 0) {
-                            break;
-                        }
-                        obj = obj->next;
-                        continue;
+                    Entity ent = parse_entity(game_mem, state->entmgr, state->texmgr, obj, tile);
+                    if (ent < 0) {
+                        util_err("Parsing entity failed");
+                        break;
                     }
 
-                    Entity ent = parse_entity(game_mem, state->entmgr, state->texmgr, obj, ts);
-                    if (ent < 0) {
-                        break;
+                    if (strncmp(obj->name, "player", strlen("player")) == 0) {
+                        state->player = ent;
                     }
                 }
             } break;
@@ -179,32 +169,56 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
 }
 
 static Entity
-parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tileset* ts)
+parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile)
 {
     Entity ent = entity_create(entmgr);
 
     transform_add(entmgr, ent, (Vector2){.x = obj->x, .y = obj->y - obj->height});
 
-    u8 slen = 5 + strlen(ts->image->source);
+    tmx_tileset* tileset = tile->tileset;
+    if (!tileset) {
+        util_error("no tileset");
+        obj = obj->next;
+        return -1;
+    }
+    const char* tilesetimg = tileset->image->source;
+
+    u8 slen = 5 + strlen(tilesetimg);
     char texid[255];
-    u8 rlen = snprintf(texid, slen, "res/%s", ts->image->source);
+    u8 rlen = snprintf(texid, slen, "res/%s", tilesetimg);
     if (rlen < 0) {
         util_error("Failed concatenating strings");
         return -1;
     }
 
     SDL_Texture* tex = texmgr_get_texture(texmgr, texid);
+    if (!tex) {
+        util_error("Texture not found: %s", texid);
+    }
 
     sprite_add(entmgr,
                ent,
                tex,
                (Vector2){.h = obj->height, .w = obj->width},
-               (SDL_FRect){0, 0, obj->width, obj->height},
+               (SDL_FRect){0, 0, tile->width, tile->height},
                false);
 
     rigid_body_add(entmgr, ent, (Vector2){0});
-    box_collider_add(entmgr, ent, (Vector2){.x = obj->width, .y = obj->height}, (Vector2){0});
-    animation_add(entmgr, ent, 3, 15, true);
+
+    if (tile->collision) {
+        box_collider_add(entmgr,
+                         ent,
+                         (Vector2){.w = tile->collision->width, .h = tile->collision->height},
+                         (Vector2){
+                             .x = tile->collision->x,
+                             .y = tile->collision->y,
+                         });
+    }
+
+    if (tile->animation) {
+        animation_add(entmgr, ent, tile->animation->tile_id, tile->animation_len, tile->animation[0].duration, false);
+    }
+
     keyboard_control_add(entmgr, ent);
 
     return ent;

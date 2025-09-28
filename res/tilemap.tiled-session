@@ -29,6 +29,7 @@
             "scaleInEditor": 3
         }
     },
+    "frame.defaultDuration": 10,
     "last.imagePath": "/home/lukefilewalker/repos/frostbit/res",
     "openFiles": [
         "level1.tmx",
@@ -39,9 +40,9 @@
     ],
     "project": "tilemap.tiled-project",
     "recentFiles": [
-        "tileset.tsx",
         "guy-jump.tsx",
         "guy-running.tsx",
+        "tileset.tsx",
         "guy.tsx",
         "level1.tmx"
     ],
