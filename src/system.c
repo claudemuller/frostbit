@@ -1,13 +1,16 @@
 #include "system.h"
 #include "entity.h"
 #include "state.h"
-#include "texture.h"
+#include <SDL3/SDL_rect.h>
 #include <assert.h>
 #include <stdint.h>
 
-void movement_sys_update(GameState* state, Entity e, void* ctx)
+void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
-    f64 dt = *(float*)ctx;
+    SystemCtx* ctx = (SystemCtx*)raw_ctx;
+    if (ctx->tag != CTX_MOVEMENT) return;
+
+    f64 dt = ctx->movement.dt;
     TransformComponent* t = &state->entmgr->transform_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
@@ -34,6 +37,31 @@ void render_sys_render(GameState* state, Entity e, void* ctx)
         .h = s->size.h, // * state->scale,
     };
     SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
+}
+
+void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
+{
+    SystemCtx* ctx = (SystemCtx*)raw_ctx;
+    if (ctx->tag != CTX_CAMERA_MOVEMENT) return;
+
+    SDL_FRect camera = ctx->camera.camera;
+
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    CameraFollowComponent* cf = &state->entmgr->camera_follow_comps[e];
+
+    if (!t || !cf) return;
+
+    if (t->pos.x + (camera.w / 2) < 20 * 40) {
+        camera.x = t->pos.x - (20 * 40 / 2);
+    }
+    if (t->pos.y + (camera.h / 2) < 15 * 40) {
+        camera.y = t->pos.y - (15 * 40 / 2);
+    }
+
+    camera.x = camera.x < 0 ? 0 : camera.x;
+    camera.y = camera.y < 0 ? 0 : camera.y;
+    camera.x = camera.x > camera.w ? camera.w : camera.x;
+    camera.y = camera.y > camera.h ? camera.h : camera.y;
 }
 
 void render_collider_sys_render(GameState* state, Entity e, void* ctx)

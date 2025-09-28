@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "eventbus.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_rect.h>
 #include <tmx.h>
 
 struct EntityManager;
@@ -32,6 +33,7 @@ typedef struct GameState {
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    SDL_FRect camera;
     u32 n_terrain_tiles;
     Entity player;
     f32 scale;

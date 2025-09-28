@@ -24,6 +24,7 @@ enum ComponentID {
     COMP_MOUSE_CONTROL = 4,
     COMP_BOX_COLLIDER = 5,
     COMP_RIGID_BODY = 6,
+    COMP_CAMERA_FOLLOW = 7,
     COMP_COUNT = MAX_COMPONENTS,
 };
 
@@ -88,6 +89,10 @@ typedef struct {
     Vector2 vel;
 } RigidBodyComponent;
 
+typedef struct {
+    Vector2 s;
+} CameraFollowComponent;
+
 typedef struct EntityManager {
     uint32_t next_entity_id;
     TransformComponent transform_comps[MAX_ENTITIES];
@@ -97,6 +102,7 @@ typedef struct EntityManager {
     MouseControlComponent mouse_control_comps[MAX_ENTITIES];
     BoxColliderComponent box_collider_comps[MAX_ENTITIES];
     RigidBodyComponent rigid_body_comps[MAX_ENTITIES];
+    CameraFollowComponent camera_follow_comps[MAX_ENTITIES];
     Signature signatures[MAX_ENTITIES];
     bool live_entities[MAX_ENTITIES];
 } EntityManager;
@@ -108,6 +114,8 @@ void entity_destroy(EntityManager* entmgr, Entity e);
 
 void transform_add(EntityManager* entmgr, Entity e, Vector2 pos);
 void transform_remove(EntityManager* entmgr, Entity e);
+void camera_follow_add(EntityManager* entmgr, Entity e);
+void camera_follow_remove(EntityManager* entmgr, Entity e);
 void sprite_add(EntityManager* entmgr, Entity e, SDL_Texture* tex, Vector2 size, SDL_FRect src, bool is_fixed);
 void sprite_remove(EntityManager* entmgr, Entity e);
 void animation_add(EntityManager* entmgr, Entity e, u8 start_frame, int num_frames, int frame_rate_speed, bool loop);

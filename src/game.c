@@ -52,6 +52,7 @@ bool game_init(MemoryArena* game_mem)
     // --------------------------------------------------------------------------------------------
 
     sysmgr_register(state.sysmgr, SYS_SIG_MOVEMENT, movement_sys_update, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_CAMERA_MOVEMENT, camera_movement_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_RENDER, render_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_KEYBOARD_CONTROL, keyboard_control_sys_update, NULL);
@@ -131,6 +132,11 @@ bool game_init(MemoryArena* game_mem)
 bool game_run(MemoryArena* game_mem)
 {
     load_level(game_mem);
+
+    state.camera.x = 0;
+    state.camera.y = 0;
+    state.camera.w = WINDOW_WIDTH;
+    state.camera.h = WINDOW_HEIGHT;
 
     MemoryArena frame_mem;
 
@@ -215,6 +221,7 @@ static void update(float* dt)
     // TODO: update to map
     for (size_t i = 0; i < state.sysmgr->count; ++i) {
         if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = dt;
+        if (state.sysmgr->systems[i].fn == camera_movement_sys_update) state.sysmgr->systems[i].ctx = &state.camera;
     }
 
     // TODO: split system render and update types so that we don't call them twice?

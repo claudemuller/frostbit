@@ -22,6 +22,7 @@ typedef struct SystemManager {
 } SystemManager;
 
 #define SYS_SIG_MOVEMENT ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
+#define SYS_SIG_CAMERA_MOVEMENT ((1U << COMP_TRANSFORM) | (1U << COMP_CAMERA_FOLLOW))
 #define SYS_SIG_RENDER ((1U << COMP_TRANSFORM) | (1U << COMP_SPRITE))
 #define SYS_SIG_RENDER_COLLIDER ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
 #define SYS_SIG_KEYBOARD_CONTROL ((1U << COMP_KEYBOARD_CONTROL) | (1U << COMP_SPRITE))
@@ -33,9 +34,14 @@ typedef struct {
     float dt;
 } MovementCtx;
 
+typedef struct {
+    SDL_FRect camera;
+} CameraCtx;
+
 typedef enum {
     CTX_NONE,
     CTX_MOVEMENT,
+    CTX_CAMERA_MOVEMENT,
     CTX_COUNT,
 } CtxTag;
 
@@ -43,6 +49,7 @@ typedef struct {
     CtxTag tag;
     union {
         MovementCtx movement;
+        CameraCtx camera;
     };
 } SystemCtx;
 
@@ -78,6 +85,7 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
 
 bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
 void movement_sys_update(GameState* state, Entity e, void* ctx);
+void camera_movement_sys_update(GameState* state, Entity e, void* ctx);
 void render_sys_render(GameState* state, Entity e, void* ctx);
 void render_collider_sys_render(GameState* state, Entity e, void* ctx);
 void keyboard_control_sys_update(GameState* state, Entity e, void* ctx);

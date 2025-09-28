@@ -8,7 +8,7 @@
 
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
 static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
-static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr);
+static void parse_objects(GameState* state, tmx_object_group* objgr);
 static SDL_Texture* get_tileset_texture(TextureManager* texmgr, tmx_tile* tile);
 static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile);
 
@@ -53,7 +53,7 @@ static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer*
             } break;
 
             case L_OBJGR: {
-                parse_objects(game_mem, state, layer->content.objgr);
+                parse_objects(state, layer->content.objgr);
             } break;
 
             case L_IMAGE: {
@@ -117,7 +117,7 @@ static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* laye
     }
 }
 
-static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr)
+static void parse_objects(GameState* state, tmx_object_group* objgr)
 {
     tmx_object* obj = objgr->head;
     tmx_map* map = state->level;
@@ -136,6 +136,7 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
                 }
 
                 if (obj->name && strncmp(obj->name, "player", strlen("player")) == 0) {
+                    camera_follow_add(state->entmgr, ent);
                     state->player = ent;
                 }
                 // }
