@@ -10,8 +10,7 @@ static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer*
 static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
 static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr);
 static SDL_Texture* get_tileset_texture(TextureManager* texmgr, tmx_tile* tile);
-static Entity
-parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile);
+static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile);
 
 static SDL_Renderer* renderer;
 
@@ -80,8 +79,6 @@ static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer*
 
 static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* layer)
 {
-    // TODO: create layers in gamesatet
-
     tmx_map* map = state->level;
     // f32 op = layer->opacity;
 
@@ -132,13 +129,13 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
                 tmx_tile* tile = map->tiles[obj->content.gid];
 
                 // if (obj->type && strncmp(obj->type, "entity", strlen("entity")) == 0) {
-                Entity ent = parse_entity(game_mem, state->entmgr, state->texmgr, obj, tile);
+                Entity ent = parse_entity(state->entmgr, state->texmgr, obj, tile);
                 if (ent == 0) {
                     util_err("Parsing entity failed");
                     break;
                 }
 
-                if (strncmp(obj->name, "player", strlen("player")) == 0) {
+                if (obj->name && strncmp(obj->name, "player", strlen("player")) == 0) {
                     state->player = ent;
                 }
                 // }
@@ -200,8 +197,7 @@ static SDL_Texture* get_tileset_texture(TextureManager* texmgr, tmx_tile* tile)
     return tex;
 }
 
-static Entity
-parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile)
+static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile)
 {
     Entity ent = entity_create(entmgr);
 
@@ -245,8 +241,6 @@ parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmg
     return ent;
 }
 
-// ---------
-
 // static void draw_image_layer(tmx_image* image)
 // {
 //     SDL_FRect dim = {0};
@@ -254,22 +248,4 @@ parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmg
 //
 //     SDL_GetTextureSize(texture, &dim.w, &dim.h);
 //     SDL_RenderTexture(renderer, texture, NULL, &dim);
-// }
-//
-// static void draw_all_layers(GameState* state, tmx_map* map, tmx_layer* layers)
-// {
-//     while (layers) {
-//         if (layers->visible) {
-//             if (layers->type == L_GROUP) {
-//                 draw_all_layers(state, map, layers->content.group_head);
-//             } else if (layers->type == L_OBJGR) {
-//                 draw_objects(state, map, layers, layers->content.objgr);
-//             } else if (layers->type == L_IMAGE) {
-//                 draw_image_layer(layers->content.image);
-//             } else if (layers->type == L_LAYER) {
-//                 // draw_layer(map, layers);
-//             }
-//         }
-//         layers = layers->next;
-//     }
 // }

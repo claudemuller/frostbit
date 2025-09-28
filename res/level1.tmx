@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="40" tileheight="40" infinite="0" nextlayerid="4" nextobjectid="25">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="40" tileheight="40" infinite="0" nextlayerid="4" nextobjectid="38">
  <tileset firstgid="1" source="tileset.tsx"/>
  <tileset firstgid="22" source="guy.tsx"/>
- <layer id="1" name="terrain" class="terrain" width="10" height="10">
+ <layer id="1" name="terrain" class="terrain" width="20" height="15">
   <data encoding="csv">
-4,16,16,16,16,16,16,16,5,13,
-10,1,2,2,2,3,18,18,15,5,
-10,8,9,13,9,11,2,3,18,8,
-10,15,5,9,9,9,9,11,3,8,
-10,1,12,9,4,5,9,9,10,8,
-10,8,9,13,10,15,5,13,10,8,
-10,8,9,9,10,18,8,9,10,8,
-10,15,5,9,10,1,12,4,17,8,
-11,3,15,16,17,15,16,17,18,8,
-9,11,2,2,3,18,18,18,1,12
+4,16,16,16,16,16,16,16,5,13,9,9,9,9,4,16,16,16,16,5,
+10,1,2,2,2,3,18,18,15,5,4,16,16,16,17,18,18,18,18,8,
+10,8,9,13,9,11,2,3,18,8,10,18,1,2,2,2,2,3,18,8,
+10,15,5,9,9,9,9,11,3,8,10,18,8,9,9,9,9,10,18,8,
+10,1,12,9,4,5,9,9,10,8,10,18,8,9,9,9,9,11,3,8,
+10,8,9,13,10,15,5,13,10,8,10,18,8,9,9,9,9,9,10,8,
+10,8,9,9,10,18,8,9,10,8,10,18,8,9,9,9,9,9,10,8,
+10,15,5,9,10,1,12,4,17,8,10,18,8,9,9,9,9,9,10,8,
+11,3,15,16,17,15,16,17,18,8,11,3,15,5,9,9,9,9,10,8,
+9,11,2,2,3,18,18,18,1,12,9,10,18,8,9,9,9,9,10,8,
+4,16,16,16,17,18,18,18,15,16,16,17,18,15,16,16,16,16,17,8,
+10,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,8,
+10,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,8,
+10,18,18,18,18,18,18,1,2,2,2,2,2,2,3,18,18,18,18,8,
+11,2,2,2,2,2,2,12,9,9,9,9,9,9,11,2,2,3,18,8
 </data>
  </layer>
  <objectgroup id="2" name="obstacles">
@@ -36,6 +41,17 @@
   <object id="17" name="tree" gid="21" x="178.333" y="83" width="40" height="40"/>
   <object id="18" name="tree" gid="21" x="19" y="362.667" width="40" height="40"/>
   <object id="19" name="tree" gid="21" x="282.333" y="225.667" width="40" height="40"/>
+  <object id="27" gid="19" x="164.667" y="520" width="40" height="40"/>
+  <object id="28" gid="19" x="327.333" y="485.333" width="40" height="40"/>
+  <object id="29" gid="19" x="724" y="513.333" width="40" height="40"/>
+  <object id="30" gid="19" x="709.333" y="114.667" width="40" height="40"/>
+  <object id="31" gid="19" x="424.667" y="296.667" width="40" height="40"/>
+  <object id="32" gid="21" x="532.667" y="165.333" width="40" height="40"/>
+  <object id="33" gid="21" x="677.333" y="338.667" width="40" height="40"/>
+  <object id="34" gid="21" x="598.667" y="224.667" width="40" height="40"/>
+  <object id="35" gid="21" x="560.667" y="406" width="40" height="40"/>
+  <object id="36" gid="6" x="459.333" y="404.667" width="40" height="40"/>
+  <object id="37" gid="6" x="498" y="404" width="40" height="40"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
   <object id="24" name="player" type="entity" gid="28" x="91.6667" y="132" width="35" height="39"/>
