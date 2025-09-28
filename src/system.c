@@ -33,8 +33,7 @@ void render_sys_render(GameState* state, Entity e, void* ctx)
         .w = s->size.w, // * state->scale,
         .h = s->size.h, // * state->scale,
     };
-    SDL_Texture* tex = texmgr_get_texture(state->texmgr, s->asset_id);
-    SDL_RenderTexture(state->renderer, tex, &s->src, &dst);
+    SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
 }
 
 void render_collider_sys_render(GameState* state, Entity e, void* ctx)

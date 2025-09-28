@@ -56,12 +56,12 @@ void transform_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_TRANSFORM);
 }
 
-void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, SDL_FRect src, bool is_fixed)
+void sprite_add(EntityManager* entmgr, Entity e, SDL_Texture* tex, Vector2 size, SDL_FRect src, bool is_fixed)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 
     entmgr->sprite_comps[e] = (SpriteComponent){
-        .asset_id = id,
+        .texture = tex,
         .size = size,
         .src = src,
         .is_fixed = is_fixed,

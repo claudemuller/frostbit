@@ -45,7 +45,7 @@ typedef struct {
 } TransformComponent;
 
 typedef struct {
-    const char* asset_id;
+    SDL_Texture* texture;
     Vector2 size; // TODO: ??
     u8 z_index;
     bool is_fixed;
@@ -106,7 +106,7 @@ void entity_destroy(EntityManager* entmgr, Entity e);
 
 void transform_add(EntityManager* entmgr, Entity e, Vector2 pos);
 void transform_remove(EntityManager* entmgr, Entity e);
-void sprite_add(EntityManager* entmgr, Entity e, const char* id, Vector2 size, SDL_FRect src, bool is_fixed);
+void sprite_add(EntityManager* entmgr, Entity e, SDL_Texture* tex, Vector2 size, SDL_FRect src, bool is_fixed);
 void sprite_remove(EntityManager* entmgr, Entity e);
 void animation_add(EntityManager* entmgr, Entity e, int num_frames, int frame_rate_speed, bool loop);
 void animation_remove(EntityManager* entmgr, Entity e);

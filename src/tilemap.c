@@ -1,5 +1,6 @@
 #include "tilemap.h"
 #include "arena.h"
+#include "texture.h"
 #include "utils/utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -17,7 +18,8 @@
 
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
 static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_group* objgr);
-static Entity parse_entity(MemoryArena* game_mem, EntityManager* entmgr, tmx_object* obj, const char* texid);
+static Entity
+parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tileset* ts);
 
 static SDL_Renderer* renderer;
 
@@ -108,19 +110,8 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
                 tmx_tileset* ts = map->tiles[obj->content.gid]->tileset;
                 if (!ts) {
                     util_error("no tileset");
+                    obj = obj->next;
                     continue;
-                }
-
-                u8 slen = 5 + strlen(ts->image->source);
-                char* texid = (char*)arena_alloc_aligned(game_mem, slen, 16);
-                if (!texid) {
-                    util_fatal("ran out of memory in game_mem");
-                }
-
-                u8 rlen = snprintf(texid, slen, "res/%s", ts->image->source);
-                if (rlen < 0) {
-                    util_error("Failed concatenating strings");
-                    break;
                 }
 
                 // tmx_image* im = map->tiles[obj->content.gid]->image;
@@ -142,14 +133,15 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
 
                 if (obj->type && strncmp(obj->type, "entity", strlen("entity")) == 0) {
                     if (strncmp(obj->name, "player", strlen("player")) == 0) {
-                        state->player = parse_entity(game_mem, state->entmgr, obj, texid);
+                        state->player = parse_entity(game_mem, state->entmgr, state->texmgr, obj, ts);
                         if (state->player < 0) {
                             break;
                         }
+                        obj = obj->next;
                         continue;
                     }
 
-                    Entity ent = parse_entity(game_mem, state->entmgr, obj, texid);
+                    Entity ent = parse_entity(game_mem, state->entmgr, state->texmgr, obj, ts);
                     if (ent < 0) {
                         break;
                     }
@@ -186,15 +178,26 @@ static void parse_objects(MemoryArena* game_mem, GameState* state, tmx_object_gr
     }
 }
 
-static Entity parse_entity(MemoryArena* game_mem, EntityManager* entmgr, tmx_object* obj, const char* texid)
+static Entity
+parse_entity(MemoryArena* game_mem, EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tileset* ts)
 {
     Entity ent = entity_create(entmgr);
 
     transform_add(entmgr, ent, (Vector2){.x = obj->x, .y = obj->y - obj->height});
 
+    u8 slen = 5 + strlen(ts->image->source);
+    char texid[255];
+    u8 rlen = snprintf(texid, slen, "res/%s", ts->image->source);
+    if (rlen < 0) {
+        util_error("Failed concatenating strings");
+        return -1;
+    }
+
+    SDL_Texture* tex = texmgr_get_texture(texmgr, texid);
+
     sprite_add(entmgr,
                ent,
-               texid,
+               tex,
                (Vector2){.h = obj->height, .w = obj->width},
                (SDL_FRect){0, 0, obj->width, obj->height},
                false);
