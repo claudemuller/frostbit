@@ -34,7 +34,10 @@ include_directories(${SDL3_INCLUDE_DIRS} ${SDL3_IMAGE_INCLUDE_DIRS})
 # 3️⃣  Gather **all** source files that belong to the executable
 # ------------------------------------------------------------------
 # Assuming everything under ./src/*.c is part of the program
-file(GLOB_RECURSE PROJECT_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+file(GLOB_RECURSE PROJECT_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.c"
+)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
