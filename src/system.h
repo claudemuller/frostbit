@@ -35,13 +35,13 @@ typedef struct {
 } MovementCtx;
 
 typedef struct {
-    SDL_FRect camera;
-} CameraCtx;
+    SDL_Event ev;
+} EventCtx;
 
 typedef enum {
     CTX_NONE,
     CTX_MOVEMENT,
-    CTX_CAMERA_MOVEMENT,
+    CTX_EVENT,
     CTX_COUNT,
 } CtxTag;
 
@@ -49,7 +49,7 @@ typedef struct {
     CtxTag tag;
     union {
         MovementCtx movement;
-        CameraCtx camera;
+        EventCtx event;
     };
 } SystemCtx;
 

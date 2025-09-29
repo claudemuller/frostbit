@@ -20,8 +20,8 @@
 void* SDL_tex_loader(const char* path);
 
 static void load_level(MemoryArena* game_mem);
-static void process_input(void);
-static void update(float* dt);
+static void process_input(MemoryArena* frame_mem);
+static void update(MemoryArena* frame_mem, const float dt);
 static void render(void);
 
 static void on_collision(EventArgs args)
@@ -141,20 +141,20 @@ bool game_run(MemoryArena* game_mem)
     MemoryArena frame_mem;
 
     while (state.is_running) {
-        arena_init(&frame_mem, sizeof(SystemCtx));
+        arena_init(&frame_mem, sizeof(SystemCtx) * 10);
         {
             u32 time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
             if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
                 SDL_Delay(time_to_wait);
             }
 
-            float* dt = arena_alloc_aligned(&frame_mem, sizeof(float), 16);
-            *dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
+            // float dt = arena_alloc_aligned(&frame_mem, sizeof(float), 16);
+            f64 dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
             prev_frame_ms = SDL_GetTicks();
 
-            process_input();
+            process_input(&frame_mem);
             state.eventbus->process_events(state.eventbus);
-            update(dt);
+            update(&frame_mem, dt);
             render();
         }
         arena_free(&frame_mem);
@@ -181,7 +181,7 @@ static void load_level(MemoryArena* game_mem)
     state.eventbus->on_event(state.eventbus, EVT_DEAD, &on_collision);
 }
 
-static void process_input(void)
+static void process_input(MemoryArena* frame_mem)
 {
     SDL_Event ev;
     // const bool* keystate = SDL_GetKeyboardState(NULL);
@@ -205,23 +205,33 @@ static void process_input(void)
 
         // Process player key events
         if (ev.type == SDL_EVENT_KEY_DOWN || ev.type == SDL_EVENT_KEY_UP) {
-            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_KEYBOARD_CONTROL))
-                keyboard_control_sys_update(&state, state.player, &ev);
+            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_KEYBOARD_CONTROL)) {
+                SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+                ctx->tag = CTX_EVENT;
+                ctx->event = (EventCtx){.ev = ev};
+                keyboard_control_sys_update(&state, state.player, ctx);
+            }
         }
 
         if (ev.type == SDL_EVENT_MOUSE_MOTION || ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_MOUSE_CONTROL))
-                mouse_control_sys_update(&state, state.player, &ev);
+            if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_MOUSE_CONTROL)) {
+                SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+                ctx->tag = CTX_EVENT;
+                ctx->event = (EventCtx){.ev = ev};
+                mouse_control_sys_update(&state, state.player, ctx);
+            }
         }
     }
 }
 
-static void update(float* dt)
+static void update(MemoryArena* frame_mem, const float dt)
 {
     // TODO: update to map
     for (size_t i = 0; i < state.sysmgr->count; ++i) {
-        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = dt;
-        if (state.sysmgr->systems[i].fn == camera_movement_sys_update) state.sysmgr->systems[i].ctx = &state.camera;
+        SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+        ctx->tag = CTX_MOVEMENT;
+        ctx->movement = (MovementCtx){.dt = dt};
+        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = ctx;
     }
 
     // TODO: split system render and update types so that we don't call them twice?
