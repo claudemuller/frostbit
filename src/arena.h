@@ -18,6 +18,9 @@ typedef size_t ArenaMarker;
 static inline void arena_init(MemoryArena* arena, size_t cap)
 {
     arena->base = (unsigned char*)util_malloc(cap, __FILE__, __LINE__);
+    if (!arena->base) {
+        util_err("Failed to malloc arena");
+    }
     arena->cap = cap;
     arena->offset = 0;
 }
@@ -32,7 +35,10 @@ static inline size_t align_forward(size_t ptr, size_t align)
 static inline void* arena_alloc_aligned(MemoryArena* arena, size_t size, size_t align)
 {
     size_t aligned_offset = align_forward(arena->offset, align);
-    if (aligned_offset + size > arena->cap) return NULL;
+    if (aligned_offset + size > arena->cap) {
+        util_error("No space left in arena: size=%zu, cap=%zu, offset=%zu", size, arena->cap, aligned_offset);
+        return NULL;
+    }
     void* ptr = arena->base + aligned_offset;
     arena->offset = aligned_offset + size;
     return ptr;

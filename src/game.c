@@ -141,14 +141,13 @@ bool game_run(MemoryArena* game_mem)
     MemoryArena frame_mem;
 
     while (state.is_running) {
-        arena_init(&frame_mem, sizeof(SystemCtx) * 10);
+        arena_init(&frame_mem, sizeof(SystemCtx) * 20);
         {
             u32 time_to_wait = MILLISECS_PER_FRAME - (SDL_GetTicks() - prev_frame_ms);
             if (time_to_wait > 0 && time_to_wait <= MILLISECS_PER_FRAME) {
                 SDL_Delay(time_to_wait);
             }
 
-            // float dt = arena_alloc_aligned(&frame_mem, sizeof(float), 16);
             f64 dt = (SDL_GetTicks() - prev_frame_ms) / 1000.0;
             prev_frame_ms = SDL_GetTicks();
 
@@ -207,6 +206,9 @@ static void process_input(MemoryArena* frame_mem)
         if (ev.type == SDL_EVENT_KEY_DOWN || ev.type == SDL_EVENT_KEY_UP) {
             if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_KEYBOARD_CONTROL)) {
                 SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+                if (!ctx) {
+                    exit(1);
+                }
                 ctx->tag = CTX_EVENT;
                 ctx->event = (EventCtx){.ev = ev};
                 keyboard_control_sys_update(&state, state.player, ctx);
@@ -216,6 +218,9 @@ static void process_input(MemoryArena* frame_mem)
         if (ev.type == SDL_EVENT_MOUSE_MOTION || ev.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
             if (SIGNATURE_MATCH(state.entmgr->signatures[state.player], SYS_SIG_MOUSE_CONTROL)) {
                 SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+                if (!ctx) {
+                    exit(1);
+                }
                 ctx->tag = CTX_EVENT;
                 ctx->event = (EventCtx){.ev = ev};
                 mouse_control_sys_update(&state, state.player, ctx);
@@ -229,6 +234,9 @@ static void update(MemoryArena* frame_mem, const float dt)
     // TODO: update to map
     for (size_t i = 0; i < state.sysmgr->count; ++i) {
         SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+        if (!ctx) {
+            exit(1);
+        }
         ctx->tag = CTX_MOVEMENT;
         ctx->movement = (MovementCtx){.dt = dt};
         if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = ctx;
@@ -238,7 +246,9 @@ static void update(MemoryArena* frame_mem, const float dt)
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
         if (!state.entmgr->live_entities[e]) continue;
 
+        util_info("b: %f %f", state.camera.x, state.camera.y);
         sysmgr_update_entity(&state, e);
+        util_info("a: %f %f", state.camera.x, state.camera.y);
     }
 }
 
@@ -258,8 +268,8 @@ static void render(void)
                               .h = tile.size.h,
                           },
                           &(SDL_FRect){
-                              .x = tile.pos.x,
-                              .y = tile.pos.y,
+                              .x = tile.pos.x - state.camera.x,
+                              .y = tile.pos.y - state.camera.y,
                               .w = tile.size.w,
                               .h = tile.size.h,
                           });

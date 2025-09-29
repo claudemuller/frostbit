@@ -32,11 +32,13 @@ void render_sys_render(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !s) return;
 
+    // TODO: check with camera if entity needs to be rendered
+
     SDL_FRect dst = (SDL_FRect){
-        .x = t->pos.x,  // * state->scale,
-        .y = t->pos.y,  // * state->scale,
-        .w = s->size.w, // * state->scale,
-        .h = s->size.h, // * state->scale,
+        .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
+        .y = t->pos.y - (s->is_fixed ? 0 : state->camera.y), // * state->scale,
+        .w = s->size.w,                                      // * state->scale,
+        .h = s->size.h,                                      // * state->scale,
     };
     SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
 }
@@ -50,12 +52,14 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !cf) return;
 
-    u32 map_width = state->level->width * state->level->tile_width;
-    u32 map_height = state->level->height * state->level->tile_height;
+    // TODO: scale - record somewhere and set it in load_level I guess
+    u32 map_width = state->level->width * state->level->tile_width * 3;
+    u32 map_height = state->level->height * state->level->tile_height * 3;
     i32 win_width, win_height;
     SDL_GetWindowSize(state->window, &win_width, &win_height);
     SDL_FRect* camera = &state->camera;
 
+    f32 c = (camera->w / 2);
     if (t->pos.x + (camera->w / 2) < map_width) {
         camera->x = t->pos.x - (win_width / 2.0f);
     }
@@ -63,10 +67,10 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
         camera->y = t->pos.y - (win_height / 2.0f);
     }
 
-    // camera->x = camera->x < 0 ? 0 : camera->x;
-    // camera->y = camera->y < 0 ? 0 : camera->y;
-    // camera->x = camera->x > camera->w ? camera->w : camera->x;
-    // camera->y = camera->y > camera->h ? camera->h : camera->y;
+    camera->x = camera->x < 0 ? 0 : camera->x;
+    camera->y = camera->y < 0 ? 0 : camera->y;
+    camera->x = camera->x > camera->w ? camera->w : camera->x;
+    camera->y = camera->y > camera->h ? camera->h : camera->y;
 }
 
 void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
@@ -81,10 +85,10 @@ void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
     SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
     SDL_RenderRect(state->renderer,
                    &(SDL_FRect){
-                       .x = (t->pos.x + bc->offset.x), // * state->scale,
-                       .y = (t->pos.y + bc->offset.y), // * state->scale,
-                       .w = bc->size.w,                // * state->scale,
-                       .h = bc->size.h,                // * state->scale,
+                       .x = (t->pos.x + bc->offset.x) - state->camera.x, // * state->scale,
+                       .y = (t->pos.y + bc->offset.y) - state->camera.y, // * state->scale,
+                       .w = bc->size.w,                                  // * state->scale,
+                       .h = bc->size.h,                                  // * state->scale,
                    });
 }
 
