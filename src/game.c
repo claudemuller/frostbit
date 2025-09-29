@@ -114,7 +114,7 @@ bool game_init(MemoryArena* game_mem)
     // u32 render_w = state.level->width * state.level->tile_width * state.scale / 3.0f;
     // u32 render_h = state.level->height * state.level->tile_height * state.scale / 3.0f;
     SDL_SetRenderLogicalPresentation(
-        state.renderer, WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+        state.renderer, WINDOW_WIDTH / state.scale, WINDOW_HEIGHT / state.scale, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     // SDL_SetWindowPosition(state.window, state.win_width, 300);
     // const char* platform = SDL_GetPlatform();

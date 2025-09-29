@@ -52,25 +52,27 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !cf) return;
 
-    // TODO: scale - record somewhere and set it in load_level I guess
-    u32 map_width = state->level->width * state->level->tile_width * 3;
-    u32 map_height = state->level->height * state->level->tile_height * 3;
-    i32 win_width, win_height;
-    SDL_GetWindowSize(state->window, &win_width, &win_height);
-    SDL_FRect* camera = &state->camera;
+    float map_w = (float)(state->level->width * state->level->tile_width * state->scale);
+    float map_h = (float)(state->level->height * state->level->tile_height * state->scale);
 
-    f32 c = (camera->w / 2);
-    if (t->pos.x + (camera->w / 2) < map_width) {
-        camera->x = t->pos.x - (win_width / 2.0f);
-    }
-    if (t->pos.y + (camera->h / 2) < map_height) {
-        camera->y = t->pos.y - (win_height / 2.0f);
-    }
+    int win_w, win_h;
+    SDL_GetWindowSize(state->window, &win_w, &win_h);
+    float vw = (float)win_w;
+    float vh = (float)win_h;
 
-    camera->x = camera->x < 0 ? 0 : camera->x;
-    camera->y = camera->y < 0 ? 0 : camera->y;
-    camera->x = camera->x > camera->w ? camera->w : camera->x;
-    camera->y = camera->y > camera->h ? camera->h : camera->y;
+    float cam_x = t->pos.x - vw / (state->scale * 2.0f);
+    float cam_y = t->pos.y - vh / (state->scale * 2.0f);
+
+    float max_x = map_w - vw;
+    float max_y = map_h - vh;
+
+    float clamped_x = (max_x > 0.0f) ? clamp_f(cam_x, 0.0f, max_x) : 0.0f;
+    float clamped_y = (max_y > 0.0f) ? clamp_f(cam_y, 0.0f, max_y) : 0.0f;
+
+    state->camera.x = clamped_x;
+    state->camera.y = clamped_y;
+    state->camera.w = vw;
+    state->camera.h = vh;
 }
 
 void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
