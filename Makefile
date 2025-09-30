@@ -11,7 +11,7 @@ CFLAGS += -I./lib/
 ASANFLAGS = -fsanitize=address -fno-omit-frame-pointer
 #ASANFLAGS += -fno-common
 CFLAGS += $(shell pkg-config --cflags sdl3 sdl3-image)
-LDFLAGS = $(shell pkg-config --libs sdl3 sdl3-image) -ltmx
+LDFLAGS = $(shell pkg-config --libs sdl3 sdl3-image) -ltmx -lm
 LIBS =
 SRC = ./src/*.c ./src/utils/*.c
 BIN_DIR = ./bin

@@ -1,8 +1,7 @@
 #include "system.h"
 #include "entity.h"
 #include "state.h"
-#include <SDL3/SDL_rect.h>
-#include <SDL3/SDL_video.h>
+#include "utils/utils.h"
 #include <assert.h>
 #include <stdint.h>
 
@@ -16,9 +15,16 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !rb) return;
 
+    float map_w = (float)(state->level->width * state->level->tile_width * state->scale);
+    float map_h = (float)(state->level->height * state->level->tile_height * state->scale);
+
     f64 dt = ctx->movement.dt;
+
     t->pos.x += rb->vel.x * dt;
+    t->pos.x = clamp_f(t->pos.x, 0.0f, map_w);
+
     t->pos.y += rb->vel.y * dt;
+    t->pos.y = clamp_f(t->pos.y, 0.0f, map_h);
 
     // TODO: check if in the map
 }
@@ -52,6 +58,7 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !cf) return;
 
+    // 20 * 40
     float map_w = (float)(state->level->width * state->level->tile_width * state->scale);
     float map_h = (float)(state->level->height * state->level->tile_height * state->scale);
 
@@ -63,8 +70,8 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     float cam_x = t->pos.x - vw / (state->scale * 2.0f);
     float cam_y = t->pos.y - vh / (state->scale * 2.0f);
 
-    float max_x = map_w - vw;
-    float max_y = map_h - vh;
+    float max_x = (map_w - vw) / state->scale;
+    float max_y = (map_h - vh) / state->scale;
 
     float clamped_x = (max_x > 0.0f) ? clamp_f(cam_x, 0.0f, max_x) : 0.0f;
     float clamped_y = (max_y > 0.0f) ? clamp_f(cam_y, 0.0f, max_y) : 0.0f;

@@ -50,6 +50,7 @@ target_link_libraries(${PROJECT_NAME}
         ${SDL3_IMAGE_LIBRARIES}
         ${TMX_LIBRARIES}
         tmx
+        m
 )
 
 # ------------------------------------------------------------------

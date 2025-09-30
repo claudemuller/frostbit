@@ -246,9 +246,7 @@ static void update(MemoryArena* frame_mem, const float dt)
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
         if (!state.entmgr->live_entities[e]) continue;
 
-        util_info("b: %f %f", state.camera.x, state.camera.y);
         sysmgr_update_entity(&state, e);
-        util_info("a: %f %f", state.camera.x, state.camera.y);
     }
 }
 

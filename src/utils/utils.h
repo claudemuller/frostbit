@@ -1,13 +1,14 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <limits.h>
 #include <math.h>
 #include <pthread.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/types.h>
+
+#define FPATH_MAX 4096
 
 typedef int8_t i8;
 typedef int16_t i16;
@@ -32,11 +33,10 @@ typedef double f64;
 #pragma clang diagnostic pop
 
 #define MAX_MEM_LOGS 1024
-#define PATH_MAX 255
 
 typedef struct {
     void* ptr;
-    char fname[PATH_MAX];
+    char fname[FPATH_MAX];
     unsigned int lnum;
     int used;
 } MemLog;
@@ -50,15 +50,9 @@ void util_fat(const char* fmt, ...);
 void* util_malloc(size_t size, const char* fname, unsigned int lnum);
 void util_free(void* ptr, const char* fname, unsigned int lnum);
 
-static inline float clamp_f(float v, float lo, float hi)
+static inline f32 clamp_f(f32 v, f32 lo, f32 hi)
 {
     return fminf(fmaxf(v, lo), hi);
-}
-
-/* If you prefer double precision */
-static inline double clamp_d(double v, double lo, double hi)
-{
-    return fmin(fmax(v, lo), hi);
 }
 
 #endif // UTILS_H_
