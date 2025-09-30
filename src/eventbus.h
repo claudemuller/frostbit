@@ -8,19 +8,22 @@
 #define MAX_EVT_EVENTS 100
 #define MAX_EVT_HANDLERS 50
 
-typedef enum { EVT_NONE, EVT_DEAD, EVT_DESTROY_ENTITY, EVT_PLAYER_MOVE } EventType;
-
-typedef union {
-    SDL_Event event;
-    i32 i;
-} EventArgs;
+typedef enum {
+    EVT_NONE,
+    EVT_DEAD,
+    EVT_DESTROY_ENTITY,
+    EVT_PLAYER_MOVE,
+} EventType;
 
 typedef struct {
     EventType type;
-    EventArgs args;
+    union {
+        SDL_Event event;
+        uint32_t entity_id;
+    };
 } Event;
 
-typedef void (*EventHandlerFn)(EventArgs);
+typedef void (*EventHandlerFn)(Event);
 
 typedef struct {
     EventType type;
@@ -34,14 +37,14 @@ typedef struct EventBus {
     Event poll[MAX_EVT_EVENTS];
 
     void (*on_event)(struct EventBus* ebus, EventType type, EventHandlerFn handler_fn);
-    void (*emit)(struct EventBus* ebus, EventType type, EventArgs args);
+    void (*emit)(struct EventBus* ebus, Event ev);
     void (*process_events)(struct EventBus* ebus);
     void (*destroy)(void);
 } EventBus;
 
 bool eventbus_init(EventBus* ebus);
 void eventbus_on_event(EventBus* ebus, EventType type, EventHandlerFn handler_fn);
-void eventbus_emit(EventBus* ebus, EventType type, EventArgs args);
+void eventbus_emit(EventBus* ebus, Event ev);
 void eventbus_process_events(EventBus* ebus);
 void eventbus_destroy(void);
 

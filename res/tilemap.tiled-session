@@ -14,14 +14,14 @@
         },
         "guy.tsx": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         },
         "level1.tmx": {
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 100.83333333333333,
-                "y": 205.49999999999997
+                "x": 372.5,
+                "y": 280.75
             }
         },
         "tileset.tsx": {
@@ -34,17 +34,15 @@
     "openFiles": [
         "level1.tmx",
         "guy.tsx",
-        "guy-running.tsx",
-        "guy-jump.tsx",
         "tileset.tsx"
     ],
     "project": "tilemap.tiled-project",
     "recentFiles": [
-        "guy-jump.tsx",
-        "guy-running.tsx",
         "tileset.tsx",
         "guy.tsx",
-        "level1.tmx"
+        "level1.tmx",
+        "guy-jump.tsx",
+        "guy-running.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

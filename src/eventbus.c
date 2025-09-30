@@ -33,12 +33,8 @@ void eventbus_on_event(EventBus* ebus, EventType type, EventHandlerFn EventHandl
     ebus->handlers[ebus->handler_count++] = handler;
 }
 
-void eventbus_emit(EventBus* ebus, EventType type, EventArgs args)
+void eventbus_emit(EventBus* ebus, Event ev)
 {
-    Event ev = {
-        .type = type,
-        .args = args,
-    };
     // array_push(event_bus.poll, ev);
     ebus->poll[ebus->poll_count++] = ev;
 }
@@ -58,7 +54,7 @@ void eventbus_process_events(EventBus* ebus)
         for (size_t j = 0; j < ebus->handler_count; j++) {
             EventHandler hn = ebus->handlers[j];
             if (ev.type == hn.type) {
-                hn.handler(ev.args);
+                hn.handler(ev);
 
                 // TODO: figure out how to remove items from array
                 // ebus->poll[i] = (Event){

@@ -5,6 +5,7 @@
 #include "utils/utils.h"
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 
 void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
@@ -195,6 +196,7 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !bc) return;
 
+    util_info("%zu", state->entmgr->next_entity_id);
     for (uint32_t i = 0; i < state->entmgr->next_entity_id - 1; ++i) {
         Entity other_e = i;
 
@@ -203,15 +205,27 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
         TransformComponent* other_t = &state->entmgr->transform_comps[other_e];
         BoxColliderComponent* other_bc = &state->entmgr->box_collider_comps[other_e];
 
-        if (check_aabb_collision(t->pos.x,
-                                 t->pos.y,
+        if (check_aabb_collision(t->pos.x + bc->offset.x,
+                                 t->pos.y + bc->offset.y,
                                  bc->size.w,
-                                 bc->size.w,
-                                 other_t->pos.x,
-                                 other_t->pos.y,
+                                 bc->size.h,
+                                 other_t->pos.x + bc->offset.x,
+                                 other_t->pos.y + bc->offset.y,
                                  other_bc->size.w,
-                                 other_bc->size.w)) {
-            // state->eventbus->emit(state->eventbus, EVT_DEAD, (EventArgs){0});
+                                 other_bc->size.h)) {
+            printf("%d - e.x:%f e.y:%f e.w:%f e.h:%f\n%d - oe.x:%f oe.y:%f oe.w:%f oe.h:%f\n\n",
+                   e,
+                   t->pos.x + bc->offset.x,
+                   t->pos.y + bc->offset.y,
+                   bc->size.w,
+                   bc->size.h,
+                   other_e,
+                   other_t->pos.x + bc->offset.x,
+                   other_t->pos.y + bc->offset.y,
+                   other_bc->size.w,
+                   other_bc->size.h);
+            // exit(0);
+            state->eventbus->emit(state->eventbus, (Event){.type = EVT_DEAD, .entity_id = e});
         }
     }
 }
