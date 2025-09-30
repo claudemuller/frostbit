@@ -221,7 +221,9 @@ static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_ob
                (SDL_FRect){.x = tile->ul_x, .y = tile->ul_y, .w = tileset->tile_width, .h = tileset->tile_height},
                false);
 
-    rigid_body_add(entmgr, ent, (Vector2){0});
+    if (obj->name && strncmp(obj->name, "player", strlen("player")) == 0) {
+        rigid_body_add(entmgr, ent, (Vector2){0});
+    }
 
     if (tile->collision) {
         box_collider_add(entmgr,

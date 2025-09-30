@@ -5,7 +5,7 @@
 
 static MemLog mlog[MAX_MEM_LOGS];
 static size_t mlogCount = 0;
-static pthread_mutex_t mlogMutex = PTHREAD_MUTEX_INITIALIZER;
+// static pthread_mutex_t mlogMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static void add_log(void* ptr, const char* fname, unsigned int lnum);
 static void remove_log(void* ptr);
@@ -19,10 +19,10 @@ void* util_malloc(size_t size, const char* fname, unsigned int lnum)
     }
 
     if (getenv("DEBUG")) {
-        pthread_mutex_lock(&mlogMutex);
+        // pthread_mutex_lock(&mlogMutex);
         add_log(p, fname, lnum);
         util_info("malloc at %s:%u [%zu live allocs]\n", fname, lnum, mlogCount);
-        pthread_mutex_unlock(&mlogMutex);
+        // pthread_mutex_unlock(&mlogMutex);
     }
 
     return p;
@@ -38,10 +38,10 @@ void util_free(void* ptr, const char* fname, unsigned int lnum)
     free(ptr);
 
     if (getenv("DEBUG")) {
-        pthread_mutex_lock(&mlogMutex);
+        // pthread_mutex_lock(&mlogMutex);
         remove_log(ptr);
         util_info("free at %s:%u [%zu live allocs]\n", fname, lnum, mlogCount);
-        pthread_mutex_unlock(&mlogMutex);
+        // pthread_mutex_unlock(&mlogMutex);
     }
 }
 

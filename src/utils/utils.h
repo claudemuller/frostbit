@@ -2,7 +2,7 @@
 #define UTILS_H_
 
 #include <math.h>
-#include <pthread.h>
+// #include <pthread.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>

@@ -14,6 +14,9 @@
   </animation>
  </tile>
  <tile id="6">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="4.36364" y="3.45455" width="24" height="35.0909"/>
+  </objectgroup>
   <animation>
    <frame tileid="6" duration="10"/>
    <frame tileid="7" duration="10"/>
@@ -22,6 +25,9 @@
   </animation>
  </tile>
  <tile id="10">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="6.36364" y="0" width="21.6364" height="39"/>
+  </objectgroup>
   <animation>
    <frame tileid="10" duration="200"/>
    <frame tileid="11" duration="200"/>

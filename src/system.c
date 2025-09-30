@@ -1,4 +1,5 @@
 #include "system.h"
+#include "component.h"
 #include "entity.h"
 #include "state.h"
 #include "utils/utils.h"
@@ -12,6 +13,8 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
+    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+    // SpriteComponent* s = &state->entmgr->sprite_comps[e];
 
     if (!t || !rb) return;
 
@@ -21,10 +24,12 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     f64 dt = ctx->movement.dt;
 
     t->pos.x += rb->vel.x * dt;
-    t->pos.x = clamp_f(t->pos.x, 0.0f, map_w);
-
     t->pos.y += rb->vel.y * dt;
-    t->pos.y = clamp_f(t->pos.y, 0.0f, map_h);
+
+    if (rb) {
+        t->pos.x = clamp_f(t->pos.x, -bc->offset.w, (map_w / state->scale) - bc->size.w - bc->offset.w);
+        t->pos.y = clamp_f(t->pos.y, -bc->offset.h, (map_h / state->scale) - bc->size.h - bc->offset.h);
+    }
 
     // TODO: check if in the map
 }
