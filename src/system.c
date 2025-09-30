@@ -14,7 +14,6 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     TransformComponent* t = &state->entmgr->transform_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
     BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
-    // SpriteComponent* s = &state->entmgr->sprite_comps[e];
 
     if (!t || !rb) return;
 
@@ -30,8 +29,6 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
         t->pos.x = clamp_f(t->pos.x, -bc->offset.w, (map_w / state->scale) - bc->size.w - bc->offset.w);
         t->pos.y = clamp_f(t->pos.y, -bc->offset.h, (map_h / state->scale) - bc->size.h - bc->offset.h);
     }
-
-    // TODO: check if in the map
 }
 
 void render_sys_render(GameState* state, Entity e, void* raw_ctx)
@@ -43,7 +40,11 @@ void render_sys_render(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !s) return;
 
-    // TODO: check with camera if entity needs to be rendered
+    // Don't draw off screen entities
+    if (t->pos.x < state->camera.x - s->size.w || t->pos.x > state->camera.x + state->camera.w ||
+        t->pos.y < state->camera.y - s->size.h || t->pos.y > state->camera.y + state->camera.h) {
+        return;
+    }
 
     SDL_FRect dst = (SDL_FRect){
         .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
