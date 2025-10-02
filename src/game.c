@@ -170,8 +170,8 @@ void game_destroy(MemoryArena* game_mem)
 
 static void on_collision(Event ev)
 {
-    // util_info("collision with %d", ev.entity_id);
-    state.entmgr->live_entities[ev.entity_id] = false;
+    util_info("collision with %d", ev.entity_id);
+    // state.entmgr->live_entities[ev.entity_id] = false;
 }
 
 static void load_level(MemoryArena* game_mem)

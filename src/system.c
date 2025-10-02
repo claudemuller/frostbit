@@ -89,25 +89,6 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     state->camera.h = vh;
 }
 
-void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
-{
-    (void)raw_ctx;
-
-    TransformComponent* t = &state->entmgr->transform_comps[e];
-    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
-
-    if (!t || !bc) return;
-
-    SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
-    SDL_RenderRect(state->renderer,
-                   &(SDL_FRect){
-                       .x = (t->pos.x + bc->offset.x) - state->camera.x, // * state->scale,
-                       .y = (t->pos.y + bc->offset.y) - state->camera.y, // * state->scale,
-                       .w = bc->size.w,                                  // * state->scale,
-                       .h = bc->size.h,                                  // * state->scale,
-                   });
-}
-
 void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
     SystemCtx* ctx = (SystemCtx*)raw_ctx;
@@ -187,6 +168,28 @@ void animation_sys_render(GameState* state, Entity e, void* raw_ctx)
     // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
 }
 
+void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
+{
+    (void)raw_ctx;
+
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+
+    if (!t || !bc) return;
+
+    float x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+    float y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+
+    SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
+    SDL_RenderRect(state->renderer,
+                   &(SDL_FRect){
+                       .x = x,
+                       .y = y,
+                       .w = bc->size.w,
+                       .h = bc->size.h,
+                   });
+}
+
 void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
     (void)raw_ctx;
@@ -196,7 +199,7 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
 
     if (!t || !bc) return;
 
-    util_info("%zu", state->entmgr->next_entity_id);
+    // util_info("%zu", state->entmgr->next_entity_id);
     for (uint32_t i = 0; i < state->entmgr->next_entity_id - 1; ++i) {
         Entity other_e = i;
 
@@ -205,23 +208,23 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
         TransformComponent* other_t = &state->entmgr->transform_comps[other_e];
         BoxColliderComponent* other_bc = &state->entmgr->box_collider_comps[other_e];
 
-        if (check_aabb_collision(t->pos.x + bc->offset.x,
-                                 t->pos.y + bc->offset.y,
-                                 bc->size.w,
-                                 bc->size.h,
-                                 other_t->pos.x + bc->offset.x,
-                                 other_t->pos.y + bc->offset.y,
-                                 other_bc->size.w,
-                                 other_bc->size.h)) {
+        float e_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+        float e_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+
+        float other_e_x = (other_t->pos.x + other_bc->offset.x) - state->camera.x; // * state->scale,
+        float other_e_y = (other_t->pos.y + other_bc->offset.y) - state->camera.y; // * state->scale,
+
+        if (check_aabb_collision(
+                e_x, e_y, bc->size.w, bc->size.h, other_e_x, other_e_y, other_bc->size.w, other_bc->size.h)) {
             printf("%d - e.x:%f e.y:%f e.w:%f e.h:%f\n%d - oe.x:%f oe.y:%f oe.w:%f oe.h:%f\n\n",
                    e,
-                   t->pos.x + bc->offset.x,
-                   t->pos.y + bc->offset.y,
+                   e_x,
+                   e_y,
                    bc->size.w,
                    bc->size.h,
                    other_e,
-                   other_t->pos.x + bc->offset.x,
-                   other_t->pos.y + bc->offset.y,
+                   other_e_x,
+                   other_e_y,
                    other_bc->size.w,
                    other_bc->size.h);
             // exit(0);

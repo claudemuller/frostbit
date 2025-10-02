@@ -31,6 +31,7 @@
     },
     "frame.defaultDuration": 10,
     "last.imagePath": "/home/lukefilewalker/repos/frostbit/res",
+    "map.lastUsedFormat": "tmx",
     "openFiles": [
         "level1.tmx",
         "guy.tsx",
