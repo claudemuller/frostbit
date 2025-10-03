@@ -7,7 +7,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
+/*
+ * The update logic for the movement system
+ *
+ * @param GameState state - the game state
+ * @param Entity e - the entity under scrutiny
+ * @param SystemCtx* ctx - the context surrounding this entity
+ * @return void
+ *
+ * NOTE: I guess we could just pass the SystemCtx as it is a wrapper?
+ */
+void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
@@ -15,7 +25,6 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
         return;
     }
 
-    SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_MOVEMENT) return;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
@@ -38,14 +47,12 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     }
 }
 
-void render_sys_render(GameState* state, Entity e, void* raw_ctx)
+void render_sys_render(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
         return;
     }
-
-    (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     SpriteComponent* s = &state->entmgr->sprite_comps[e];
@@ -67,14 +74,12 @@ void render_sys_render(GameState* state, Entity e, void* raw_ctx)
     SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
 }
 
-void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
+void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_CAMERA_FOLLOW)) {
         return;
     }
-
-    (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     CameraFollowComponent* cf = &state->entmgr->camera_follow_comps[e];
@@ -105,7 +110,7 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
     state->camera.h = vh;
 }
 
-void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
+void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_KEYBOARD_CONTROL) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY) ||
@@ -113,7 +118,6 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
         return;
     }
 
-    SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_EVENT) return;
 
     KeyboardControlComponent* kb = &state->entmgr->keyboard_control_comps[e];
@@ -154,13 +158,12 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
     }
 }
 
-void mouse_control_sys_update(GameState* state, Entity e, void* raw_ctx)
+void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_MOUSE_CONTROL)) {
         return;
     }
 
-    SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_MOVEMENT) return;
 
     MouseControlComponent* m = &state->entmgr->mouse_control_comps[e];
@@ -174,15 +177,13 @@ void mouse_control_sys_update(GameState* state, Entity e, void* raw_ctx)
     }
 }
 
-void animation_sys_render(GameState* state, Entity e, void* raw_ctx)
+void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_ANIMATION) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
         return;
     }
-
-    (void)raw_ctx;
 
     AnimationComponent* a = &state->entmgr->animation_comps[e];
     SpriteComponent* s = &state->entmgr->sprite_comps[e];
@@ -200,7 +201,7 @@ void animation_sys_render(GameState* state, Entity e, void* raw_ctx)
     // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
 }
 
-void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
+void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!state->debug) {
         return;
@@ -210,8 +211,6 @@ void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER)) {
         return;
     }
-
-    (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
@@ -231,21 +230,19 @@ void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
                    });
 }
 
-void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
+void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
+        // Only check collision against moving objects
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
         return;
     }
-
-    (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
     RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
-    // Only check collision against moving objects
     if (!t || !bc || !rb) {
         return;
     }
@@ -284,7 +281,13 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
             //        other_bc->size.w,
             //        other_bc->size.h);
 
-            state->eventbus->emit(state->eventbus, (Event){.type = EVT_DEAD, .entity_id = e});
+            // TODO: temp
+            t->pos = t->prev_pos;
+
+            // state->eventbus->emit(state->eventbus, (Event){.type = EVT_DEAD, .entity_id = e});
+        } else {
+            // TODO: temp
+            t->prev_pos = t->pos;
         }
     }
 }
@@ -294,7 +297,7 @@ bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
-void debug_sys_update(GameState* state, Entity e, void* raw_ctx)
+void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!state->debug) {
         return;
@@ -303,8 +306,6 @@ void debug_sys_update(GameState* state, Entity e, void* raw_ctx)
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TILEINFO)) {
         return;
     }
-
-    (void)raw_ctx;
 
     TileinfoComponent* ti = &state->entmgr->tileinfo_comps[e];
 

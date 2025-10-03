@@ -1,10 +1,10 @@
 # Todo
 
 - [ ] TileRenderSystem
-- [ ] Static objects i.e. don't have rigid body, can't collide with each other
 - [ ] Make collision layer for ground, ceiling, wall etc.
 - [ ] Make gameplay object layer - same as above but with extra behaviour like EnemyAI, Collectible etc.
 - [ ] Make UI layer
+- [x] Static objects i.e. don't have rigid body, can't collide with each other
 
 # Research
 

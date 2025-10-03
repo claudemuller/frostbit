@@ -40,6 +40,8 @@ enum ComponentID {
 
 typedef struct {
     Vector2 pos;
+    // TODO: temp
+    Vector2 prev_pos;
     Vector2 scale;
     f32 rotation;
 } TransformComponent;

@@ -11,6 +11,12 @@ void transform_add(EntityManager* entmgr, Entity e, Vector2 pos)
                 .x = pos.x,
                 .y = pos.y,
             },
+        // TODO: temp
+        .prev_pos =
+            {
+                .x = pos.x,
+                .y = pos.y,
+            },
     };
 
     SIGNATURE_SET(entmgr->signatures[e], COMP_TRANSFORM);
