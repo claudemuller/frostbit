@@ -34,6 +34,7 @@ enum ComponentID {
     COMP_BOX_COLLIDER = 5,
     COMP_RIGID_BODY = 6,
     COMP_CAMERA_FOLLOW = 7,
+    COMP_TILEINFO = 8,
     COMP_COUNT = MAX_COMPONENTS,
 };
 
@@ -88,6 +89,10 @@ typedef struct {
 } RigidBodyComponent;
 
 typedef struct {
+    Entity entity_id;
+} TileinfoComponent;
+
+typedef struct {
     Vector2 s;
 } CameraFollowComponent;
 
@@ -107,5 +112,7 @@ void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 off
 void box_collider_remove(EntityManager* entmgr, Entity e);
 void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v);
 void rigid_body_remove(EntityManager* entmgr, Entity e);
+void tileinfo_add(EntityManager* entmgr, Entity e);
+void tileinfo_remove(EntityManager* entmgr, Entity e);
 
 #endif // !COMPONENT_H_

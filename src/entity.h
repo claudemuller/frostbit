@@ -8,6 +8,8 @@
 
 #define MAX_ENTITIES 32
 
+#define ENTITY_HAS(entity_sig, comp_mask) (((entity_sig) & (1U << comp_mask)) == (1U << comp_mask))
+
 typedef uint32_t Signature;
 typedef uint32_t Entity;
 
@@ -21,6 +23,7 @@ typedef struct EntityManager {
     BoxColliderComponent box_collider_comps[MAX_ENTITIES];
     RigidBodyComponent rigid_body_comps[MAX_ENTITIES];
     CameraFollowComponent camera_follow_comps[MAX_ENTITIES];
+    TileinfoComponent tileinfo_comps[MAX_ENTITIES];
     Signature signatures[MAX_ENTITIES];
     bool live_entities[MAX_ENTITIES];
 } EntityManager;

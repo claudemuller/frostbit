@@ -39,6 +39,7 @@ typedef struct GameState {
     f32 scale;
     bool is_running;
     bool is_fullscreen;
+    bool debug;
 } GameState;
 
 extern GameState state;

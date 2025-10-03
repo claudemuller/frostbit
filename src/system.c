@@ -9,6 +9,12 @@
 
 void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
+        return;
+    }
+
     SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_MOVEMENT) return;
 
@@ -34,6 +40,11 @@ void movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
 void render_sys_render(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
+        return;
+    }
+
     (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
@@ -58,6 +69,11 @@ void render_sys_render(GameState* state, Entity e, void* raw_ctx)
 
 void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_CAMERA_FOLLOW)) {
+        return;
+    }
+
     (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
@@ -91,6 +107,12 @@ void camera_movement_sys_update(GameState* state, Entity e, void* raw_ctx)
 
 void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_KEYBOARD_CONTROL) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
+        return;
+    }
+
     SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_EVENT) return;
 
@@ -134,6 +156,10 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* raw_ctx)
 
 void mouse_control_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_MOUSE_CONTROL)) {
+        return;
+    }
+
     SystemCtx* ctx = (SystemCtx*)raw_ctx;
     if (ctx->tag != CTX_MOVEMENT) return;
 
@@ -150,6 +176,12 @@ void mouse_control_sys_update(GameState* state, Entity e, void* raw_ctx)
 
 void animation_sys_render(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_ANIMATION) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
+        return;
+    }
+
     (void)raw_ctx;
 
     AnimationComponent* a = &state->entmgr->animation_comps[e];
@@ -170,6 +202,15 @@ void animation_sys_render(GameState* state, Entity e, void* raw_ctx)
 
 void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!state->debug) {
+        return;
+    }
+
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER)) {
+        return;
+    }
+
     (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
@@ -192,14 +233,23 @@ void render_collider_sys_render(GameState* state, Entity e, void* raw_ctx)
 
 void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
 {
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
+        return;
+    }
+
     (void)raw_ctx;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
     BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
 
-    if (!t || !bc) return;
+    // Only check collision against moving objects
+    if (!t || !bc || !rb) {
+        return;
+    }
 
-    // util_info("%zu", state->entmgr->next_entity_id);
     for (uint32_t i = 0; i < state->entmgr->next_entity_id - 1; ++i) {
         Entity other_e = i;
 
@@ -208,26 +258,32 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
         TransformComponent* other_t = &state->entmgr->transform_comps[other_e];
         BoxColliderComponent* other_bc = &state->entmgr->box_collider_comps[other_e];
 
-        float e_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
-        float e_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+        float e_bc_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+        float e_bc_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
 
-        float other_e_x = (other_t->pos.x + other_bc->offset.x) - state->camera.x; // * state->scale,
-        float other_e_y = (other_t->pos.y + other_bc->offset.y) - state->camera.y; // * state->scale,
+        float other_e_bc_x = (other_t->pos.x + other_bc->offset.x) - state->camera.x; // * state->scale,
+        float other_e_bc_y = (other_t->pos.y + other_bc->offset.y) - state->camera.y; // * state->scale,
 
-        if (check_aabb_collision(
-                e_x, e_y, bc->size.w, bc->size.h, other_e_x, other_e_y, other_bc->size.w, other_bc->size.h)) {
-            printf("%d - e.x:%f e.y:%f e.w:%f e.h:%f\n%d - oe.x:%f oe.y:%f oe.w:%f oe.h:%f\n\n",
-                   e,
-                   e_x,
-                   e_y,
-                   bc->size.w,
-                   bc->size.h,
-                   other_e,
-                   other_e_x,
-                   other_e_y,
-                   other_bc->size.w,
-                   other_bc->size.h);
-            // exit(0);
+        if (check_aabb_collision(e_bc_x,
+                                 e_bc_y,
+                                 bc->size.w,
+                                 bc->size.h,
+                                 other_e_bc_x,
+                                 other_e_bc_y,
+                                 other_bc->size.w,
+                                 other_bc->size.h)) {
+            // printf("%d - e.x:%f e.y:%f e.w:%f e.h:%f\n%d - oe.x:%f oe.y:%f oe.w:%f oe.h:%f\n\n",
+            //        e,
+            //        e_bc_x,
+            //        e_bc_y,
+            //        bc->size.w,
+            //        bc->size.h,
+            //        other_e,
+            //        other_e_bc_x,
+            //        other_e_bc_y,
+            //        other_bc->size.w,
+            //        other_bc->size.h);
+
             state->eventbus->emit(state->eventbus, (Event){.type = EVT_DEAD, .entity_id = e});
         }
     }
@@ -236,4 +292,54 @@ void collision_sys_update(GameState* state, Entity e, void* raw_ctx)
 bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh)
 {
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+void debug_sys_update(GameState* state, Entity e, void* raw_ctx)
+{
+    if (!state->debug) {
+        return;
+    }
+
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TILEINFO)) {
+        return;
+    }
+
+    (void)raw_ctx;
+
+    TileinfoComponent* ti = &state->entmgr->tileinfo_comps[e];
+
+    if (!ti) return;
+
+    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+
+    bool has_collider = ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER);
+    char entid[50];
+    snprintf(entid, 30, "eid:%d col:%d", e, has_collider);
+
+    if (t && bc) {
+        float x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+        float y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+
+        // Draw debug text
+        SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
+        SDL_RenderDebugText(state->renderer, x, y - 10, entid);
+    }
+
+    SpriteComponent* s = &state->entmgr->sprite_comps[e];
+
+    if (s) {
+        float x = t->pos.x - state->camera.x; // * state->scale,
+        float y = t->pos.y - state->camera.y; // * state->scale,
+
+        // Draw sprite indicator
+        SDL_SetRenderDrawColor(state->renderer, 180, 180, 180, 255);
+        SDL_RenderRect(state->renderer,
+                       &(SDL_FRect){
+                           .x = x,
+                           .y = y,
+                           .w = s->size.w,
+                           .h = s->size.h,
+                       });
+    }
 }

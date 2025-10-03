@@ -4,6 +4,7 @@
 #include "utils/utils.h"
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
@@ -137,6 +138,7 @@ static void parse_objects(GameState* state, tmx_object_group* objgr)
 
                 if (obj->name && strncmp(obj->name, "player", strlen("player")) == 0) {
                     camera_follow_add(state->entmgr, ent);
+                    keyboard_control_add(state->entmgr, ent);
                     state->player = ent;
                 }
                 // }
@@ -239,7 +241,7 @@ static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_ob
         animation_add(entmgr, ent, tile->animation->tile_id, tile->animation_len, tile->animation[0].duration, false);
     }
 
-    keyboard_control_add(entmgr, ent);
+    tileinfo_add(entmgr, ent);
 
     return ent;
 }

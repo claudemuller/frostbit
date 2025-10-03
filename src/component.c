@@ -140,3 +140,21 @@ void rigid_body_remove(EntityManager* entmgr, Entity e)
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_RIGID_BODY);
 }
+
+void tileinfo_add(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+
+    TileinfoComponent ti = (TileinfoComponent){
+        .entity_id = e,
+    };
+
+    entmgr->tileinfo_comps[e] = ti;
+    SIGNATURE_SET(entmgr->signatures[e], COMP_TILEINFO);
+}
+
+void tileinfo_remove(EntityManager* entmgr, Entity e)
+{
+    if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
+    SIGNATURE_CLEAR(entmgr->signatures[e], COMP_TILEINFO);
+}

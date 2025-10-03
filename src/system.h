@@ -29,6 +29,7 @@ typedef struct SystemManager {
 #define SYS_SIG_MOUSE_CONTROL ((1U << COMP_MOUSE_CONTROL))
 #define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
 #define SYS_SIG_COLLISION ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
+#define SYS_SIG_DEBUG ((1U << COMP_TILEINFO))
 
 typedef struct {
     float dt;
@@ -92,5 +93,6 @@ void keyboard_control_sys_update(GameState* state, Entity e, void* ctx);
 void mouse_control_sys_update(GameState* state, Entity e, void* ctx);
 void animation_sys_render(GameState* state, Entity e, void* ctx);
 void collision_sys_update(GameState* state, Entity e, void* ctx);
+void debug_sys_update(GameState* state, Entity e, void* raw_ctx);
 
 #endif // !SYSTEM_H_

@@ -54,6 +54,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, SYS_SIG_MOUSE_CONTROL, mouse_control_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_COLLISION, collision_sys_update, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_DEBUG, debug_sys_update, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL
@@ -201,6 +202,10 @@ static void process_input(MemoryArena* frame_mem)
                 SDL_SetWindowFullscreen(state.window, state.is_fullscreen);
                 state.is_fullscreen = !state.is_fullscreen;
             }
+
+            if (ev.key.key == SDLK_F1) {
+                state.debug = !state.debug;
+            }
         }
 
         // Process player key events
@@ -278,7 +283,9 @@ static void render(void)
 
     // TODO: split system render and update types so that we don't call them twice?
     for (Entity e = 0; e < state.entmgr->next_entity_id; ++e) {
-        if (!state.entmgr->live_entities[e]) continue;
+        if (!state.entmgr->live_entities[e]) {
+            continue;
+        }
 
         sysmgr_update_entity(&state, e);
     }
