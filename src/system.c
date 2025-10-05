@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+static bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
+static int cmp_id_by_rect_y(const void* a, const void* b);
+
 // ------------------------------------------------------------------------------------------------
 // Update systems
 
@@ -20,7 +23,7 @@
  *
  * NOTE: I guess we could just pass the SystemCtx as it is a wrapper?
  */
-void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_movement(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
@@ -52,11 +55,12 @@ void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-void physics_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_physics(GameState* state, Entity e, SystemCtx* ctx)
 {
 }
 
-void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+// TODO: rename this :(
+void sys_update_apply(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
@@ -72,7 +76,7 @@ void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     t->pos.y = rb->next_pos.y;
 }
 
-void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_camera_movement(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_CAMERA_FOLLOW)) {
@@ -108,7 +112,7 @@ void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     state->camera.h = vh;
 }
 
-void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_keyboard_control(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_KEYBOARD_CONTROL) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY) ||
@@ -156,7 +160,7 @@ void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_mouse_control(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_MOUSE_CONTROL)) {
         return;
@@ -175,7 +179,7 @@ void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_collision(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER) ||
@@ -239,12 +243,7 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh)
-{
-    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
-}
-
-void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+void sys_update_debug(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!state->debug) {
         return;
@@ -295,34 +294,50 @@ void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 // ------------------------------------------------------------------------------------------------
 // Render systems
 
-void render_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+void sys_render_entities(GameState* state, Entity _, SystemCtx* ctx)
 {
-    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
-        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
-        return;
+    Entity ents_to_render[MAX_ENTITIES];
+    size_t n_ents = 0;
+
+    for (Entity e = 0; e < state->entmgr->next_entity_id; ++e) {
+        if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+            !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
+            continue;
+        }
+
+        TransformComponent* t = &state->entmgr->transform_comps[e];
+        SpriteComponent* s = &state->entmgr->sprite_comps[e];
+
+        if (!t || !s) continue;
+
+        // Don't draw off screen entities
+        if (t->pos.x < state->camera.x - s->size.w || t->pos.x > state->camera.x + state->camera.w ||
+            t->pos.y < state->camera.y - s->size.h || t->pos.y > state->camera.y + state->camera.h) {
+            continue;
+        }
+
+        ents_to_render[n_ents++] = e;
     }
 
-    TransformComponent* t = &state->entmgr->transform_comps[e];
-    SpriteComponent* s = &state->entmgr->sprite_comps[e];
+    qsort(ents_to_render, n_ents, sizeof(Entity), cmp_id_by_rect_y);
 
-    if (!t || !s) return;
+    for (size_t i = 0; i < n_ents; ++i) {
+        Entity e = ents_to_render[i];
+        TransformComponent* t = &state->entmgr->transform_comps[e];
+        SpriteComponent* s = &state->entmgr->sprite_comps[e];
 
-    // Don't draw off screen entities
-    if (t->pos.x < state->camera.x - s->size.w || t->pos.x > state->camera.x + state->camera.w ||
-        t->pos.y < state->camera.y - s->size.h || t->pos.y > state->camera.y + state->camera.h) {
-        return;
+        SDL_FRect dst = (SDL_FRect){
+            .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
+            .y = t->pos.y - (s->is_fixed ? 0 : state->camera.y), // * state->scale,
+            .w = s->size.w,                                      // * state->scale,
+            .h = s->size.h,                                      // * state->scale,
+        };
+
+        SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
     }
-
-    SDL_FRect dst = (SDL_FRect){
-        .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
-        .y = t->pos.y - (s->is_fixed ? 0 : state->camera.y), // * state->scale,
-        .w = s->size.w,                                      // * state->scale,
-        .h = s->size.h,                                      // * state->scale,
-    };
-    SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
 }
 
-void tilemap_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+void sys_render_tilemap(GameState* state, Entity e, SystemCtx* ctx)
 {
     for (size_t i = 0; i < state->n_terrain_tiles; ++i) {
         Tile tile = state->terrain_tiles[i];
@@ -343,7 +358,7 @@ void tilemap_sys_render(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-void tilemap_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+void sys_render_tilemap_collider(GameState* state, Entity e, SystemCtx* ctx)
 {
     // TODO: add a terrain collisions render system
     for (size_t i = 0; i < state->n_terrain_collisions; ++i) {
@@ -354,7 +369,7 @@ void tilemap_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
     }
 }
 
-void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+void sys_render_animation(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_ANIMATION) ||
         !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE) ||
@@ -378,7 +393,7 @@ void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx)
     // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
 }
 
-void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+void sys_render_collider(GameState* state, Entity e, SystemCtx* ctx)
 {
     if (!state->debug) {
         return;
@@ -405,4 +420,18 @@ void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
                        .w = bc->size.w,
                        .h = bc->size.h,
                    });
+}
+
+// ------------------------------------------------------------------------------------------------
+
+static bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh)
+{
+    return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+static int cmp_id_by_rect_y(const void* a, const void* b)
+{
+    Entity e1 = *(const Entity*)a;
+    Entity e2 = *(const Entity*)b;
+    return state.entmgr->transform_comps[e1].pos.y - state.entmgr->transform_comps[e2].pos.y;
 }

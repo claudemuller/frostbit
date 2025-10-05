@@ -40,8 +40,10 @@ typedef struct System {
 } System;
 
 typedef struct SystemManager {
-    System systems[MAX_SYSTEMS];
-    uint32_t count;
+    System update_systems[MAX_SYSTEMS];
+    System render_systems[MAX_SYSTEMS];
+    size_t n_update_systems;
+    size_t n_render_systems;
 } SystemManager;
 
 #define SYS_SIG_MOVEMENT ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
@@ -62,14 +64,27 @@ static inline SystemManager* sysmgr_init(MemoryArena* mem)
 {
     SystemManager* sysmgr = (SystemManager*)arena_alloc_aligned(mem, sizeof(SystemManager), 16);
     assert(sysmgr && "Failed to allocate system manager.");
-    sysmgr->count = 0;
+
+    sysmgr->n_update_systems = 0;
+    sysmgr->n_render_systems = 0;
+
     return sysmgr;
 }
 
-static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn fn, SystemCtx* ctx)
+static inline void sysmgr_register_update_sys(SystemManager* mgr, uint32_t mask, SystemFn fn, SystemCtx* ctx)
 {
-    if (mgr->count >= MAX_SYSTEMS) return;
-    mgr->systems[mgr->count++] = (System){
+    if (mgr->n_update_systems >= MAX_SYSTEMS) return;
+    mgr->update_systems[mgr->n_update_systems++] = (System){
+        .component_mask = mask,
+        .fn = fn,
+        .ctx = ctx,
+    };
+}
+
+static inline void sysmgr_register_render_sys(SystemManager* mgr, uint32_t mask, SystemFn fn, SystemCtx* ctx)
+{
+    if (mgr->n_render_systems >= MAX_SYSTEMS) return;
+    mgr->render_systems[mgr->n_render_systems++] = (System){
         .component_mask = mask,
         .fn = fn,
         .ctx = ctx,
@@ -78,8 +93,8 @@ static inline void sysmgr_register(SystemManager* mgr, uint32_t mask, SystemFn f
 
 static inline void sysmgr_update_entity(GameState* state, Entity e)
 {
-    for (size_t i = 0; i < state->sysmgr->count; ++i) {
-        System* s = &state->sysmgr->systems[i];
+    for (size_t i = 0; i < state->sysmgr->n_update_systems; ++i) {
+        System* s = &state->sysmgr->update_systems[i];
 
         // Keyboard system is called manually on key event
         if (s->component_mask == SYS_SIG_KEYBOARD_CONTROL) continue;
@@ -88,22 +103,28 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
     }
 }
 
-// TODO: naming should probably be: sys_movement_update
-void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void physics_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx);
+static inline void sysmgr_render_entity(GameState* state, Entity e)
+{
+    for (size_t i = 0; i < state->sysmgr->n_render_systems; ++i) {
+        System* s = &state->sysmgr->render_systems[i];
 
-void render_sys_render(GameState* state, Entity e, SystemCtx* ctx);
-void tilemap_sys_render(GameState* state, Entity e, SystemCtx* ctx);
-void tilemap_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
-void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
-void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+        if (SIGNATURE_MATCH(state->entmgr->signatures[e], s->component_mask)) s->fn(state, e, s->ctx);
+    }
+}
 
-bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
+void sys_update_movement(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_camera_movement(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_keyboard_control(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_mouse_control(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_collision(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_physics(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_apply(GameState* state, Entity e, SystemCtx* ctx);
+void sys_update_debug(GameState* state, Entity e, SystemCtx* ctx);
+
+void sys_render_entities(GameState* state, Entity e, SystemCtx* ctx);
+void sys_render_tilemap(GameState* state, Entity e, SystemCtx* ctx);
+void sys_render_tilemap_collider(GameState* state, Entity e, SystemCtx* ctx);
+void sys_render_render_collider(GameState* state, Entity e, SystemCtx* ctx);
+void sys_render_animation(GameState* state, Entity e, SystemCtx* ctx);
 
 #endif // !SYSTEM_H_

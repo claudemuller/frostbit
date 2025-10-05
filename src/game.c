@@ -22,7 +22,7 @@ void* SDL_tex_loader(const char* path);
 static void load_level(MemoryArena* game_mem);
 static void process_input(MemoryArena* frame_mem);
 static void update(MemoryArena* frame_mem, const float dt);
-static void render(void);
+static void render(MemoryArena* frame_mem);
 
 GameState state = {0};
 static u32 prev_frame_ms = 0;
@@ -46,21 +46,21 @@ bool game_init(MemoryArena* game_mem)
     // Register systems
     // --------------------------------------------------------------------------------------------
 
-    sysmgr_register(state.sysmgr, SYS_SIG_MOVEMENT, movement_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_CAMERA_MOVEMENT, camera_movement_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_KEYBOARD_CONTROL, keyboard_control_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_MOUSE_CONTROL, mouse_control_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_COLLISION, collision_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_DEBUG, debug_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_PHYSICS, physics_sys_update, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_MOVEMENT, sys_update_movement, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_CAMERA_MOVEMENT, sys_update_camera_movement, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_KEYBOARD_CONTROL, sys_update_keyboard_control, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_MOUSE_CONTROL, sys_update_mouse_control, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_COLLISION, sys_update_collision, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_DEBUG, sys_update_debug, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_PHYSICS, sys_update_physics, NULL);
 
-    sysmgr_register(state.sysmgr, SYS_SIG_RENDER, render_sys_render, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_TILEMAP_RENDER, tilemap_sys_render, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_TILEMAP_RENDER, tilemap_collider_sys_render, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_RENDER, sys_render_entities, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_TILEMAP_RENDER, sys_render_tilemap, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_TILEMAP_RENDER, sys_render_tilemap_collider, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_RENDER_COLLIDER, sys_render_render_collider, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_ANIMATION, sys_render_animation, NULL);
 
-    sysmgr_register(state.sysmgr, SYS_SIG_APPLY, apply_sys_update, NULL);
+    sysmgr_register_update_sys(state.sysmgr, SYS_SIG_APPLY, sys_update_apply, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL
@@ -156,7 +156,7 @@ bool game_run(MemoryArena* game_mem)
             process_input(&frame_mem);
             state.eventbus->process_events(state.eventbus);
             update(&frame_mem, dt);
-            render();
+            render(&frame_mem);
         }
         arena_free(&frame_mem);
     }
@@ -223,7 +223,7 @@ static void process_input(MemoryArena* frame_mem)
                 }
                 ctx->tag = CTX_EVENT;
                 ctx->event = (EventCtx){.ev = ev};
-                keyboard_control_sys_update(&state, state.player, ctx);
+                sys_update_keyboard_control(&state, state.player, ctx);
             }
         }
 
@@ -235,7 +235,7 @@ static void process_input(MemoryArena* frame_mem)
                 }
                 ctx->tag = CTX_EVENT;
                 ctx->event = (EventCtx){.ev = ev};
-                mouse_control_sys_update(&state, state.player, ctx);
+                sys_update_mouse_control(&state, state.player, ctx);
             }
         }
     }
@@ -244,14 +244,14 @@ static void process_input(MemoryArena* frame_mem)
 static void update(MemoryArena* frame_mem, const float dt)
 {
     // TODO: update to map
-    for (size_t i = 0; i < state.sysmgr->count; ++i) {
+    for (size_t i = 0; i < state.sysmgr->n_update_systems; ++i) {
         SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
         if (!ctx) {
             exit(1);
         }
         ctx->tag = CTX_MOVEMENT;
         ctx->movement = (MovementCtx){.dt = dt};
-        if (state.sysmgr->systems[i].fn == movement_sys_update) state.sysmgr->systems[i].ctx = ctx;
+        if (state.sysmgr->update_systems[i].fn == sys_update_movement) state.sysmgr->update_systems[i].ctx = ctx;
     }
 
     // TODO: split system render and update types so that we don't call them twice?
@@ -264,14 +264,23 @@ static void update(MemoryArena* frame_mem, const float dt)
     }
 }
 
-static void render(void)
+static void render(MemoryArena* frame_mem)
 {
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    tilemap_sys_render(&state, state.player, NULL);
+    // Draw tilemap
+    // SystemCtx* ctx = (SystemCtx*)arena_alloc_aligned(frame_mem, sizeof(SystemCtx), 16);
+    // if (!ctx) {
+    //     exit(1);
+    // }
+    // ctx->tag = CTX_MOVEMENT;
+    // ctx->movement = (MovementCtx){.dt = dt};
+
+    sys_render_tilemap(&state, state.player, NULL);
+
     if (state.debug) {
-        tilemap_collider_sys_render(&state, state.player, NULL);
+        sys_render_tilemap_collider(&state, state.player, NULL);
     }
 
     // TODO: split system render and update types so that we don't call them twice?
@@ -280,7 +289,7 @@ static void render(void)
             continue;
         }
 
-        sysmgr_update_entity(&state, e);
+        sysmgr_render_entity(&state, e);
     }
 
     SDL_RenderPresent(state.renderer);

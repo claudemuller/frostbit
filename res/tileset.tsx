@@ -8,19 +8,19 @@
  </tile>
  <tile id="13">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0.181818" y="8.36364" width="39.4545" height="31.8182"/>
+   <object id="1" x="1.43182" y="21.1136" width="36.4545" height="18.0682"/>
   </objectgroup>
  </tile>
  <tile id="18">
   <objectgroup draworder="index" id="3">
-   <object id="3" x="2.90909" y="6.36364" width="27.2727" height="28.1818">
+   <object id="3" x="5.40909" y="19.3636" width="21.5227" height="11.4318">
     <ellipse/>
    </object>
   </objectgroup>
  </tile>
  <tile id="20">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="8.90909" y="24" width="21.2727" height="16.3636">
+   <object id="1" x="8.40909" y="26.75" width="21.7727" height="11.3636">
     <ellipse/>
    </object>
   </objectgroup>
