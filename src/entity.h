@@ -20,6 +20,7 @@ typedef struct EntityManager {
     AnimationComponent animation_comps[MAX_ENTITIES];
     KeyboardControlComponent keyboard_control_comps[MAX_ENTITIES];
     MouseControlComponent mouse_control_comps[MAX_ENTITIES];
+    // TODO: 2d array?
     BoxColliderComponent box_collider_comps[MAX_ENTITIES];
     RigidBodyComponent rigid_body_comps[MAX_ENTITIES];
     CameraFollowComponent camera_follow_comps[MAX_ENTITIES];
