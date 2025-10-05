@@ -55,6 +55,8 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register(state.sysmgr, SYS_SIG_PHYSICS, physics_sys_update, NULL);
 
     sysmgr_register(state.sysmgr, SYS_SIG_RENDER, render_sys_render, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_TILEMAP_RENDER, tilemap_sys_render, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_TILEMAP_RENDER, tilemap_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
 
@@ -267,31 +269,9 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
-    // TODO: add a terrain render system
-    for (size_t i = 0; i < state.n_terrain_tiles; ++i) {
-        Tile tile = state.terrain_tiles[i];
-        SDL_RenderTexture(state.renderer,
-                          tile.texture,
-                          &(SDL_FRect){
-                              .x = tile.src.x,
-                              .y = tile.src.y,
-                              .w = tile.size.w,
-                              .h = tile.size.h,
-                          },
-                          &(SDL_FRect){
-                              .x = tile.pos.x - state.camera.x,
-                              .y = tile.pos.y - state.camera.y,
-                              .w = tile.size.w,
-                              .h = tile.size.h,
-                          });
-    }
-
-    // TODO: add a terrain collisions render system
-    for (size_t i = 0; i < state.n_terrain_collisions; ++i) {
-        SDL_SetRenderDrawColor(state.renderer, 0xff, 0x00, 0x00, 0xff);
-        state.terrain_collisions[i].x -= state.camera.x;
-        state.terrain_collisions[i].y -= state.camera.y;
-        SDL_RenderRect(state.renderer, &state.terrain_collisions[i]);
+    tilemap_sys_render(&state, state.player, NULL);
+    if (state.debug) {
+        tilemap_collider_sys_render(&state, state.player, NULL);
     }
 
     // TODO: split system render and update types so that we don't call them twice?

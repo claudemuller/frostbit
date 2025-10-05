@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+// ------------------------------------------------------------------------------------------------
+// Update systems
+
 /*
  * The update logic for the movement system
  *
@@ -67,33 +70,6 @@ void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 
     t->pos.x = rb->next_pos.x;
     t->pos.y = rb->next_pos.y;
-}
-
-void render_sys_render(GameState* state, Entity e, SystemCtx* ctx)
-{
-    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
-        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
-        return;
-    }
-
-    TransformComponent* t = &state->entmgr->transform_comps[e];
-    SpriteComponent* s = &state->entmgr->sprite_comps[e];
-
-    if (!t || !s) return;
-
-    // Don't draw off screen entities
-    if (t->pos.x < state->camera.x - s->size.w || t->pos.x > state->camera.x + state->camera.w ||
-        t->pos.y < state->camera.y - s->size.h || t->pos.y > state->camera.y + state->camera.h) {
-        return;
-    }
-
-    SDL_FRect dst = (SDL_FRect){
-        .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
-        .y = t->pos.y - (s->is_fixed ? 0 : state->camera.y), // * state->scale,
-        .w = s->size.w,                                      // * state->scale,
-        .h = s->size.h,                                      // * state->scale,
-    };
-    SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
 }
 
 void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
@@ -197,59 +173,6 @@ void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx)
     if (ev.button.button == SDL_BUTTON_LEFT) {
         util_info("Left mouse button clicked [%d]", ev.button.clicks);
     }
-}
-
-void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx)
-{
-    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_ANIMATION) ||
-        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE) ||
-        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
-        return;
-    }
-
-    AnimationComponent* a = &state->entmgr->animation_comps[e];
-    SpriteComponent* s = &state->entmgr->sprite_comps[e];
-    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
-
-    if (!a || !s || !rb) return;
-
-    if (rb->vel.x == 0.0f && rb->vel.y == 0.0f) return;
-
-    a->cur_frame = (((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames) + a->start_frame;
-
-    s->src.x = (i32)(a->cur_frame * s->size.w) % (i32)s->texture->w;
-    // s->src.w = s->is_h_flipped ? -s->src.w : s->src.w;
-    s->src.y = (i32)((a->cur_frame * s->size.w) / s->texture->w) + s->size.h;
-    // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
-}
-
-void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
-{
-    if (!state->debug) {
-        return;
-    }
-
-    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
-        !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER)) {
-        return;
-    }
-
-    TransformComponent* t = &state->entmgr->transform_comps[e];
-    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
-
-    if (!t || !bc) return;
-
-    float x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
-    float y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
-
-    SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
-    SDL_RenderRect(state->renderer,
-                   &(SDL_FRect){
-                       .x = x,
-                       .y = y,
-                       .w = bc->size.w,
-                       .h = bc->size.h,
-                   });
 }
 
 void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
@@ -367,4 +290,119 @@ void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx)
                            .h = s->size.h,
                        });
     }
+}
+
+// ------------------------------------------------------------------------------------------------
+// Render systems
+
+void render_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+{
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE)) {
+        return;
+    }
+
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    SpriteComponent* s = &state->entmgr->sprite_comps[e];
+
+    if (!t || !s) return;
+
+    // Don't draw off screen entities
+    if (t->pos.x < state->camera.x - s->size.w || t->pos.x > state->camera.x + state->camera.w ||
+        t->pos.y < state->camera.y - s->size.h || t->pos.y > state->camera.y + state->camera.h) {
+        return;
+    }
+
+    SDL_FRect dst = (SDL_FRect){
+        .x = t->pos.x - (s->is_fixed ? 0 : state->camera.x), // * state->scale,
+        .y = t->pos.y - (s->is_fixed ? 0 : state->camera.y), // * state->scale,
+        .w = s->size.w,                                      // * state->scale,
+        .h = s->size.h,                                      // * state->scale,
+    };
+    SDL_RenderTexture(state->renderer, s->texture, &s->src, &dst);
+}
+
+void tilemap_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+{
+    for (size_t i = 0; i < state->n_terrain_tiles; ++i) {
+        Tile tile = state->terrain_tiles[i];
+        SDL_RenderTexture(state->renderer,
+                          tile.texture,
+                          &(SDL_FRect){
+                              .x = tile.src.x,
+                              .y = tile.src.y,
+                              .w = tile.size.w,
+                              .h = tile.size.h,
+                          },
+                          &(SDL_FRect){
+                              .x = tile.pos.x - state->camera.x,
+                              .y = tile.pos.y - state->camera.y,
+                              .w = tile.size.w,
+                              .h = tile.size.h,
+                          });
+    }
+}
+
+void tilemap_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+{
+    // TODO: add a terrain collisions render system
+    for (size_t i = 0; i < state->n_terrain_collisions; ++i) {
+        SDL_SetRenderDrawColor(state->renderer, 0xff, 0x00, 0x00, 0xff);
+        state->terrain_collisions[i].x -= state->camera.x;
+        state->terrain_collisions[i].y -= state->camera.y;
+        SDL_RenderRect(state->renderer, &state->terrain_collisions[i]);
+    }
+}
+
+void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+{
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_ANIMATION) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_SPRITE) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
+        return;
+    }
+
+    AnimationComponent* a = &state->entmgr->animation_comps[e];
+    SpriteComponent* s = &state->entmgr->sprite_comps[e];
+    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
+
+    if (!a || !s || !rb) return;
+
+    if (rb->vel.x == 0.0f && rb->vel.y == 0.0f) return;
+
+    a->cur_frame = (((SDL_GetTicks() - a->start_time) * a->frame_rate_speed / 1000) % a->num_frames) + a->start_frame;
+
+    s->src.x = (i32)(a->cur_frame * s->size.w) % (i32)s->texture->w;
+    // s->src.w = s->is_h_flipped ? -s->src.w : s->src.w;
+    s->src.y = (i32)((a->cur_frame * s->size.w) / s->texture->w) + s->size.h;
+    // s->src.h = s->is_v_flipped ? -s->src.h : s->src.h;
+}
+
+void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx)
+{
+    if (!state->debug) {
+        return;
+    }
+
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_BOX_COLLIDER)) {
+        return;
+    }
+
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    BoxColliderComponent* bc = &state->entmgr->box_collider_comps[e];
+
+    if (!t || !bc) return;
+
+    float x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+    float y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+
+    SDL_SetRenderDrawColor(state->renderer, bc->colour.r, bc->colour.g, bc->colour.b, bc->colour.a);
+    SDL_RenderRect(state->renderer,
+                   &(SDL_FRect){
+                       .x = x,
+                       .y = y,
+                       .w = bc->size.w,
+                       .h = bc->size.h,
+                   });
 }

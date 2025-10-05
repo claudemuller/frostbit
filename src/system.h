@@ -46,15 +46,17 @@ typedef struct SystemManager {
 
 #define SYS_SIG_MOVEMENT ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
 #define SYS_SIG_CAMERA_MOVEMENT ((1U << COMP_TRANSFORM) | (1U << COMP_CAMERA_FOLLOW))
-#define SYS_SIG_RENDER ((1U << COMP_TRANSFORM) | (1U << COMP_SPRITE))
-#define SYS_SIG_RENDER_COLLIDER ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
 #define SYS_SIG_KEYBOARD_CONTROL ((1U << COMP_KEYBOARD_CONTROL) | (1U << COMP_SPRITE))
 #define SYS_SIG_MOUSE_CONTROL ((1U << COMP_MOUSE_CONTROL))
-#define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
 #define SYS_SIG_COLLISION ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
 #define SYS_SIG_PHYSICS ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
 #define SYS_SIG_APPLY ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
 #define SYS_SIG_DEBUG ((1U << COMP_TILEINFO))
+
+#define SYS_SIG_RENDER ((1U << COMP_TRANSFORM) | (1U << COMP_SPRITE))
+#define SYS_SIG_TILEMAP_RENDER ((1U << COMP_NONE))
+#define SYS_SIG_RENDER_COLLIDER ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
+#define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
 
 static inline SystemManager* sysmgr_init(MemoryArena* mem)
 {
@@ -86,6 +88,7 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
     }
 }
 
+// TODO: naming should probably be: sys_movement_update
 void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx);
@@ -96,6 +99,8 @@ void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 
 void render_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+void tilemap_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+void tilemap_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
 void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
 void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx);
 
