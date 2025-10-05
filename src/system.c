@@ -247,6 +247,22 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
         return;
     }
 
+    float e_bc_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+    float e_bc_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+
+    // TODO: add a terrain collisions render system
+    for (size_t i = 0; i < state->n_terrain_collisions; ++i) {
+        SDL_FRect ter_bc = state->terrain_collisions[i];
+
+        float ter_bc_x = ter_bc.x - state->camera.x; // * state->scale,
+        float ter_bc_y = ter_bc.y - state->camera.y; // * state->scale,
+
+        // TODO: need to know what type of collision to do - here it's rect vs rect
+        if (check_aabb_collision(e_bc_x, e_bc_y, bc->size.w, bc->size.h, ter_bc_x, ter_bc_y, ter_bc.w, ter_bc.h)) {
+            util_info("collided with terrain");
+        }
+    }
+
     for (uint32_t i = 0; i < state->entmgr->next_entity_id - 1; ++i) {
         Entity other_e = i;
 
@@ -254,9 +270,6 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 
         TransformComponent* other_t = &state->entmgr->transform_comps[other_e];
         BoxColliderComponent* other_bc = &state->entmgr->box_collider_comps[other_e];
-
-        float e_bc_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
-        float e_bc_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
 
         float other_e_bc_x = (other_t->pos.x + other_bc->offset.x) - state->camera.x; // * state->scale,
         float other_e_bc_y = (other_t->pos.y + other_bc->offset.y) - state->camera.y; // * state->scale,

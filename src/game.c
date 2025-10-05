@@ -263,6 +263,7 @@ static void render(void)
     SDL_SetRenderDrawColor(state.renderer, 0x00, 0xff, 0xaa, 0xff);
     SDL_RenderClear(state.renderer);
 
+    // TODO: add a terrain render system
     for (size_t i = 0; i < state.n_terrain_tiles; ++i) {
         Tile tile = state.terrain_tiles[i];
         SDL_RenderTexture(state.renderer,
@@ -279,6 +280,14 @@ static void render(void)
                               .w = tile.size.w,
                               .h = tile.size.h,
                           });
+    }
+
+    // TODO: add a terrain collisions render system
+    for (size_t i = 0; i < state.n_terrain_collisions; ++i) {
+        SDL_SetRenderDrawColor(state.renderer, 0xff, 0x00, 0x00, 0xff);
+        state.terrain_collisions[i].x -= state.camera.x;
+        state.terrain_collisions[i].y -= state.camera.y;
+        SDL_RenderRect(state.renderer, &state.terrain_collisions[i]);
     }
 
     // TODO: split system render and update types so that we don't call them twice?

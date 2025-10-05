@@ -5,6 +5,8 @@
 - [ ] Make gameplay object layer - same as above but with extra behaviour like EnemyAI, Collectible etc.
 - [ ] Make UI layer
 - [x] Static objects i.e. don't have rigid body, can't collide with each other
+- [ ] Tile collisions
+    - [ ] other shapes
 
 # Research
 

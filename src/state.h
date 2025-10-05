@@ -7,6 +7,8 @@
 #include <SDL3/SDL_rect.h>
 #include <tmx.h>
 
+#define MAX_TERRAIN_COLLISIONS 100
+
 struct EntityManager;
 struct SystemManager;
 struct TextureManager;
@@ -26,6 +28,7 @@ typedef struct GameState {
     struct TextureManager* texmgr;
     struct EventBus* eventbus;
     Tile* terrain_tiles;
+    SDL_FRect* terrain_collisions;
 
     // Allocated externally
     // TODO: do I want to store this?
@@ -35,6 +38,7 @@ typedef struct GameState {
 
     SDL_FRect camera;
     u32 n_terrain_tiles;
+    u32 n_terrain_collisions;
     Entity player;
     f32 scale;
     bool is_running;

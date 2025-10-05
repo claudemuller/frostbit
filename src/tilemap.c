@@ -2,14 +2,16 @@
 #include "arena.h"
 #include "texture.h"
 #include "utils/utils.h"
+#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <tmx.h>
 
 static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
-static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* layer);
-static void parse_objects(GameState* state, tmx_object_group* objgr);
+static void parse_tile_layer(GameState* state, tmx_layer* layer);
+static void parse_object_layer(GameState* state, const char* layer_type, tmx_object_group* objgr);
 static SDL_Texture* get_tileset_texture(TextureManager* texmgr, tmx_tile* tile);
 static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_object* obj, tmx_tile* tile);
 
@@ -49,20 +51,37 @@ static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer*
     while (layer) {
         if (layer->visible) {
             switch (layer->type) {
+            case L_LAYER: {
+                if (!state->terrain_tiles) {
+                    size_t n_tiles = state->level->width * state->level->width;
+                    state->terrain_tiles = arena_alloc_aligned(game_mem, sizeof(Tile) * n_tiles, 16);
+                    if (!state->terrain_tiles) {
+                        util_fatal("Ekk! couldn't thing the thing");
+                    }
+                    state->n_terrain_tiles = n_tiles;
+                }
+
+                if (!state->terrain_collisions) {
+                    state->terrain_collisions =
+                        arena_alloc_aligned(game_mem, sizeof(Tile) * MAX_TERRAIN_COLLISIONS, 16);
+                    if (!state->terrain_collisions) {
+                        util_fatal("Ekk! couldn't thing the thing");
+                    }
+                }
+
+                parse_tile_layer(state, layer);
+            } break;
+
             case L_GROUP: {
                 parse_all_layers(game_mem, state, layer->content.group_head);
             } break;
 
             case L_OBJGR: {
-                parse_objects(state, layer->content.objgr);
+                parse_object_layer(state, layer->class_type, layer->content.objgr);
             } break;
 
             case L_IMAGE: {
                 // parse_objects(state, map, layer, layer->content.objgr);
-            } break;
-
-            case L_LAYER: {
-                parse_layer(game_mem, state, layer);
             } break;
 
             case L_NONE: {
@@ -78,16 +97,10 @@ static void parse_all_layers(MemoryArena* game_mem, GameState* state, tmx_layer*
     }
 }
 
-static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* layer)
+static void parse_tile_layer(GameState* state, tmx_layer* layer)
 {
     tmx_map* map = state->level;
     // f32 op = layer->opacity;
-
-    state->terrain_tiles = arena_alloc_aligned(game_mem, sizeof(Tile) * map->width * map->height, 16);
-    if (!state->terrain_tiles) {
-        util_fatal("Ekk! couldn't thing the thing");
-    }
-    state->n_terrain_tiles = map->width * map->height;
 
     for (size_t i = 0; i < map->height; i++) {
         for (size_t j = 0; j < map->width; j++) {
@@ -103,7 +116,9 @@ static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* laye
                     return; // -1;
                 }
 
-                state->terrain_tiles[(i * map->width) + j] = (Tile){
+                size_t idx = (i * map->width) + j;
+
+                state->terrain_tiles[idx] = (Tile){
                     .pos =
                         {
                             .x = j * ts->tile_width,
@@ -113,18 +128,67 @@ static void parse_layer(MemoryArena* game_mem, GameState* state, tmx_layer* laye
                     .src = {.x = map->tiles[gid]->ul_x, .y = map->tiles[gid]->ul_y},
                     .texture = tex,
                 };
+
+                if (tile->collision) {
+                    switch (tile->collision->obj_type) {
+                    case OT_SQUARE: {
+                        // state->terrain_collisions[idx] = (SDL_FRect){
+                        //     .x = tile->collision->x,
+                        //     .y = tile->collision->y,
+                        //     .w = tile->collision->width,
+                        //     .h = tile->collision->height,
+                        // };
+                    } break;
+
+                    case OT_POLYGON: {
+                        util_info("implement: OT_POLYLINE tile collision parsing");
+                    } break;
+
+                    case OT_POLYLINE: {
+                        util_info("implement: OT_POLYLINE tile collision parsing");
+                    } break;
+
+                    case OT_ELLIPSE: {
+                        util_info("implement: OT_ELLIPSE tile collision parsing");
+                    } break;
+
+                    default: {
+                        util_info("Object type unsupported");
+                    } break;
+                    }
+                }
             }
         }
     }
 }
 
-static void parse_objects(GameState* state, tmx_object_group* objgr)
+static void parse_object_layer(GameState* state, const char* layer_type, tmx_object_group* objgr)
 {
     tmx_object* obj = objgr->head;
     tmx_map* map = state->level;
 
     while (obj) {
         if (obj->visible) {
+            if (layer_type && strncmp(layer_type, "collision", strlen("collision")) == 0) {
+                switch (obj->obj_type) {
+                case OT_SQUARE: {
+                    state->terrain_collisions[state->n_terrain_collisions++] = (SDL_FRect){
+                        .x = obj->x,
+                        .y = obj->y,
+                        .w = obj->width,
+                        .h = obj->height,
+                    };
+                } break;
+
+                default:
+                    util_info("Collision object type unsupported");
+                    break;
+                }
+
+                obj = obj->next;
+                continue;
+            }
+
             switch (obj->obj_type) {
             case OT_TILE: {
                 tmx_tile* tile = map->tiles[obj->content.gid];
@@ -145,29 +209,25 @@ static void parse_objects(GameState* state, tmx_object_group* objgr)
 
             } break;
 
-                // case OT_SQUARE: {
-                //     rect.x = head->x;
-                //     rect.y = head->y;
-                //     rect.w = head->width;
-                //     rect.h = head->height;
-                //     SDL_RenderRect(renderer, &rect);
-                // } break;
-                //
-                // case OT_POLYGON: {
-                //     draw_polygon(head->content.shape->points, head->x, head->y, head->content.shape->points_len);
-                // } break;
-                //
-                // case OT_POLYLINE: {
-                //     draw_polyline(head->content.shape->points, head->x, head->y,
-                //     head->content.shape->points_len);
-                // } break;
-                //
-                // case OT_ELLIPSE: {
-                //     /* FIXME: no function in SDL2 */
-                // } break;
+            case OT_SQUARE: {
+                util_info("implement: OT_SQUARE parsing");
+            } break;
 
-            default:
-                break;
+            case OT_POLYGON: {
+                util_info("implement: OT_POLYGON parsing");
+            } break;
+
+            case OT_POLYLINE: {
+                util_info("implement: OT_POLYLINE parsing");
+            } break;
+
+            case OT_ELLIPSE: {
+                util_info("implement: OT_ELLIPSE parsing");
+            } break;
+
+            default: {
+                util_info("Object type unsupported");
+            } break;
             }
         }
 
