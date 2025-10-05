@@ -6,6 +6,7 @@
 - [ ] Make UI layer
 - [x] Static objects i.e. don't have rigid body, can't collide with each other
 - [ ] Tile collisions
+    - [ ] multiple colliders per entity
     - [ ] other shapes
 
 # Research

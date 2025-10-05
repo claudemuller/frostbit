@@ -51,8 +51,10 @@ void* texmgr_load_texture(const char* fname)
         util_error("Failed to create texture: %s", SDL_GetError());
         return NULL;
     }
-    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
     SDL_DestroySurface(surface);
+
+    // SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 
     size_t fnamelen = strlen(fname);
     char* texid = (char*)arena_alloc_aligned(game_mem, fnamelen, 16);

@@ -124,7 +124,7 @@ void sys_update_debug(GameState* state, Entity e, SystemCtx* ctx);
 void sys_render_entities(GameState* state, Entity e, SystemCtx* ctx);
 void sys_render_tilemap(GameState* state, Entity e, SystemCtx* ctx);
 void sys_render_tilemap_collider(GameState* state, Entity e, SystemCtx* ctx);
-void sys_render_render_collider(GameState* state, Entity e, SystemCtx* ctx);
+void sys_render_collider(GameState* state, Entity e, SystemCtx* ctx);
 void sys_render_animation(GameState* state, Entity e, SystemCtx* ctx);
 
 #endif // !SYSTEM_H_

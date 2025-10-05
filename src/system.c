@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 static bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
-static int cmp_id_by_rect_y(const void* a, const void* b);
+static int cmp_ents_by_y(const void* a, const void* b);
 
 // ------------------------------------------------------------------------------------------------
 // Update systems
@@ -319,7 +319,7 @@ void sys_render_entities(GameState* state, Entity _, SystemCtx* ctx)
         ents_to_render[n_ents++] = e;
     }
 
-    qsort(ents_to_render, n_ents, sizeof(Entity), cmp_id_by_rect_y);
+    qsort(ents_to_render, n_ents, sizeof(Entity), cmp_ents_by_y);
 
     for (size_t i = 0; i < n_ents; ++i) {
         Entity e = ents_to_render[i];
@@ -429,9 +429,11 @@ static bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by,
     return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
-static int cmp_id_by_rect_y(const void* a, const void* b)
+static int cmp_ents_by_y(const void* a, const void* b)
 {
     Entity e1 = *(const Entity*)a;
     Entity e2 = *(const Entity*)b;
-    return state.entmgr->transform_comps[e1].pos.y - state.entmgr->transform_comps[e2].pos.y;
+    f32 e1_bottom_y = state.entmgr->transform_comps[e1].pos.y + state.entmgr->sprite_comps[e1].size.y;
+    f32 e2_bottom_y = state.entmgr->transform_comps[e2].pos.y + state.entmgr->sprite_comps[e2].size.y;
+    return e1_bottom_y - e2_bottom_y;
 }

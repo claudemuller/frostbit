@@ -1,5 +1,5 @@
 {
-    "activeFile": "level1.tmx",
+    "activeFile": "tileset.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,6 +13,7 @@
             "scaleInEditor": 1
         },
         "guy.tsx": {
+            "dynamicWrapping": false,
             "scaleInDock": 1,
             "scaleInEditor": 3
         },
@@ -20,13 +21,22 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.5,
-                "y": 280.75
+                "x": 270.5,
+                "y": 267.75
             }
         },
-        "tileset.tsx": {
+        "obstacles.tsx": {
+            "dynamicWrapping": true,
             "scaleInDock": 1,
-            "scaleInEditor": 3
+            "scaleInEditor": 1
+        },
+        "tileset.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "ui.tsx": {
+            "scaleInDock": 1
         }
     },
     "frame.defaultDuration": 10,
@@ -35,13 +45,16 @@
     "openFiles": [
         "level1.tmx",
         "guy.tsx",
-        "tileset.tsx"
+        "tileset.tsx",
+        "obstacles.tsx"
     ],
     "project": "tilemap.tiled-project",
+    "property.type": "int",
     "recentFiles": [
-        "tileset.tsx",
-        "guy.tsx",
         "level1.tmx",
+        "guy.tsx",
+        "obstacles.tsx",
+        "tileset.tsx",
         "guy-jump.tsx",
         "guy-running.tsx"
     ],
@@ -49,5 +62,6 @@
     "tileset.tileSize": {
         "height": 8,
         "width": 8
-    }
+    },
+    "tileset.type": 1
 }

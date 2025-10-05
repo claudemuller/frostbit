@@ -4,6 +4,7 @@
  <tile id="0">
   <objectgroup draworder="index" id="2">
    <object id="1" x="6.75" y="2.5" width="21.625" height="35.75"/>
+   <object id="2" type="zcollider" x="9.5" y="35.375" width="9.75" height="2.75"/>
   </objectgroup>
   <animation>
    <frame tileid="0" duration="200"/>
@@ -16,6 +17,7 @@
  <tile id="6">
   <objectgroup draworder="index" id="2">
    <object id="1" x="4.36364" y="3.45455" width="24" height="35.0909"/>
+   <object id="2" type="ycollider" x="4.25" y="33" width="22.25" height="5.25"/>
   </objectgroup>
   <animation>
    <frame tileid="6" duration="10"/>

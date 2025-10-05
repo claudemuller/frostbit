@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="40" tileheight="40" infinite="0" nextlayerid="7" nextobjectid="53">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="40" tileheight="40" infinite="0" nextlayerid="8" nextobjectid="56">
  <tileset firstgid="1" source="tileset.tsx"/>
  <tileset firstgid="22" source="guy.tsx"/>
  <tileset firstgid="37" source="ui.tsx"/>
+ <tileset firstgid="46" source="obstacles.tsx"/>
  <layer id="1" name="terrain" class="terrain" width="20" height="15">
   <data encoding="csv">
 4,16,16,16,16,16,16,16,5,13,9,9,9,9,4,16,16,16,16,5,
@@ -37,10 +38,6 @@
   <object id="7" name="island" gid="20" x="280.094" y="78.8356" width="40" height="40"/>
   <object id="8" name="island" gid="20" x="299.816" y="397.994" width="40" height="40"/>
   <object id="9" name="island" gid="20" x="20.1003" y="180.401" width="40" height="40"/>
-  <object id="10" name="house" gid="14" x="120.022" y="319.437" width="40" height="40"/>
-  <object id="11" name="house" gid="14" x="239.666" y="158.379" width="40" height="40"/>
-  <object id="12" name="house-roof" gid="7" x="120" y="280" width="40" height="40"/>
-  <object id="13" name="house-roof" gid="7" x="239.545" y="118.364" width="40" height="40"/>
   <object id="14" name="tree" gid="21" x="266" y="293.333" width="40" height="40"/>
   <object id="15" name="tree" gid="21" x="127" y="176.333" width="40" height="40"/>
   <object id="16" name="tree" gid="21" x="63" y="101.333" width="40" height="40"/>
@@ -58,8 +55,10 @@
   <object id="35" gid="21" x="560.667" y="406" width="40" height="40"/>
   <object id="36" gid="6" x="459.333" y="404.667" width="40" height="40"/>
   <object id="37" gid="6" x="498" y="404" width="40" height="40"/>
+  <object id="54" name="house" gid="46" x="245" y="182.5" width="40" height="53"/>
+  <object id="55" gid="46" x="123.5" y="317.5" width="40" height="53"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="24" name="player" type="entity" gid="28" x="91.6667" y="132" width="35" height="39"/>
+  <object id="24" name="player" type="entity" gid="28" x="96.1667" y="138" width="35" height="39"/>
  </objectgroup>
 </map>

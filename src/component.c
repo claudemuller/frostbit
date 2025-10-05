@@ -103,7 +103,7 @@ void mouse_control_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_MOUSE_CONTROL);
 }
 
-void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset)
+void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset, ColliderType type)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 

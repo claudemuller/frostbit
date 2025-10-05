@@ -1,5 +1,6 @@
 #include "tilemap.h"
 #include "arena.h"
+#include "component.h"
 #include "texture.h"
 #include "utils/utils.h"
 #include <SDL3/SDL_rect.h>
@@ -237,12 +238,17 @@ static void parse_object_layer(GameState* state, const char* layer_type, tmx_obj
 
 static SDL_Texture* get_tileset_texture(TextureManager* texmgr, tmx_tile* tile)
 {
-    tmx_tileset* tileset = tile->tileset;
-    if (!tileset) {
-        util_error("no tileset");
-        return NULL;
+    const char* tilesetimg;
+    if (tile->image) {
+        tilesetimg = tile->image->source;
+    } else {
+        tmx_tileset* tileset = tile->tileset;
+        if (!tileset) {
+            util_error("no tileset");
+            return NULL;
+        }
+        tilesetimg = tileset->image->source;
     }
-    const char* tilesetimg = tileset->image->source;
 
     u8 slen = 5 + strlen(tilesetimg);
     char texid[255];
@@ -289,13 +295,24 @@ static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_ob
     }
 
     if (tile->collision) {
-        box_collider_add(entmgr,
-                         ent,
-                         (Vector2){.w = tile->collision->width, .h = tile->collision->height},
-                         (Vector2){
-                             .x = tile->collision->x,
-                             .y = tile->collision->y,
-                         });
+        tmx_object* collider = tile->collision;
+
+        while (collider) {
+            ColliderType type = COLLIDER_TYPE_GENERIC;
+
+            if (collider->type && strncmp(collider->type, "ycollider", strlen("ycollider")) == 0) {
+                type = COLLIDER_TYPE_Z;
+            }
+            box_collider_add(entmgr,
+                             ent,
+                             (Vector2){.w = tile->collision->width, .h = tile->collision->height},
+                             (Vector2){
+                                 .x = tile->collision->x,
+                                 .y = tile->collision->y,
+                             },
+                             type);
+            collider = collider->next;
+        }
     }
 
     if (tile->animation) {

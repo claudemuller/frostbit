@@ -57,7 +57,7 @@ bool game_init(MemoryArena* game_mem)
     sysmgr_register_render_sys(state.sysmgr, SYS_SIG_RENDER, sys_render_entities, NULL);
     sysmgr_register_render_sys(state.sysmgr, SYS_SIG_TILEMAP_RENDER, sys_render_tilemap, NULL);
     sysmgr_register_render_sys(state.sysmgr, SYS_SIG_TILEMAP_RENDER, sys_render_tilemap_collider, NULL);
-    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_RENDER_COLLIDER, sys_render_render_collider, NULL);
+    sysmgr_register_render_sys(state.sysmgr, SYS_SIG_RENDER_COLLIDER, sys_render_collider, NULL);
     sysmgr_register_render_sys(state.sysmgr, SYS_SIG_ANIMATION, sys_render_animation, NULL);
 
     sysmgr_register_update_sys(state.sysmgr, SYS_SIG_APPLY, sys_update_apply, NULL);

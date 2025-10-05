@@ -79,10 +79,16 @@ typedef struct {
     Vector2 right_vel;
 } MouseControlComponent;
 
+typedef enum {
+    COLLIDER_TYPE_GENERIC = 0,
+    COLLIDER_TYPE_Z,
+} ColliderType;
+
 typedef struct {
     Vector2 size;
     Vector2 offset;
     SDL_Color colour;
+    ColliderType type;
 } BoxColliderComponent;
 
 typedef struct {
@@ -110,7 +116,7 @@ void keyboard_control_add(EntityManager* entmgr, Entity e);
 void keyboard_control_remove(EntityManager* entmgr, Entity e);
 void mouse_control_add(EntityManager* entmgr, Entity e, MouseControlComponent m);
 void mouse_control_remove(EntityManager* entmgr, Entity e);
-void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset);
+void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset, ColliderType type);
 void box_collider_remove(EntityManager* entmgr, Entity e);
 void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v, Vector2 np);
 void rigid_body_remove(EntityManager* entmgr, Entity e);
