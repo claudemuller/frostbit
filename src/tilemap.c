@@ -264,7 +264,8 @@ static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_ob
 {
     Entity ent = entity_create(entmgr);
 
-    transform_add(entmgr, ent, (Vector2){.x = obj->x, .y = obj->y - obj->height});
+    Vector2 ent_pos = {.x = obj->x, .y = obj->y - obj->height};
+    transform_add(entmgr, ent, ent_pos);
 
     SDL_Texture* tex = get_tileset_texture(texmgr, tile);
     if (!tex) {
@@ -284,7 +285,7 @@ static Entity parse_entity(EntityManager* entmgr, TextureManager* texmgr, tmx_ob
                false);
 
     if (obj->name && strncmp(obj->name, "player", strlen("player")) == 0) {
-        rigid_body_add(entmgr, ent, (Vector2){0});
+        rigid_body_add(entmgr, ent, (Vector2){0}, ent_pos);
     }
 
     if (tile->collision) {

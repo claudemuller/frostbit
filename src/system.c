@@ -25,6 +25,7 @@ void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
         return;
     }
 
+    // TODO: should I put tihs guard in elsewhere?
     if (ctx->tag != CTX_MOVEMENT) return;
 
     TransformComponent* t = &state->entmgr->transform_comps[e];
@@ -33,18 +34,39 @@ void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 
     if (!t || !rb) return;
 
+    float dt = ctx->movement.dt;
+
     float map_w = (float)(state->level->width * state->level->tile_width * state->scale);
     float map_h = (float)(state->level->height * state->level->tile_height * state->scale);
 
-    f64 dt = ctx->movement.dt;
-
-    t->pos.x += rb->vel.x * dt;
-    t->pos.y += rb->vel.y * dt;
+    // dt get's added in collision system
+    rb->next_pos.x = t->pos.x + (rb->vel.x * dt);
+    rb->next_pos.y = t->pos.y + (rb->vel.y * dt);
 
     if (rb) {
-        t->pos.x = clamp_f(t->pos.x, -bc->offset.w, (map_w / state->scale) - bc->size.w - bc->offset.w);
-        t->pos.y = clamp_f(t->pos.y, -bc->offset.h, (map_h / state->scale) - bc->size.h - bc->offset.h);
+        rb->next_pos.x = clamp_f(rb->next_pos.x, -bc->offset.w, (map_w / state->scale) - bc->size.w - bc->offset.w);
+        rb->next_pos.y = clamp_f(rb->next_pos.y, -bc->offset.h, (map_h / state->scale) - bc->size.h - bc->offset.h);
     }
+}
+
+void physics_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+{
+}
+
+void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx)
+{
+    if (!ENTITY_HAS(state->entmgr->signatures[e], COMP_TRANSFORM) ||
+        !ENTITY_HAS(state->entmgr->signatures[e], COMP_RIGID_BODY)) {
+        return;
+    }
+
+    TransformComponent* t = &state->entmgr->transform_comps[e];
+    RigidBodyComponent* rb = &state->entmgr->rigid_body_comps[e];
+
+    if (!t || !rb) return;
+
+    t->pos.x = rb->next_pos.x;
+    t->pos.y = rb->next_pos.y;
 }
 
 void render_sys_render(GameState* state, Entity e, SystemCtx* ctx)
@@ -247,8 +269,8 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
         return;
     }
 
-    float e_bc_x = (t->pos.x + bc->offset.x) - state->camera.x; // * state->scale,
-    float e_bc_y = (t->pos.y + bc->offset.y) - state->camera.y; // * state->scale,
+    float e_bc_x = (rb->next_pos.x + bc->offset.x) - state->camera.x; // * state->scale,
+    float e_bc_y = (rb->next_pos.y + bc->offset.y) - state->camera.y; // * state->scale,
 
     // TODO: add a terrain collisions render system
     for (size_t i = 0; i < state->n_terrain_collisions; ++i) {
@@ -259,7 +281,10 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
 
         // TODO: need to know what type of collision to do - here it's rect vs rect
         if (check_aabb_collision(e_bc_x, e_bc_y, bc->size.w, bc->size.h, ter_bc_x, ter_bc_y, ter_bc.w, ter_bc.h)) {
-            util_info("collided with terrain");
+            rb->next_pos.x = t->pos.x;
+            rb->next_pos.y = t->pos.y;
+
+            return;
         }
     }
 
@@ -282,25 +307,11 @@ void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx)
                                  other_e_bc_y,
                                  other_bc->size.w,
                                  other_bc->size.h)) {
-            // printf("%d - e.x:%f e.y:%f e.w:%f e.h:%f\n%d - oe.x:%f oe.y:%f oe.w:%f oe.h:%f\n\n",
-            //        e,
-            //        e_bc_x,
-            //        e_bc_y,
-            //        bc->size.w,
-            //        bc->size.h,
-            //        other_e,
-            //        other_e_bc_x,
-            //        other_e_bc_y,
-            //        other_bc->size.w,
-            //        other_bc->size.h);
 
-            // TODO: temp
-            t->pos = t->prev_pos;
+            rb->next_pos.x = t->pos.x;
+            rb->next_pos.y = t->pos.y;
 
             // state->eventbus->emit(state->eventbus, (Event){.type = EVT_DEAD, .entity_id = e});
-        } else {
-            // TODO: temp
-            t->prev_pos = t->pos;
         }
     }
 }

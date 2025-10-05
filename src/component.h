@@ -40,8 +40,6 @@ enum ComponentID {
 
 typedef struct {
     Vector2 pos;
-    // TODO: temp
-    Vector2 prev_pos;
     Vector2 scale;
     f32 rotation;
 } TransformComponent;
@@ -88,6 +86,7 @@ typedef struct {
 
 typedef struct {
     Vector2 vel;
+    Vector2 next_pos;
 } RigidBodyComponent;
 
 typedef struct {
@@ -112,7 +111,7 @@ void mouse_control_add(EntityManager* entmgr, Entity e, MouseControlComponent m)
 void mouse_control_remove(EntityManager* entmgr, Entity e);
 void box_collider_add(EntityManager* entmgr, Entity e, Vector2 size, Vector2 offset);
 void box_collider_remove(EntityManager* entmgr, Entity e);
-void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v);
+void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v, Vector2 np);
 void rigid_body_remove(EntityManager* entmgr, Entity e);
 void tileinfo_add(EntityManager* entmgr, Entity e);
 void tileinfo_remove(EntityManager* entmgr, Entity e);

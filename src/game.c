@@ -48,13 +48,17 @@ bool game_init(MemoryArena* game_mem)
 
     sysmgr_register(state.sysmgr, SYS_SIG_MOVEMENT, movement_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_CAMERA_MOVEMENT, camera_movement_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_RENDER, render_sys_render, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_KEYBOARD_CONTROL, keyboard_control_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_MOUSE_CONTROL, mouse_control_sys_update, NULL);
-    sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_COLLISION, collision_sys_update, NULL);
     sysmgr_register(state.sysmgr, SYS_SIG_DEBUG, debug_sys_update, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_PHYSICS, physics_sys_update, NULL);
+
+    sysmgr_register(state.sysmgr, SYS_SIG_RENDER, render_sys_render, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_RENDER_COLLIDER, render_collider_sys_render, NULL);
+    sysmgr_register(state.sysmgr, SYS_SIG_ANIMATION, animation_sys_render, NULL);
+
+    sysmgr_register(state.sysmgr, SYS_SIG_APPLY, apply_sys_update, NULL);
 
     // --------------------------------------------------------------------------------------------
     // Bootstrap SDL

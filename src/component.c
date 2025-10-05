@@ -11,12 +11,6 @@ void transform_add(EntityManager* entmgr, Entity e, Vector2 pos)
                 .x = pos.x,
                 .y = pos.y,
             },
-        // TODO: temp
-        .prev_pos =
-            {
-                .x = pos.x,
-                .y = pos.y,
-            },
     };
 
     SIGNATURE_SET(entmgr->signatures[e], COMP_TRANSFORM);
@@ -129,12 +123,13 @@ void box_collider_remove(EntityManager* entmgr, Entity e)
     SIGNATURE_CLEAR(entmgr->signatures[e], COMP_BOX_COLLIDER);
 }
 
-void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v)
+void rigid_body_add(EntityManager* entmgr, Entity e, Vector2 v, Vector2 np)
 {
     if (e >= MAX_ENTITIES || !entmgr->live_entities[e]) return;
 
     RigidBodyComponent rb = (RigidBodyComponent){
         .vel = v,
+        .next_pos = {0},
     };
 
     entmgr->rigid_body_comps[e] = rb;

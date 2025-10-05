@@ -52,6 +52,8 @@ typedef struct SystemManager {
 #define SYS_SIG_MOUSE_CONTROL ((1U << COMP_MOUSE_CONTROL))
 #define SYS_SIG_ANIMATION ((1U << COMP_ANIMATION))
 #define SYS_SIG_COLLISION ((1U << COMP_TRANSFORM) | (1U << COMP_BOX_COLLIDER))
+#define SYS_SIG_PHYSICS ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
+#define SYS_SIG_APPLY ((1U << COMP_TRANSFORM) | (1U << COMP_RIGID_BODY))
 #define SYS_SIG_DEBUG ((1U << COMP_TILEINFO))
 
 static inline SystemManager* sysmgr_init(MemoryArena* mem)
@@ -84,15 +86,19 @@ static inline void sysmgr_update_entity(GameState* state, Entity e)
     }
 }
 
-bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
 void movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void camera_movement_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void render_sys_render(GameState* state, Entity e, SystemCtx* ctx);
-void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
 void keyboard_control_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void mouse_control_sys_update(GameState* state, Entity e, SystemCtx* ctx);
-void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx);
 void collision_sys_update(GameState* state, Entity e, SystemCtx* ctx);
+void physics_sys_update(GameState* state, Entity e, SystemCtx* ctx);
+void apply_sys_update(GameState* state, Entity e, SystemCtx* ctx);
 void debug_sys_update(GameState* state, Entity e, SystemCtx* ctx);
+
+void render_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+void render_collider_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+void animation_sys_render(GameState* state, Entity e, SystemCtx* ctx);
+
+bool check_aabb_collision(f64 ax, f64 ay, f64 aw, f64 ah, f64 bx, f64 by, f64 bw, f64 bh);
 
 #endif // !SYSTEM_H_
